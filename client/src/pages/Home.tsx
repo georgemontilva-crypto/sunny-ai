@@ -1,22 +1,28 @@
 import Navbar from "@/components/landing/Navbar";
+import Hero from "@/components/landing/Hero";
+import Categories from "@/components/landing/Categories";
+import HowItWorks from "@/components/landing/HowItWorks";
+import CompoundLibrary from "@/components/landing/CompoundLibrary";
+import B2BWhiteLabel from "@/components/landing/B2BWhiteLabel";
+import FAQ from "@/components/landing/FAQ";
 import Contact from "@/components/landing/Contact";
+import LegalNotice from "@/components/landing/LegalNotice";
 import Footer from "@/components/landing/Footer";
 import SchemaMarkup from "@/components/landing/SchemaMarkup";
 
-// Placeholder hero — Fase 4 replaces this con hero, categorías, cómo funciona,
-// biblioteca de compuestos, B2B/white-label y FAQ.
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SchemaMarkup />
       <Navbar />
-      <section className="pt-40 pb-24 px-4 text-center">
-        <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6 max-w-3xl mx-auto">Sunny</h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Consultora de péptidos con IA. Contenido educativo y de investigación.
-        </p>
-      </section>
+      <Hero />
+      <Categories />
+      <HowItWorks />
+      <CompoundLibrary />
+      <B2BWhiteLabel />
+      <FAQ />
       <Contact />
+      <LegalNotice />
       <Footer />
     </div>
   );

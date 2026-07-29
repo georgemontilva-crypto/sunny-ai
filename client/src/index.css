@@ -48,6 +48,7 @@
   --color-noche: var(--noche);
   --color-dorado: var(--dorado);
   --color-dorado-claro: var(--dorado-claro);
+  --color-dorado-texto: var(--dorado-texto);
 }
 
 :root {
@@ -60,12 +61,14 @@
   --tinta: oklch(0.2275 0.0197 73.54);
   --noche: oklch(0.1759 0.0135 77.72);
 
-  /* Dorado: el claro es SOLO decorativo (gradiente/filo/eyebrow). Para texto
-     usar siempre --dorado (#9C6F1E, ~4:1 sobre arena — reservado a texto
-     grande/negrita: eyebrows, badges, headings, nunca párrafo de cuerpo). */
+  /* Dorado — tres usos, no intercambiables:
+     · --dorado-claro (#E8C572, 1.48:1 sobre arena): SOLO decorativo — gradiente, filo de 1px, eyebrow de fondo. Nunca texto.
+     · --dorado (#9C6F1E, 3.97:1 sobre arena — medido): solo texto GRANDE/negrita (eyebrows, badges, headings ≥18.66px). No pasa AA para párrafo.
+     · --dorado-texto (#755317, 4.87:1 sobre arena-media / 6.21:1 sobre arena / 6.99:1 sobre card blanco — medido, el peor caso de los tres fondos claros de la paleta): el ÚNICO dorado válido para texto de cuerpo. */
   --dorado-inicio: oklch(0.6536 0.1201 78.15); /* #B8862B */
   --dorado-claro: oklch(0.8363 0.1098 87.15); /* #E8C572 — decorativo, nunca texto */
-  --dorado: oklch(0.574 0.1086 77.19); /* #9C6F1E — único dorado válido para texto */
+  --dorado: oklch(0.574 0.1086 77.19); /* #9C6F1E — solo texto grande/negrita */
+  --dorado-texto: oklch(0.4677 0.0866 77.22); /* #755317 — AA (4.5:1+) en texto de cuerpo sobre arena, arena-media o card */
   --dorado-gradiente: linear-gradient(135deg, var(--dorado-inicio), var(--dorado-claro), var(--dorado));
 
   /* ── Mapeo semántico (shadcn) ───────────────────────────────────────── */
