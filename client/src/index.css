@@ -1,9 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@plugin "@tailwindcss/typography";
 
-/* No hay toggle de tema (paleta fija), pero se conserva el variant "dark" para
-   que las clases dark: heredadas de shadcn/ui sigan siendo sintaxis valida. */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -35,67 +32,85 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-
-  --font-sans: "Switzer", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Boska", ui-serif, Georgia, serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-
-  /* Marca Sunny — disponibles como bg-arena, text-dorado, border-noche, etc. */
-  --color-arena: var(--arena);
-  --color-arena-media: var(--arena-media);
-  --color-sol: var(--sol);
-  --color-tinta: var(--tinta);
-  --color-noche: var(--noche);
-  --color-dorado: var(--dorado);
-  --color-dorado-claro: var(--dorado-claro);
-  --color-dorado-texto: var(--dorado-texto);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 :root {
-  --radius: 0.75rem;
-
-  /* ── Paleta Sunny (fija, sin modo oscuro) ──────────────────────────── */
-  --arena: oklch(0.9598 0.016 82.79);
-  --arena-media: oklch(0.8802 0.0352 82.9);
-  --sol: oklch(0.7587 0.153 74.46);
-  --tinta: oklch(0.2275 0.0197 73.54);
-  --noche: oklch(0.1759 0.0135 77.72);
-
-  /* Dorado — tres usos, no intercambiables:
-     · --dorado-claro (#E8C572, 1.48:1 sobre arena): SOLO decorativo — gradiente, filo de 1px, eyebrow de fondo. Nunca texto.
-     · --dorado (#9C6F1E, 3.97:1 sobre arena — medido): solo texto GRANDE/negrita (eyebrows, badges, headings ≥18.66px). No pasa AA para párrafo.
-     · --dorado-texto (#755317, 4.87:1 sobre arena-media / 6.21:1 sobre arena / 6.99:1 sobre card blanco — medido, el peor caso de los tres fondos claros de la paleta): el ÚNICO dorado válido para texto de cuerpo. */
-  --dorado-inicio: oklch(0.6536 0.1201 78.15); /* #B8862B */
-  --dorado-claro: oklch(0.8363 0.1098 87.15); /* #E8C572 — decorativo, nunca texto */
-  --dorado: oklch(0.574 0.1086 77.19); /* #9C6F1E — solo texto grande/negrita */
-  --dorado-texto: oklch(0.4677 0.0866 77.22); /* #755317 — AA (4.5:1+) en texto de cuerpo sobre arena, arena-media o card */
-  --dorado-gradiente: linear-gradient(135deg, var(--dorado-inicio), var(--dorado-claro), var(--dorado));
-
-  /* ── Mapeo semántico (shadcn) ───────────────────────────────────────── */
-  --background: var(--arena);
-  --foreground: var(--tinta);
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-600);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --radius: 0.65rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.235 0.015 65);
   --card: oklch(1 0 0);
-  --card-foreground: var(--tinta);
+  --card-foreground: oklch(0.235 0.015 65);
   --popover: oklch(1 0 0);
-  --popover-foreground: var(--tinta);
-  --primary: var(--sol);
-  --primary-foreground: var(--tinta);
-  --secondary: var(--arena-media);
-  --secondary-foreground: var(--tinta);
-  --muted: var(--arena-media);
-  --muted-foreground: oklch(0.4317 0.04 79.74); /* #5C4E37 — AA sobre arena y arena-media */
-  --accent: var(--arena-media);
-  --accent-foreground: var(--tinta);
-  --destructive: oklch(0.5209 0.1579 29.21); /* #B23A2E */
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.8534 0.0516 89.77); /* #DCCEA9 */
-  --input: oklch(0.8534 0.0516 89.77);
-  --ring: var(--sol);
-  --chart-1: var(--sol);
-  --chart-2: var(--dorado-inicio);
-  --chart-3: var(--dorado);
-  --chart-4: var(--dorado-claro);
-  --chart-5: var(--tinta);
+  --popover-foreground: oklch(0.235 0.015 65);
+  --secondary: oklch(0.98 0.001 286.375);
+  --secondary-foreground: oklch(0.4 0.015 65);
+  --muted: oklch(0.967 0.001 286.375);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.141 0.005 285.823);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.92 0.004 286.32);
+  --input: oklch(0.92 0.004 286.32);
+  --ring: oklch(0.623 0.214 259.815);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.235 0.015 65);
+  --sidebar-accent: oklch(0.967 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-ring: oklch(0.623 0.214 259.815);
+}
+
+.dark {
+  --primary: var(--color-blue-700);
+  --primary-foreground: var(--color-blue-50);
+  --sidebar-primary: var(--color-blue-500);
+  --sidebar-primary-foreground: var(--color-blue-50);
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.85 0.005 65);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.85 0.005 65);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.85 0.005 65);
+  --secondary: oklch(0.24 0.006 286.033);
+  --secondary-foreground: oklch(0.7 0.005 65);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground:  oklch(0.92 0.005 65);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.488 0.243 264.376);
+  --chart-1: var(--color-blue-300);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-blue-600);
+  --chart-4: var(--color-blue-700);
+  --chart-5: var(--color-blue-800);
+  --sidebar: oklch(0.21 0.006 285.885);
+  --sidebar-foreground: oklch(0.85 0.005 65);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.488 0.243 264.376);
 }
 
 @layer base {
@@ -104,128 +119,59 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
-  h1, h2, h3, h4 {
-    font-family: var(--font-display);
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
   }
+}
+
+@layer components {
+  /**
+   * Custom container utility that centers content and adds responsive padding.
+   *
+   * This overrides Tailwind's default container behavior to:
+   * - Auto-center content (mx-auto)
+   * - Add responsive horizontal padding
+   * - Set max-width for large screens
+   *
+   * Usage: <div className="container">...</div>
+   *
+   * For custom widths, use max-w-* utilities directly:
+   * <div className="max-w-6xl mx-auto px-4">...</div>
+   */
   .container {
-    @apply mx-auto px-4 sm:px-6 lg:px-8;
-    max-width: 1280px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem; /* 16px - mobile padding */
+    padding-right: 1rem;
   }
+
   .flex {
-    min-width: 0;
     min-height: 0;
-  }
-}
-
-@layer utilities {
-  .glass-card {
-    background: var(--card);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-  }
-  .hero-bg {
-    background: radial-gradient(ellipse 80% 60% at 50% -10%, oklch(0.7587 0.153 74.46 / 0.14), transparent),
-                radial-gradient(ellipse 60% 40% at 80% 50%, oklch(0.6536 0.1201 78.15 / 0.1), transparent),
-                var(--background);
-  }
-  .section-bg-alt {
-    background: var(--muted);
-  }
-  .noise-bg {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    min-width: 0;
   }
 
-  /* Elemento firma: filo dorado de 1px — nunca relleno de área grande */
-  .dorado-filo {
-    border: 1px solid transparent;
-    background-image: linear-gradient(var(--card), var(--card)), var(--dorado-gradiente);
-    background-origin: border-box;
-    background-clip: padding-box, border-box;
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-right: 1.5rem;
+    }
   }
-  /* Elemento firma: texto con gradiente dorado (solo titulares/acentos puntuales) */
-  .dorado-texto-gradiente {
-    background: var(--dorado-gradiente);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem; /* 32px - desktop padding */
+      padding-right: 2rem;
+      max-width: 1280px; /* Standard content width */
+    }
   }
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
-}
-
-/* Selection */
-::selection {
-  background: oklch(0.7587 0.153 74.46 / 0.3);
-  color: var(--tinta);
-}
-
-/* Smooth scroll + prevent horizontal overflow + disable pull-to-refresh on mobile */
-html {
-  scroll-behavior: smooth;
-  overscroll-behavior-y: none;
-  touch-action: pan-y;
-}
-body {
-  overflow-x: clip;
-  overscroll-behavior-y: none;
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
-}
-
-/* Animation keyframes */
-@keyframes navSlideDown {
-  from { transform: translateY(-80px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px oklch(0.7587 0.153 74.46 / 0.2); }
-  50% { box-shadow: 0 0 40px oklch(0.7587 0.153 74.46 / 0.45); }
-}
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-.animate-pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-.animate-gradient {
-  background-size: 200% 200%;
-  animation: gradient-shift 4s ease infinite;
-}
-.animate-shimmer {
-  background: linear-gradient(90deg, transparent 0%, oklch(0.7587 0.153 74.46 / 0.12) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 2s infinite;
 }

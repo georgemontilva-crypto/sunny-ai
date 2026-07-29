@@ -1,29 +1,25 @@
-import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import Categories from "@/components/landing/Categories";
-import HowItWorks from "@/components/landing/HowItWorks";
-import CompoundLibrary from "@/components/landing/CompoundLibrary";
-import B2BWhiteLabel from "@/components/landing/B2BWhiteLabel";
-import FAQ from "@/components/landing/FAQ";
-import Contact from "@/components/landing/Contact";
-import LegalNotice from "@/components/landing/LegalNotice";
-import Footer from "@/components/landing/Footer";
-import SchemaMarkup from "@/components/landing/SchemaMarkup";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { Streamdown } from 'streamdown';
 
+/**
+ * All content in this page are only for example, replace with your own feature implementation
+ * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
+ */
 export default function Home() {
+  // If theme is switchable in App.tsx, we can implement theme toggling like this:
+  // const { theme, toggleTheme } = useTheme();
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SchemaMarkup />
-      <Navbar />
-      <Hero />
-      <Categories />
-      <HowItWorks />
-      <CompoundLibrary />
-      <B2BWhiteLabel />
-      <FAQ />
-      <Contact />
-      <LegalNotice />
-      <Footer />
+    <div className="min-h-screen flex flex-col">
+      <main>
+        {/* Example: lucide-react for icons */}
+        <Loader2 className="animate-spin" />
+        Example Page
+        {/* Example: Streamdown for markdown rendering */}
+        <Streamdown>Any **markdown** content</Streamdown>
+        <Button variant="default">Example Button</Button>
+      </main>
     </div>
   );
 }
