@@ -59,10 +59,11 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           <Link href="/">
             <motion.span
-              className="flex items-center gap-2 cursor-pointer font-bold text-lg tracking-tight"
+              className="flex items-center gap-2 cursor-pointer font-display font-bold text-lg tracking-tight"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
+              <img src="/favicon.svg" alt="" width={28} height={28} className="shrink-0" />
               Sunny
             </motion.span>
           </Link>

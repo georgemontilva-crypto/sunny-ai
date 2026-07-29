@@ -5,6 +5,7 @@ import { getMetaForPath, canonicalUrl, type HeadMeta } from "./lib/seo";
 
 export type { HeadMeta };
 export { getAllPosts } from "./lib/blog";
+export { SITE } from "@shared/site";
 
 export interface RenderResult {
   html: string;

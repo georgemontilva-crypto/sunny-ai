@@ -39,5 +39,6 @@ export function useSeoMeta() {
     setMeta("twitter:description", meta.description);
     setCanonical(canonicalUrl(meta.canonicalPath));
     setMeta("og:url", canonicalUrl(meta.canonicalPath), true);
+    setMeta("robots", meta.noindex ? "noindex, nofollow" : "index, follow");
   }, [location]);
 }

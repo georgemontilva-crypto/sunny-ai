@@ -5,10 +5,10 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F7F1E6",
-  "theme_color": "#F7F1E6",
+  "theme_color": "oklch(0.1759 0.0135 77.72)",
   "lang": "es",
   "orientation": "portrait-primary",
-  "categories": ["business", "productivity"],
+  "categories": ["education", "medical"],
   "icons": [
     {
       "src": "/icon-192x192.png",

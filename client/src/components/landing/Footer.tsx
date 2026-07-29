@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { SITE } from "@shared/site";
 
 export default function Footer() {
   return (
@@ -6,7 +7,10 @@ export default function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-2 md:col-span-1">
-            <p className="font-bold text-lg tracking-tight mb-4">Sunny</p>
+            <p className="flex items-center gap-2 font-display font-bold text-lg tracking-tight mb-4">
+              <img src="/favicon.svg" alt="" width={22} height={22} className="shrink-0" />
+              Sunny
+            </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
               Consultora de péptidos con IA. Contenido educativo y de investigación.
             </p>
@@ -24,6 +28,11 @@ export default function Footer() {
                 <Link href="/contact" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   Contacto
                 </Link>
+              </li>
+              <li>
+                <a href={`mailto:${SITE.contactEmail}`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                  {SITE.contactEmail}
+                </a>
               </li>
             </ul>
           </div>
