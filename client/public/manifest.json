@@ -1,12 +1,12 @@
 {
-  "name": "Lynx AI — Smart Chatbot",
-  "short_name": "Lynx AI",
-  "description": "AI-powered chatbot that scans your website and assists your visitors 24/7",
+  "name": "Sunny — Consultora de péptidos con IA",
+  "short_name": "Sunny",
+  "description": "Contenido educativo y de investigación sobre péptidos.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0f14",
-  "theme_color": "#0d0f14",
-  "lang": "en",
+  "background_color": "#F7F1E6",
+  "theme_color": "#F7F1E6",
+  "lang": "es",
   "orientation": "portrait-primary",
   "categories": ["business", "productivity"],
   "icons": [

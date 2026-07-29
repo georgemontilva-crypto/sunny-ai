@@ -76,8 +76,6 @@
   --sidebar-accent-foreground: oklch(0.20 0.02 240);
   --sidebar-border: oklch(0.88 0.01 240);
   --sidebar-ring: oklch(0.55 0.20 240);
-  --lynx-gradient: linear-gradient(135deg, oklch(0.45 0.22 260), oklch(0.55 0.18 240), oklch(0.62 0.16 200));
-  --lynx-glow: 0 0 40px oklch(0.55 0.20 240 / 0.25);
 }
 
 /* Dark mode: applies when .dark IS on <html> */
@@ -113,8 +111,6 @@
   --sidebar-accent-foreground: oklch(0.88 0.01 240);
   --sidebar-border: oklch(0.20 0.02 240);
   --sidebar-ring: oklch(0.65 0.18 240);
-  --lynx-gradient: linear-gradient(135deg, oklch(0.55 0.22 260), oklch(0.65 0.18 240), oklch(0.72 0.16 200));
-  --lynx-glow: 0 0 40px oklch(0.65 0.18 240 / 0.3);
 }
 
 @layer base {
@@ -137,26 +133,7 @@
   }
 }
 
-/* Lynx AI Custom Utilities */
 @layer utilities {
-  .lynx-gradient {
-    background: var(--lynx-gradient);
-  }
-  .lynx-glow {
-    box-shadow: var(--lynx-glow);
-  }
-  .lynx-text-gradient {
-    background: linear-gradient(135deg, oklch(0.45 0.22 260), oklch(0.55 0.20 240), oklch(0.50 0.22 210));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .dark .lynx-text-gradient {
-    background: linear-gradient(135deg, oklch(0.75 0.18 240), oklch(0.80 0.16 200), oklch(0.72 0.20 270));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
   .glass-card {
     background: var(--card);
     backdrop-filter: blur(20px);
