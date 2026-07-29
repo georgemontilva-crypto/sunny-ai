@@ -4,7 +4,7 @@
 export const SITE = {
   name: "Sunny",
   // TODO: reemplazar por el dominio definitivo cuando se confirme (hoy vive en un dominio temporal de Railway).
-  domain: "https://sunny.up.railway.app",
+  domain: "https://sunny-ai-production.up.railway.app",
   description:
     "Sunny es una consultora de péptidos con IA: información educativa y de investigación sobre compuestos, sin diagnosticar ni prescribir.",
   ogImage: "/og-image.png",
