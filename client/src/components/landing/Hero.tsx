@@ -1,19 +1,25 @@
 import { motion } from "framer-motion";
-import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 export default function Hero() {
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
-    <section className="hero-bg pt-40 pb-28 px-4 text-center">
+    <section className="hero-gradient pt-40 pb-28 px-4 text-center min-h-screen flex flex-col items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-medium text-dorado-texto mb-6"
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-medium text-muted-foreground mb-6"
       >
         <Sparkles className="w-3.5 h-3.5" />
-        Investigación en péptidos, asistida por IA
+        AI-powered peptide research
       </motion.div>
 
       <motion.h1
@@ -22,8 +28,10 @@ export default function Hero() {
         transition={{ duration: 0.7, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
         className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl mx-auto leading-[1.05]"
       >
-        Claridad, no ruido, sobre{" "}
-        <span className="dorado-texto-gradiente">investigación en péptidos</span>
+        Clarity on{" "}
+        <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
+          peptide research
+        </span>
       </motion.h1>
 
       <motion.p
@@ -32,8 +40,7 @@ export default function Hero() {
         transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
       >
-        Sunny organiza la literatura científica disponible sobre péptidos y te la explica en lenguaje
-        claro. Sin humo, sin promesas — investigación, no prescripción.
+        Sunny organizes scientific literature on peptides and explains it in clear language. Research-backed, judgment-free, and always educational.
       </motion.p>
 
       <motion.div
@@ -42,19 +49,17 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
         className="flex flex-col sm:flex-row items-center justify-center gap-4"
       >
-        <Link href="/contact">
-          <Button size="lg" className="text-base font-semibold px-8 h-12">
-            Habla con Sunny
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </Link>
+        <Button size="lg" className="text-base font-semibold px-8 h-12">
+          Start Exploring
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Button>
         <Button
           size="lg"
           variant="outline"
           className="text-base font-medium px-8 h-12"
-          onClick={() => document.getElementById("biblioteca")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => scrollToSection("compounds")}
         >
-          Ver biblioteca de compuestos
+          Browse Compounds
         </Button>
       </motion.div>
 
@@ -64,8 +69,9 @@ export default function Hero() {
         transition={{ duration: 0.6, delay: 0.5 }}
         className="text-xs text-muted-foreground mt-8"
       >
-        Contenido educativo y de investigación. No es consejo médico. Mayores de 21 años.
+        Educational research content. Not medical advice. For adults 21+.
       </motion.p>
     </section>
   );
 }
+

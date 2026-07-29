@@ -1,25 +1,27 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { MessageSquare, SearchCheck, FileText } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const steps = [
   {
-    icon: MessageSquare,
-    title: "Cuéntanos tu objetivo de investigación",
-    description:
-      "Nos escribes qué te interesa investigar — recuperación, longevidad, metabolismo, rendimiento — y por qué.",
+    number: "01",
+    title: "Tell us your goals",
+    description: "Share what you're optimizing for — recovery, performance, longevity, or metabolic health.",
   },
   {
-    icon: SearchCheck,
-    title: "Revisamos la literatura disponible",
-    description:
-      "Con ayuda de IA, buscamos y organizamos estudios publicados relevantes para ese objetivo: qué existe, en qué modelos y con qué nivel de evidencia.",
+    number: "02",
+    title: "Smart research analysis",
+    description: "We review published literature and map the most relevant peptide research to your goals.",
   },
   {
-    icon: FileText,
-    title: "Recibes un resumen educativo, no una receta",
-    description:
-      "Te devolvemos un panorama claro de lo que la evidencia dice y no dice. Nunca dosis, protocolos ni indicaciones de uso — eso es trabajo de un profesional de la salud.",
+    number: "03",
+    title: "Get clear guidance",
+    description: "Receive research-backed recommendations with citations and educational context.",
+  },
+  {
+    number: "04",
+    title: "Explore at your pace",
+    description: "Browse our compound library and dive deeper into the science whenever you're ready.",
   },
 ];
 
@@ -28,38 +30,39 @@ export default function HowItWorks() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="como-funciona" className="py-24 px-4" ref={ref}>
+    <section id="how-it-works" className="py-24 px-4 bg-background" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Cómo funciona</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            Four steps to clarity
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Tres pasos, siempre educativos. En ningún momento diagnosticamos, prescribimos ni
-            recomendamos un uso específico.
+            From your first question to research-backed guidance, we make peptide science accessible.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {steps.map((step, i) => (
             <motion.div
-              key={step.title}
+              key={step.number}
               initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.12, duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-              className="relative rounded-2xl bg-card border border-border p-8"
+              transition={{ delay: i * 0.1, duration: 0.5 }}
             >
-              <span className="absolute -top-4 -left-2 font-display text-5xl font-bold text-primary/20">
-                {i + 1}
-              </span>
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                <step.icon className="w-5 h-5 text-dorado-texto" />
-              </div>
-              <h3 className="font-semibold text-lg mb-3">{step.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+              <Card className="p-8 h-full">
+                <div className="flex items-start gap-4">
+                  <div className="text-4xl font-bold text-accent/30">{step.number}</div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
+                    <p className="text-muted-foreground">{step.description}</p>
+                  </div>
+                </div>
+              </Card>
             </motion.div>
           ))}
         </div>
@@ -67,3 +70,4 @@ export default function HowItWorks() {
     </section>
   );
 }
+
