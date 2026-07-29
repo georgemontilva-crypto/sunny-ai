@@ -1,45 +1,20 @@
 import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import HowItWorks from "@/components/landing/HowItWorks";
-import Features from "@/components/landing/Features";
-import Comparison from "@/components/landing/Comparison";
-import WhiteLabel from "@/components/landing/WhiteLabel";
-import Pricing from "@/components/landing/Pricing";
+import Contact from "@/components/landing/Contact";
 import Footer from "@/components/landing/Footer";
-import SchemaMarkup from "@/components/landing/SchemaMarkup";
-import { useEffect } from "react";
-import { useLocation } from "wouter";
-import { trpc } from "@/lib/trpc";
 
+// Placeholder hero — Fase 4 replaces this with hero, categorías, cómo funciona,
+// biblioteca de compuestos, B2B/white-label y FAQ.
 export default function Home() {
-  const [, navigate] = useLocation();
-  // Use initialData: null so the query starts as "success" (not loading),
-  // which means the landing renders immediately. If the user IS logged in,
-  // the query will update and the useEffect will redirect them to the dashboard.
-  const meQuery = trpc.auth.me.useQuery(undefined, {
-    retry: false,
-    refetchOnWindowFocus: false,
-    initialData: null as any,
-  });
-
-  useEffect(() => {
-    if (meQuery.data) {
-      // Restore last visited dashboard route, or fall back to /dashboard
-      const lastRoute = localStorage.getItem("lynx-last-route");
-      navigate(lastRoute && lastRoute.startsWith("/dashboard") ? lastRoute : "/dashboard");
-    }
-  }, [meQuery.data, navigate]);
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SchemaMarkup />
       <Navbar />
-      <Hero />
-      <HowItWorks />
-      <Features />
-      <Comparison />
-      <WhiteLabel />
-      <Pricing />
+      <section className="pt-40 pb-24 px-4 text-center">
+        <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6 max-w-3xl mx-auto">Sunny</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Consultora de péptidos con IA. Contenido educativo y de investigación.
+        </p>
+      </section>
+      <Contact />
       <Footer />
     </div>
   );

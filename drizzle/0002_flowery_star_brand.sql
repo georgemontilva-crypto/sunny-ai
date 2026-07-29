@@ -1,1 +1,0 @@
-ALTER TABLE `chatbots` MODIFY COLUMN `welcomeMessage` text DEFAULT ('Hola! Como puedo ayudarte hoy?');

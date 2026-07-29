@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/contexts/ThemeContext";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 // Helper: navigate to a hash section — works from any page
 function useAnchorNav() {
@@ -11,16 +10,12 @@ function useAnchorNav() {
   return (href: string, closeMobile?: () => void) => {
     if (closeMobile) closeMobile();
     if (href.startsWith("#")) {
-      // If already on home, just scroll
       if (window.location.pathname === "/") {
-        const el = document.getElementById(href.slice(1));
-        if (el) el.scrollIntoView({ behavior: "smooth" });
+        document.getElementById(href.slice(1))?.scrollIntoView({ behavior: "smooth" });
       } else {
-        // Navigate to home then scroll after mount
         navigate("/");
         setTimeout(() => {
-          const el = document.getElementById(href.slice(1));
-          if (el) el.scrollIntoView({ behavior: "smooth" });
+          document.getElementById(href.slice(1))?.scrollIntoView({ behavior: "smooth" });
         }, 400);
       }
     } else {
@@ -32,18 +27,16 @@ function useAnchorNav() {
 type NavLink = { label: string; href: string };
 
 const navLinks: NavLink[] = [
-  { label: "Features", href: "#features" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "White-Label", href: "#whitelabel" },
+  { label: "Cómo funciona", href: "#como-funciona" },
+  { label: "Compuestos", href: "#biblioteca" },
+  { label: "White-Label", href: "#white-label" },
   { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contacto", href: "/contact" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, toggleTheme } = useTheme();
   const goTo = useAnchorNav();
 
   useEffect(() => {
@@ -61,26 +54,19 @@ export default function Navbar() {
           ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-black/10"
           : "bg-transparent"
       }`}
-      style={{ animation: "navSlideDown 0.6s cubic-bezier(0.23,1,0.32,1) both" }}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link href="/">
-            <motion.div
-              className="flex items-center cursor-pointer"
+            <motion.span
+              className="flex items-center gap-2 cursor-pointer font-bold text-lg tracking-tight"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <img
-                src={theme === "dark" ? "/manus-storage/lynx-logo-dark_062479cc.png" : "/manus-storage/lynx-logo-light_445bc1c1.png"}
-                alt="Lynx AI"
-                className="h-9 w-auto object-contain"
-              />
-            </motion.div>
+              Sunny
+            </motion.span>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) =>
               link.href.startsWith("/") ? (
@@ -103,37 +89,15 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all duration-200"
-            >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            <Link href="/login">
-              <Button variant="ghost" size="sm" className="text-sm">
-                Sign in
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button
-                size="sm"
-                className="lynx-gradient text-white border-0 shadow-lg hover:opacity-90 transition-opacity text-sm font-medium"
-              >
-                Get started free
+            <Link href="/contact">
+              <Button size="sm" className="text-sm font-medium">
+                Hablar con Sunny
               </Button>
             </Link>
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground"
-            >
-              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/50"
@@ -144,7 +108,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -175,19 +138,9 @@ export default function Navbar() {
                   </button>
                 )
               )}
-              <div className="pt-3 flex flex-col gap-2">
-                <Link href="/login" onClick={closeMobile}>
-                  <Button variant="ghost" size="sm" className="w-full justify-center">
-                    Sign in
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={closeMobile}>
-                  <Button
-                    size="sm"
-                    className="w-full lynx-gradient text-white border-0"
-                  >
-                    Get started free
-                  </Button>
+              <div className="pt-3">
+                <Link href="/contact" onClick={closeMobile}>
+                  <Button size="sm" className="w-full">Hablar con Sunny</Button>
                 </Link>
               </div>
             </div>

@@ -1,1 +1,0 @@
-ALTER TABLE `chatbots` ADD `isClientChatbot` boolean DEFAULT false NOT NULL;

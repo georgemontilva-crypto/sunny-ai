@@ -1,1 +1,0 @@
-ALTER TABLE `users` MODIFY COLUMN `plan` enum('free','cloud','embedded','whitelabel') NOT NULL DEFAULT 'free';
