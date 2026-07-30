@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Code2, Palette, ShieldCheck } from "lucide-react";
+import { Code2, Palette } from "lucide-react";
 
 const embedCapabilities = [
   "Embeddable widget to bring the compound library into your site or app.",
@@ -15,12 +15,10 @@ const whiteLabelCapabilities = [
   "Built for clinics, supplement brands, and wellness platforms.",
 ];
 
-// Explicit placeholders — no real numbers yet. Not filled with estimates or
-// reference figures; swapped in once we have our own metrics.
-const stats = [
-  { label: "API response time", value: "[METRIC PENDING]" },
-  { label: "Clinics & brands integrated", value: "[METRIC PENDING]" },
-  { label: "Queries processed", value: "[METRIC PENDING]" },
+const partnerBenefits = [
+  { title: "Trained on your catalog", subtext: "Indexed from your own product data" },
+  { title: "Your brand, your domain", subtext: "Fully white-labeled" },
+  { title: "Guardrails built in", subtext: "No dosing, no protocols, no diagnosis" },
 ];
 
 export default function B2BWhiteLabel() {
@@ -95,15 +93,12 @@ export default function B2BWhiteLabel() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Card className="p-8 bg-secondary/40">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-6">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Sunny's own figures, pending publication — not third-party estimates.
-            </div>
+            <div className="text-xs text-muted-foreground mb-6">What partners get</div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <p className="text-2xl font-bold text-muted-foreground mb-1">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+              {partnerBenefits.map((benefit) => (
+                <div key={benefit.title}>
+                  <p className="text-2xl font-bold text-accent mb-1">{benefit.title}</p>
+                  <p className="text-xs text-muted-foreground">{benefit.subtext}</p>
                 </div>
               ))}
             </div>
