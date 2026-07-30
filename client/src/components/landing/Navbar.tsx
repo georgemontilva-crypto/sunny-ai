@@ -46,7 +46,7 @@ export default function Navbar() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <img src="/logo.png" alt="Sunny" className="h-12 w-auto max-w-xs" />
+              <img src="/logo.png" alt="Sunny" className="h-12 w-auto max-w-xs" loading="lazy" />
             </motion.div>
           </Link>
 

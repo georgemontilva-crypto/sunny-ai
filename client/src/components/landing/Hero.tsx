@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Brain } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import ParticleBackground from "./ParticleBackground";
 
 export default function Hero() {
@@ -91,16 +91,23 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="relative h-96 lg:h-full min-h-96"
           >
-            {/* HERO BANNER IMAGE PLACEHOLDER - 1200x600px */}
-            <div className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-full rounded-2xl flex items-center justify-center text-gray-600 shadow-2xl overflow-hidden">
+            <div className="w-full h-full rounded-2xl shadow-2xl overflow-hidden">
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="text-center"
+                className="w-full h-full"
               >
-                <Brain className="w-24 h-24 mx-auto mb-4 opacity-60" />
-                <div className="font-bold text-lg">1200 × 600px</div>
-                <div className="text-sm mt-2">Hero Banner Image</div>
+                <img
+                  src="/hero-sunny.webp"
+                  srcSet="/hero-sunny.webp 1200w, /hero-sunny@2x.webp 2400w"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  width={1200}
+                  height={600}
+                  fetchPriority="high"
+                  decoding="async"
+                  alt="Sunny, the AI peptide research assistant"
+                  className="w-full h-full object-cover rounded-2xl shadow-2xl"
+                />
               </motion.div>
             </div>
           </motion.div>
