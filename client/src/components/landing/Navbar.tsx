@@ -46,10 +46,7 @@ export default function Navbar() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-                <span className="text-white font-bold text-sm">S</span>
-              </div>
-              <span className="font-bold text-lg tracking-tight">Sunny</span>
+              <img src="/logo.png" alt="Sunny" className="h-12 w-auto max-w-xs" />
             </motion.div>
           </Link>
 
@@ -111,4 +108,3 @@ export default function Navbar() {
     </nav>
   );
 }
-
