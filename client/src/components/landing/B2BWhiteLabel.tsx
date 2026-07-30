@@ -1,7 +1,7 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Code2, Palette } from "lucide-react";
+import { Boxes, Code2, Palette, ShieldCheck } from "lucide-react";
 
 const embedCapabilities = [
   "Embeddable widget to bring the compound library into your site or app.",
@@ -16,14 +16,15 @@ const whiteLabelCapabilities = [
 ];
 
 const partnerBenefits = [
-  { title: "Trained on your catalog", subtext: "Indexed from your own product data" },
-  { title: "Your brand, your domain", subtext: "Fully white-labeled" },
-  { title: "Guardrails built in", subtext: "No dosing, no protocols, no diagnosis" },
+  { icon: Boxes, title: "Trained on your catalog", subtext: "Indexed from your own product data" },
+  { icon: Palette, title: "Your brand, your domain", subtext: "Fully white-labeled" },
+  { icon: ShieldCheck, title: "Guardrails built in", subtext: "No dosing, no protocols, no diagnosis" },
 ];
 
 export default function B2BWhiteLabel() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section id="white-label" className="py-24 px-4 bg-secondary/20" ref={ref}>
@@ -93,13 +94,39 @@ export default function B2BWhiteLabel() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <Card className="p-8 bg-secondary/40">
-            <div className="text-xs text-muted-foreground mb-6">What partners get</div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-              {partnerBenefits.map((benefit) => (
-                <div key={benefit.title}>
+            <div className="text-xs text-muted-foreground mb-6 text-center">What partners get</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {partnerBenefits.map((benefit, i) => (
+                <motion.div
+                  key={benefit.title}
+                  initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.9 }}
+                  animate={shouldReduceMotion || isInView ? { opacity: 1, scale: 1 } : {}}
+                  transition={
+                    shouldReduceMotion
+                      ? { duration: 0 }
+                      : { duration: 0.5, delay: i * 0.12, ease: "easeOut" }
+                  }
+                  className="group flex flex-col items-center text-center"
+                >
+                  <motion.div
+                    animate={shouldReduceMotion ? {} : { y: [0, -4, 0] }}
+                    transition={
+                      shouldReduceMotion
+                        ? {}
+                        : { duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }
+                    }
+                    className="mb-4"
+                  >
+                    <div className="w-[72px] h-[72px] rounded-full bg-accent/10 border border-accent/25 flex items-center justify-center transition-colors duration-200 group-hover:bg-accent/20">
+                      <benefit.icon
+                        className="w-10 h-10 text-accent transition-transform duration-200 group-hover:scale-[1.08]"
+                        strokeWidth={1.5}
+                      />
+                    </div>
+                  </motion.div>
                   <p className="text-2xl font-bold text-accent mb-1">{benefit.title}</p>
                   <p className="text-xs text-muted-foreground">{benefit.subtext}</p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </Card>
