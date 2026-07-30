@@ -5,19 +5,19 @@ import { useInView } from "framer-motion";
 const chatMessages = [
   {
     type: "user",
-    text: "I keep waking up at 3am exhausted. What peptide could help me sleep?",
+    text: "How do you decide what research to show me?",
   },
   {
     type: "assistant",
-    text: "Based on your sleep pattern, I'd research BPC-157 for its role in sleep quality and recovery. Let me analyze the latest studies...",
+    text: "I start from your goal, then map it to the peer-reviewed literature — what's been studied, in which models, and where the evidence runs out.",
   },
   {
     type: "user",
-    text: "What about recovery from my shoulder injury?",
+    text: "So can you tell me what to take?",
   },
   {
     type: "assistant",
-    text: "TB-500 shows promise in literature for tissue repair. I'm mapping this to your specific recovery goals now.",
+    text: "No. I don't diagnose, prescribe, or recommend protocols. I organize published research so you can bring it to a licensed clinician.",
   },
 ];
 
@@ -50,7 +50,6 @@ export default function ChatDemo() {
         >
           <div className="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-b border-border">
             <h3 className="font-semibold text-sm">Sunny AI Research Assistant</h3>
-            <p className="text-xs text-muted-foreground">Online</p>
           </div>
 
           <div className="h-96 overflow-y-auto p-6 space-y-4 bg-background">
@@ -80,15 +79,20 @@ export default function ChatDemo() {
               <input
                 type="text"
                 placeholder="Ask Sunny about peptides..."
-                className="flex-1 px-4 py-2 bg-background border border-border rounded-lg text-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
+                className="flex-1 px-4 py-2 bg-background border border-border rounded-lg text-sm placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled
               />
-              <button className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors">
+              <button
+                className="px-4 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-accent"
+                disabled
+              >
                 Send
               </button>
             </div>
           </div>
         </motion.div>
+
+        <p className="text-center text-xs text-muted-foreground mt-4">Illustrative example</p>
       </div>
     </section>
   );
