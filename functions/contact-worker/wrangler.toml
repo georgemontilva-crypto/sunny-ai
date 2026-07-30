@@ -1,0 +1,12 @@
+name = "sunny-contact-form"
+main = "src/index.ts"
+compatibility_date = "2026-07-29"
+
+[vars]
+# Must be a verified sender on your Resend domain — update once the real
+# domain/inbox is confirmed.
+CONTACT_TO_EMAIL = "hola@sunnypeptides.com"
+CONTACT_FROM_EMAIL = "Sunny <noreply@sunnypeptides.com>"
+
+# RESEND_API_KEY is a secret, not a var — set it with:
+#   wrangler secret put RESEND_API_KEY
