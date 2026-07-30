@@ -2,6 +2,7 @@ import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Questions from "@/components/landing/Questions";
 import HowItWorks from "@/components/landing/HowItWorks";
+import MeetSunny from "@/components/landing/MeetSunny";
 import Compounds from "@/components/landing/Compounds";
 import Goals from "@/components/landing/Goals";
 import Contact from "@/components/landing/Contact";
@@ -14,6 +15,7 @@ export default function Home() {
       <Hero />
       <Questions />
       <HowItWorks />
+      <MeetSunny />
       <Compounds />
       <Goals />
       <Contact />
