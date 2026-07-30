@@ -45,7 +45,15 @@ export default function ConsentGate() {
   const [declined, setDeclined] = useState(false);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsConfirmed, setTermsConfirmed] = useState(false);
+  const [termsAtBottom, setTermsAtBottom] = useState(false);
   const firstCheckboxRef = useRef<HTMLInputElement>(null);
+  const termsBoxRef = useRef<HTMLDivElement>(null);
+
+  const checkTermsScrollPosition = () => {
+    const el = termsBoxRef.current;
+    if (!el) return;
+    setTermsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 2);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -65,6 +73,13 @@ export default function ConsentGate() {
       document.body.style.overflow = previousOverflow;
     };
   }, [visible]);
+
+  useEffect(() => {
+    if (!visible || declined) return;
+    // Catches terms content short enough that it never overflows in the
+    // first place — no fade needed then either.
+    checkTermsScrollPosition();
+  }, [visible, declined]);
 
   if (!mounted || !visible) return null;
 
@@ -132,33 +147,44 @@ export default function ConsentGate() {
                   Sunny is a research and education platform for adults exploring peptide science.
                 </p>
 
-                <div
-                  id={TERMS_ID}
-                  className="max-h-40 sm:max-h-48 overflow-y-auto rounded-lg border border-border bg-secondary/40 p-4 text-xs text-muted-foreground leading-relaxed space-y-3 mb-5"
-                >
-                  <p>
-                    Everything Sunny publishes — compound summaries, articles, and anything generated
-                    through this site — is for educational and research purposes only. Sunny is an AI
-                    system, not a physician: it does not diagnose conditions, prescribe treatment, or
-                    recommend dosing protocols of any kind.
-                  </p>
-                  <p>
-                    The compounds discussed here are research chemicals. None of them are approved for
-                    human consumption, and nothing on this site is an endorsement to use them. Always talk
-                    to a licensed healthcare professional before making decisions about your health.
-                  </p>
-                  <p>
-                    By continuing, you accept that Sunny carries no responsibility for choices made based
-                    on this content. Full details in our{" "}
-                    <Link href="/legal/disclaimer" className="text-accent hover:underline">
-                      Disclaimer
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/legal/terms" className="text-accent hover:underline">
-                      Terms of Service
-                    </Link>
-                    .
-                  </p>
+                <div className="relative mb-5">
+                  <div
+                    id={TERMS_ID}
+                    ref={termsBoxRef}
+                    onScroll={checkTermsScrollPosition}
+                    className="scrollbar-hidden max-h-40 sm:max-h-48 overflow-y-auto rounded-lg border border-border bg-secondary/40 p-4 text-xs text-muted-foreground leading-relaxed space-y-3"
+                  >
+                    <p>
+                      Everything Sunny publishes — compound summaries, articles, and anything generated
+                      through this site — is for educational and research purposes only. Sunny is an AI
+                      system, not a physician: it does not diagnose conditions, prescribe treatment, or
+                      recommend dosing protocols of any kind.
+                    </p>
+                    <p>
+                      The compounds discussed here are research chemicals. None of them are approved for
+                      human consumption, and nothing on this site is an endorsement to use them. Always
+                      talk to a licensed healthcare professional before making decisions about your
+                      health.
+                    </p>
+                    <p>
+                      By continuing, you accept that Sunny carries no responsibility for choices made
+                      based on this content. Full details in our{" "}
+                      <Link href="/legal/disclaimer" className="text-accent hover:underline">
+                        Disclaimer
+                      </Link>{" "}
+                      and{" "}
+                      <Link href="/legal/terms" className="text-accent hover:underline">
+                        Terms of Service
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                  <div
+                    aria-hidden="true"
+                    className={`pointer-events-none absolute inset-x-0 bottom-0 h-10 rounded-b-lg bg-gradient-to-t from-card to-transparent transition-opacity duration-200 ${
+                      termsAtBottom ? "opacity-0" : "opacity-100"
+                    }`}
+                  />
                 </div>
 
                 <div className="space-y-3 mb-6">

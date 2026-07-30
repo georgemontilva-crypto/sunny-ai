@@ -166,7 +166,15 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid oklch(0.8534 0.0516 89.77 / 0.5);
   }
-  
+
+  .scrollbar-hidden {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Edge antiguo */
+  }
+  .scrollbar-hidden::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
+
   /**
    * Custom container utility that centers content and adds responsive padding.
    *
