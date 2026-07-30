@@ -48,7 +48,8 @@ export default function ChatDemo() {
           transition={{ delay: 0.2, duration: 0.6 }}
           className="max-w-2xl mx-auto bg-card border border-border rounded-2xl overflow-hidden shadow-lg"
         >
-          <div className="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-b border-border">
+          <div className="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-b border-border flex items-center gap-2">
+            <img src="/logo.png" alt="Sunny" className="h-6 w-auto" />
             <h3 className="font-semibold text-sm">Sunny AI Research Assistant</h3>
           </div>
 
