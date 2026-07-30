@@ -10,6 +10,7 @@ const goals = [
     label: "area of interest",
     description: "Tissue repair, injury support, faster bounce-back from training and surgery.",
     compounds: ["BPC-157", "TB-500", "GHK-Cu"],
+    image: "/goal-recovery.webp",
   },
   {
     title: "Fat Loss & Metabolic",
@@ -17,6 +18,7 @@ const goals = [
     label: "area of interest",
     description: "Body recomposition, metabolic optimization, insulin sensitivity.",
     compounds: ["MOTS-c", "AOD-9604"],
+    image: "/goal-fat-loss.webp",
   },
   {
     title: "Cognition & Focus",
@@ -24,6 +26,7 @@ const goals = [
     label: "area of interest",
     description: "Sharpen focus, memory, and mental clarity with nootropic peptide research.",
     compounds: ["Semax", "Selank", "Cerebrolysin"],
+    image: "/goal-cognition.webp",
   },
   {
     title: "Longevity & Anti-Aging",
@@ -31,6 +34,7 @@ const goals = [
     label: "area of interest",
     description: "Cellular health, mitochondrial repair, biological age reversal protocols.",
     compounds: ["Epitalon", "NAD+", "Thymalin"],
+    image: "/goal-longevity.webp",
   },
   {
     title: "Performance & Growth",
@@ -38,6 +42,7 @@ const goals = [
     label: "area of interest",
     description: "Growth hormone support, athletic output, lean mass and recovery.",
     compounds: ["CJC-1295", "Ipamorelin", "MK-677"],
+    image: "/goal-performance.webp",
   },
   {
     title: "Sleep & Hormones",
@@ -45,6 +50,7 @@ const goals = [
     label: "area of interest",
     description: "Deep sleep architecture, cortisol balance, libido, mood — the foundation.",
     compounds: ["DSIP", "PT-141", "Kisspeptin"],
+    image: "/goal-sleep.webp",
   },
 ];
 
@@ -78,16 +84,20 @@ export default function Goals() {
               transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
             >
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow group cursor-pointer overflow-hidden">
-                {/* GOAL CARD IMAGE PLACEHOLDER - 400x160px */}
-                <motion.div 
-                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-40 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium mx-auto"
+                <motion.div
+                  className="w-full h-40 rounded-lg mb-4 overflow-hidden mx-auto"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="text-center">
-                    <div className="font-bold">400 × 160px</div>
-                    <div className="text-xs mt-1">{goal.title}</div>
-                  </div>
+                  <img
+                    src={goal.image}
+                    width={400}
+                    height={160}
+                    loading="lazy"
+                    decoding="async"
+                    alt={`Ilustración de la categoría ${goal.title}`}
+                    className="w-full h-full object-cover rounded-xl"
+                  />
                 </motion.div>
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-2xl font-bold text-accent">{goal.metric}</span>
