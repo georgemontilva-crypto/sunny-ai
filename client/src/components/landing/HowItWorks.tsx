@@ -1,36 +1,35 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Target, Microscope, BookOpen, Compass } from "lucide-react";
 
 const steps = [
   {
     number: "01",
     title: "Tell us your goals",
     description: "Share what you're optimizing for — recovery, performance, longevity, or metabolic health.",
-    imageName: "goals",
-    icon: Target,
+    image: "how-goals",
+    hiRes: false,
   },
   {
     number: "02",
     title: "Smart research analysis",
     description: "We review published literature and map the most relevant peptide research to your goals.",
-    imageName: "intake",
-    icon: Microscope,
+    image: "how-analysis",
+    hiRes: false,
   },
   {
     number: "03",
     title: "Get clear guidance",
     description: "Receive research-backed recommendations with citations and educational context.",
-    imageName: "pathway",
-    icon: BookOpen,
+    image: "how-guidance",
+    hiRes: false,
   },
   {
     number: "04",
     title: "Explore at your pace",
     description: "Browse our compound library and dive deeper into the science whenever you're ready.",
-    imageName: "optimize",
-    icon: Compass,
+    image: "how-explore",
+    hiRes: true,
   },
 ];
 
@@ -64,22 +63,30 @@ export default function HowItWorks() {
               transition={{ delay: i * 0.1, duration: 0.5 }}
             >
               <Card className="p-8 h-full">
-                {/* HOW IT WORKS IMAGE PLACEHOLDER - 500x300px with icon */}
-                <motion.div 
-                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-48 rounded-lg mb-6 flex items-center justify-center text-gray-600 text-xs font-medium mx-auto"
-                  whileHover={{ scale: 1.03 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <motion.div 
-                    className="text-center"
-                    animate={{ rotate: [0, 5, 0, -5, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <step.icon className="w-16 h-16 mx-auto mb-2 opacity-60" />
-                    <div className="font-bold text-sm">500 × 300px</div>
-                    <div className="text-xs mt-1">{step.imageName}</div>
-                  </motion.div>
-                </motion.div>
+                <div className="w-full h-48 rounded-lg mb-6 overflow-hidden">
+                  {step.hiRes ? (
+                    <img
+                      src={`/${step.image}.webp`}
+                      srcSet={`/${step.image}.webp 500w, /${step.image}@2x.webp 1000w`}
+                      width={500}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
+                      alt={step.title}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  ) : (
+                    <img
+                      src={`/${step.image}.webp`}
+                      width={500}
+                      height={300}
+                      loading="lazy"
+                      decoding="async"
+                      alt={step.title}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  )}
+                </div>
                 <div className="flex items-start gap-4">
                   <div className="text-4xl font-bold text-accent/30">{step.number}</div>
                   <div className="flex-1">
