@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Brain } from "lucide-react";
+import ParticleBackground from "./ParticleBackground";
 
 export default function Hero() {
   const scrollToSection = (id: string) => {
@@ -11,7 +12,8 @@ export default function Hero() {
   };
 
   return (
-    <section className="hero-gradient pt-32 pb-32 px-4 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <section className="hero-gradient pt-32 pb-32 px-4 min-h-screen flex items-center justify-center relative overflow-hidden" id="hero">
+      <ParticleBackground />
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* LEFT SIDE - TEXT CONTENT */}

@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="font-bold mb-4">Sunny</h3>
+            <img src="/logo.png" alt="Sunny" className="h-10 w-auto mb-4" />
             <p className="text-sm text-muted-foreground">
               AI-powered peptide research. Educational content, research-backed guidance.
             </p>

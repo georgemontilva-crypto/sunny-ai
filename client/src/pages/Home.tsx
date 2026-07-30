@@ -3,6 +3,7 @@ import Hero from "@/components/landing/Hero";
 import Questions from "@/components/landing/Questions";
 import HowItWorks from "@/components/landing/HowItWorks";
 import MeetSunny from "@/components/landing/MeetSunny";
+import ChatDemo from "@/components/landing/ChatDemo";
 import Compounds from "@/components/landing/Compounds";
 import Goals from "@/components/landing/Goals";
 import Contact from "@/components/landing/Contact";
@@ -16,6 +17,7 @@ export default function Home() {
       <Questions />
       <HowItWorks />
       <MeetSunny />
+      <ChatDemo />
       <Compounds />
       <Goals />
       <Contact />
