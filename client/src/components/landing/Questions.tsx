@@ -1,50 +1,56 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Moon, Flame, Zap, Brain, Heart, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const questions = [
   {
     metric: "Sleep quality",
     label: "area of interest",
-    question: "I keep waking up at 3am exhausted — what peptide could help me sleep?",
+    question: "What does the literature say about peptides studied for sleep quality?",
     category: "Sleep",
-    icon: Moon,
+    image: "sleep-quality",
+    hiRes: false,
   },
   {
     metric: "Body composition",
     label: "area of interest",
-    question: "I've tried everything for stubborn belly fat. What's safer than shots?",
+    question: "Which compounds appear in body composition research, and in what models?",
     category: "Fat Loss",
-    icon: Flame,
+    image: "body-composition",
+    hiRes: false,
   },
   {
     metric: "Tissue repair",
     label: "area of interest",
-    question: "My shoulder hasn't healed in 6 months. What speeds up tissue repair?",
+    question: "How is tissue repair studied, and where does the evidence stop?",
     category: "Recovery",
-    icon: Zap,
+    image: "tissue-repair",
+    hiRes: false,
   },
   {
     metric: "Cognitive focus",
     label: "area of interest",
-    question: "Brain fog is ruining my work. Which peptides sharpen focus?",
+    question: "What has been published on peptides and cognitive focus?",
     category: "Focus",
-    icon: Brain,
+    image: "cognitive-focus",
+    hiRes: true,
   },
   {
     metric: "Hormonal balance",
     label: "area of interest",
-    question: "My drive is gone and I'm 38. What's safe to try before TRT?",
+    question: "How does the research approach hormonal pathways?",
     category: "Libido",
-    icon: Heart,
+    image: "hormonal-balance",
+    hiRes: true,
   },
   {
     metric: "Skin & hair health",
     label: "area of interest",
-    question: "Can peptides really help with hair thinning and skin tone?",
+    question: "What is documented about peptides in skin and hair research?",
     category: "Skin & Hair",
-    icon: Sparkles,
+    image: "skin-hair",
+    hiRes: true,
   },
 ];
 
@@ -78,22 +84,29 @@ export default function Questions() {
               transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
             >
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow cursor-pointer group overflow-hidden">
-                {/* QUESTION CARD IMAGE PLACEHOLDER - 400x160px with icon */}
-                <motion.div 
-                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-40 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium mx-auto"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <motion.div 
-                    className="text-center"
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                    <q.icon className="w-12 h-12 mx-auto mb-2 opacity-60" />
-                    <div className="font-bold text-sm">400 × 160px</div>
-                    <div className="text-xs mt-1">{q.category}</div>
-                  </motion.div>
-                </motion.div>
+                {q.hiRes ? (
+                  <img
+                    src={`/card-${q.image}.webp`}
+                    srcSet={`/card-${q.image}.webp 800w, /card-${q.image}@2x.webp 1600w`}
+                    sizes="(max-width: 768px) 100vw, 400px"
+                    width={800}
+                    height={320}
+                    loading="lazy"
+                    decoding="async"
+                    alt={`Research-grade vial, ${q.image} category`}
+                    className="w-full h-40 object-cover rounded-xl mb-4"
+                  />
+                ) : (
+                  <img
+                    src={`/card-${q.image}.webp`}
+                    width={400}
+                    height={160}
+                    loading="lazy"
+                    decoding="async"
+                    alt={`Research-grade vial, ${q.image} category`}
+                    className="w-full h-40 object-cover rounded-xl mb-4"
+                  />
+                )}
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-2xl font-bold text-accent">{q.metric}</span>
                   <span className="text-xs text-muted-foreground">{q.label}</span>

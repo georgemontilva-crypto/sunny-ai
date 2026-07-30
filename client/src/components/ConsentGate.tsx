@@ -161,10 +161,10 @@ export default function ConsentGate() {
                       recommend dosing protocols of any kind.
                     </p>
                     <p>
-                      The compounds discussed here are research chemicals. None of them are approved for
-                      human consumption, and nothing on this site is an endorsement to use them. Always
-                      talk to a licensed healthcare professional before making decisions about your
-                      health.
+                      The compounds discussed here are research chemicals sold by Sunny's operator,
+                      Brighter Days Labs, strictly for laboratory and research use. None of them are
+                      approved for human consumption. Always talk to a licensed healthcare professional
+                      before making decisions about your health.
                     </p>
                     <p>
                       By continuing, you accept that Sunny carries no responsibility for choices made

@@ -136,6 +136,9 @@ export default function Footer() {
           <p className="text-xs text-muted-foreground">
             © 2026 Sunny. Educational research content. Not medical advice. For adults 21+.
           </p>
+          <p className="text-xs text-muted-foreground">
+            Sunny is operated by Brighter Days Labs. Compounds shown are BDL research products.
+          </p>
         </div>
       </div>
     </footer>

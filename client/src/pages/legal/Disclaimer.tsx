@@ -36,8 +36,10 @@ export default function Disclaimer() {
             this site creates liability for Sunny.
           </p>
           <p>
-            Sunny does not sell or distribute compounds. Any decision to acquire, use, or research a
-            compound mentioned on this site is the user's sole responsibility.
+            Sunny is operated by <strong>Brighter Days Labs (BDL)</strong>. The compounds featured on this
+            site are research products sold by BDL, offered strictly for laboratory and research use —
+            not for human consumption. Any decision to acquire, use, or research a compound mentioned on
+            this site is the user's sole responsibility.
           </p>
         </div>
 
