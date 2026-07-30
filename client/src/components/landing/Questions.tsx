@@ -94,7 +94,7 @@ export default function Questions() {
                     loading="lazy"
                     decoding="async"
                     alt={`Research-grade vial, ${q.image} category`}
-                    className="w-full h-40 object-cover rounded-xl mb-4"
+                    className="w-full h-40 object-cover object-center rounded-xl mb-4"
                   />
                 ) : (
                   <img
@@ -104,7 +104,7 @@ export default function Questions() {
                     loading="lazy"
                     decoding="async"
                     alt={`Research-grade vial, ${q.image} category`}
-                    className="w-full h-40 object-cover rounded-xl mb-4"
+                    className="w-full h-40 object-cover object-center rounded-xl mb-4"
                   />
                 )}
                 <div className="flex items-baseline gap-2 mb-3">

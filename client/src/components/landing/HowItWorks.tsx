@@ -73,7 +73,7 @@ export default function HowItWorks() {
                       loading="lazy"
                       decoding="async"
                       alt={step.title}
-                      className="w-full h-full object-cover rounded-xl"
+                      className="w-full h-full object-cover object-top rounded-xl"
                     />
                   ) : (
                     <img
@@ -83,7 +83,7 @@ export default function HowItWorks() {
                       loading="lazy"
                       decoding="async"
                       alt={step.title}
-                      className="w-full h-full object-cover rounded-xl"
+                      className="w-full h-full object-cover object-top rounded-xl"
                     />
                   )}
                 </div>
