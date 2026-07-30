@@ -87,7 +87,7 @@ export default function Compounds() {
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow overflow-hidden">
                 {/* COMPOUND CARD IMAGE PLACEHOLDER - 350x140px with icon */}
                 <motion.div 
-                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-32 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium -mx-6 -mt-6 mb-4"
+                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-32 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium mx-auto"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}
                 >

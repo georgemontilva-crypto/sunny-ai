@@ -66,7 +66,7 @@ export default function HowItWorks() {
               <Card className="p-8 h-full">
                 {/* HOW IT WORKS IMAGE PLACEHOLDER - 500x300px with icon */}
                 <motion.div 
-                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-48 rounded-lg mb-6 flex items-center justify-center text-gray-600 text-xs font-medium -mx-8 -mt-8 mb-6"
+                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-48 rounded-lg mb-6 flex items-center justify-center text-gray-600 text-xs font-medium mx-auto"
                   whileHover={{ scale: 1.03 }}
                   transition={{ duration: 0.3 }}
                 >

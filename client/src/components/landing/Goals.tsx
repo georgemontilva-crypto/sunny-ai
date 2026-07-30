@@ -79,12 +79,16 @@ export default function Goals() {
             >
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow group cursor-pointer overflow-hidden">
                 {/* GOAL CARD IMAGE PLACEHOLDER - 400x160px */}
-                <div className="bg-gray-300 w-full h-40 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium -mx-6 -mt-6 mb-4">
+                <motion.div 
+                  className="bg-gradient-to-br from-gray-300 to-gray-400 w-full h-40 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium mx-auto"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <div className="text-center">
                     <div className="font-bold">400 × 160px</div>
                     <div className="text-xs mt-1">{goal.title}</div>
                   </div>
-                </div>
+                </motion.div>
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-2xl font-bold text-accent">{goal.metric}</span>
                   <span className="text-xs text-muted-foreground">{goal.label}</span>
