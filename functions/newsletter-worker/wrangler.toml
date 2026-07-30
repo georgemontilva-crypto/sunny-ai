@@ -1,0 +1,9 @@
+name = "sunny-newsletter-signup"
+main = "src/index.ts"
+compatibility_date = "2026-07-29"
+
+# RESEND_API_KEY and RESEND_AUDIENCE_ID are secrets, not vars:
+#   wrangler secret put RESEND_API_KEY
+#   wrangler secret put RESEND_AUDIENCE_ID
+# Create the audience first in the Resend dashboard (Audiences tab) and copy
+# its ID.

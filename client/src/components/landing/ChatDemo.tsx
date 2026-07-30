@@ -1,6 +1,5 @@
-import { motion } from "framer-motion";
-import { useRef } from "react";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 const chatMessages = [
   {
@@ -21,9 +20,88 @@ const chatMessages = [
   },
 ];
 
+const TYPING_MIN_MS = 900;
+const TYPING_MAX_MS = 1400;
+const MS_PER_CHAR = 35;
+const MAX_MESSAGE_DELAY_MS = 2500;
+const CYCLE_PAUSE_MS = 4000;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const messageDelay = (text: string) => Math.min(MAX_MESSAGE_DELAY_MS, text.length * MS_PER_CHAR);
+
+function TypingIndicator() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="flex justify-start"
+    >
+      <div className="max-w-xs px-4 py-3 rounded-lg bg-secondary text-foreground rounded-bl-none flex items-center gap-1">
+        {[0, 1, 2].map((i) => (
+          <motion.span
+            key={i}
+            className="w-1.5 h-1.5 rounded-full bg-muted-foreground"
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function ChatDemo() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) {
+      setVisibleCount(chatMessages.length);
+      return;
+    }
+
+    let cancelled = false;
+
+    const runCycle = async () => {
+      while (!cancelled) {
+        setVisibleCount(0);
+        setIsTyping(false);
+
+        for (let i = 0; i < chatMessages.length; i++) {
+          const msg = chatMessages[i];
+          if (msg.type === "assistant") {
+            setIsTyping(true);
+            await wait(TYPING_MIN_MS + Math.random() * (TYPING_MAX_MS - TYPING_MIN_MS));
+            if (cancelled) return;
+            setIsTyping(false);
+          } else {
+            await wait(messageDelay(msg.text));
+          }
+          if (cancelled) return;
+          setVisibleCount(i + 1);
+        }
+
+        await wait(CYCLE_PAUSE_MS);
+      }
+    };
+
+    runCycle();
+    return () => {
+      cancelled = true;
+    };
+  }, [isInView]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [visibleCount, isTyping]);
 
   return (
     <section className="py-24 px-4 bg-background" ref={ref}>
@@ -49,17 +127,17 @@ export default function ChatDemo() {
           className="max-w-2xl mx-auto bg-card border border-border rounded-2xl overflow-hidden shadow-lg"
         >
           <div className="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-b border-border flex items-center gap-2">
-            <img src="/logo.png" alt="Sunny" className="h-6 w-auto" />
-            <h3 className="font-semibold text-sm">Sunny AI Research Assistant</h3>
+            <img src="/logo.png" alt="Sunny" className="h-10 w-auto" />
+            <h3 className="font-semibold text-sm">AI Research Assistant</h3>
           </div>
 
-          <div className="h-96 overflow-y-auto p-6 space-y-4 bg-background">
-            {chatMessages.map((msg, i) => (
+          <div ref={scrollRef} className="h-96 overflow-y-auto p-6 space-y-4 bg-background">
+            {chatMessages.slice(0, visibleCount).map((msg, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 10 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
                 className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
@@ -73,6 +151,7 @@ export default function ChatDemo() {
                 </div>
               </motion.div>
             ))}
+            {isTyping && <TypingIndicator />}
           </div>
 
           <div className="p-4 border-t border-border bg-secondary/50">
@@ -98,4 +177,3 @@ export default function ChatDemo() {
     </section>
   );
 }
-
