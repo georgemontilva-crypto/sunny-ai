@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import { useSeoMeta } from "./hooks/useSeoMeta";
+import ConsentGate from "./components/ConsentGate";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -47,6 +48,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <ConsentGate />
           <Router />
         </TooltipProvider>
       </ThemeProvider>
