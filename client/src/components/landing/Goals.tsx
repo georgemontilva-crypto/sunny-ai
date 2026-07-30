@@ -10,6 +10,7 @@ const goals = [
     label: "faster repair",
     description: "Tissue repair, injury support, faster bounce-back from training and surgery.",
     compounds: ["BPC-157", "TB-500", "GHK-Cu"],
+    imageUrl: null, // Replace with: "https://your-r2-bucket.com/recovery-goal.jpg"
   },
   {
     title: "Fat Loss & Metabolic",
@@ -17,6 +18,7 @@ const goals = [
     label: "in 12 wks (avg)",
     description: "Body recomposition, metabolic optimization, insulin sensitivity.",
     compounds: ["MOTS-c", "AOD-9604"],
+    imageUrl: null, // Replace with: "https://your-r2-bucket.com/fat-loss-goal.jpg"
   },
   {
     title: "Cognition & Focus",
@@ -24,6 +26,7 @@ const goals = [
     label: "sustained focus",
     description: "Sharpen focus, memory, and mental clarity with nootropic peptide research.",
     compounds: ["Semax", "Selank", "Cerebrolysin"],
+    imageUrl: null, // Replace with: "https://your-r2-bucket.com/cognition-goal.jpg"
   },
   {
     title: "Longevity & Anti-Aging",
@@ -31,6 +34,7 @@ const goals = [
     label: "biological age",
     description: "Cellular health, mitochondrial repair, biological age reversal protocols.",
     compounds: ["Epitalon", "NAD+", "Thymalin"],
+    imageUrl: null, // Replace with: "https://your-r2-bucket.com/longevity-goal.jpg"
   },
   {
     title: "Performance & Growth",
@@ -38,6 +42,7 @@ const goals = [
     label: "lean mass / cycle",
     description: "Growth hormone support, athletic output, lean mass and recovery.",
     compounds: ["CJC-1295", "Ipamorelin", "MK-677"],
+    imageUrl: null, // Replace with: "https://your-r2-bucket.com/performance-goal.jpg"
   },
   {
     title: "Sleep & Hormones",
@@ -45,6 +50,7 @@ const goals = [
     label: "deep sleep / night",
     description: "Deep sleep architecture, cortisol balance, libido, mood — the foundation.",
     compounds: ["DSIP", "PT-141", "Kisspeptin"],
+    imageUrl: null, // Replace with: "https://your-r2-bucket.com/sleep-goal.jpg"
   },
 ];
 
@@ -77,7 +83,15 @@ export default function Goals() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
             >
-              <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow group cursor-pointer">
+              <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow group cursor-pointer overflow-hidden">
+                {/* GOAL CARD IMAGE - Replace imageUrl with Cloudflare R2 URL */}
+                {goal.imageUrl && (
+                  <img 
+                    src={goal.imageUrl} 
+                    alt={goal.title}
+                    className="w-full h-40 object-cover rounded-lg mb-4 -mx-6 -mt-6 mb-4"
+                  />
+                )}
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-2xl font-bold text-accent">{goal.metric}</span>
                   <span className="text-xs text-muted-foreground">{goal.label}</span>
@@ -102,4 +116,3 @@ export default function Goals() {
     </section>
   );
 }
-

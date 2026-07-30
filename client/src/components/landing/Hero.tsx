@@ -11,7 +11,14 @@ export default function Hero() {
   };
 
   return (
-    <section className="hero-gradient pt-40 pb-28 px-4 text-center min-h-screen flex flex-col items-center justify-center">
+    <section className="hero-gradient pt-40 pb-28 px-4 text-center min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+      {/* HERO BACKGROUND IMAGE - Replace with Cloudflare R2 URL */}
+      {/* <img 
+        src="https://your-r2-bucket.com/hero-background.jpg" 
+        alt="Hero background" 
+        className="absolute inset-0 w-full h-full object-cover -z-10 opacity-20"
+      /> */}
+      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -74,4 +81,3 @@ export default function Hero() {
     </section>
   );
 }
-
