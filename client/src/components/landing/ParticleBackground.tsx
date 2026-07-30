@@ -125,5 +125,7 @@ export default function ParticleBackground() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 -z-10 pointer-events-none" />;
+  // No z-index here — the parent in Hero.tsx owns stacking (z-[2], between
+  // the background photo/gradient and the copy).
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none" />;
 }
