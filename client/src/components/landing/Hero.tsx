@@ -116,6 +116,36 @@ export default function Hero() {
             Educational research content. Not medical advice. For adults 21+.
           </motion.p>
         </motion.div>
+
+        {/* Small accent card, floating over the full-bleed background photo.
+            Hidden below lg — no room for it once text is bottom-anchored on
+            mobile/tablet. */}
+        <motion.div
+          initial={{ opacity: 0, x: 40, scale: 0.95 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
+          className="hidden lg:block absolute right-8 xl:right-16 top-1/2 -translate-y-1/2 w-72 xl:w-80 h-96"
+        >
+          <div className="w-full h-full rounded-2xl shadow-2xl overflow-hidden">
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="w-full h-full"
+            >
+              <img
+                src="/hero-sunny.webp"
+                srcSet="/hero-sunny.webp 1200w, /hero-sunny@2x.webp 2400w"
+                sizes="320px"
+                width={1200}
+                height={600}
+                loading="lazy"
+                decoding="async"
+                alt="Sunny, the AI peptide research assistant"
+                className="w-full h-full object-cover rounded-2xl shadow-2xl"
+              />
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
