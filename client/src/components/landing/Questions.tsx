@@ -9,42 +9,36 @@ const questions = [
     label: "deep sleep / night",
     question: "I keep waking up at 3am exhausted — what peptide could help me sleep?",
     category: "Sleep",
-    imageUrl: null, // Replace with: "https://your-r2-bucket.com/sleep-peptide.jpg"
   },
   {
     metric: "−14 lbs",
     label: "avg. in 12 weeks",
     question: "I've tried everything for stubborn belly fat. What's safer than shots?",
     category: "Fat Loss",
-    imageUrl: null, // Replace with: "https://your-r2-bucket.com/fat-loss-peptide.jpg"
   },
   {
     metric: "2.3×",
     label: "faster tissue repair",
     question: "My shoulder hasn't healed in 6 months. What speeds up tissue repair?",
     category: "Recovery",
-    imageUrl: null, // Replace with: "https://your-r2-bucket.com/recovery-peptide.jpg"
   },
   {
     metric: "+38%",
     label: "sustained focus",
     question: "Brain fog is ruining my work. Which peptides sharpen focus?",
     category: "Focus",
-    imageUrl: null, // Replace with: "https://your-r2-bucket.com/focus-peptide.jpg"
   },
   {
     metric: "Day 7",
     label: "first noticeable shift",
     question: "My drive is gone and I'm 38. What's safe to try before TRT?",
     category: "Libido",
-    imageUrl: null, // Replace with: "https://your-r2-bucket.com/libido-peptide.jpg"
   },
   {
     metric: "8 wks",
     label: "visible regrowth",
     question: "Can peptides really help with hair thinning and skin tone?",
     category: "Skin & Hair",
-    imageUrl: null, // Replace with: "https://your-r2-bucket.com/hair-skin-peptide.jpg"
   },
 ];
 
@@ -78,14 +72,13 @@ export default function Questions() {
               transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
             >
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow cursor-pointer group overflow-hidden">
-                {/* QUESTION CARD IMAGE - Replace imageUrl with Cloudflare R2 URL */}
-                {q.imageUrl && (
-                  <img 
-                    src={q.imageUrl} 
-                    alt={q.category}
-                    className="w-full h-40 object-cover rounded-lg mb-4 -mx-6 -mt-6 mb-4"
-                  />
-                )}
+                {/* QUESTION CARD IMAGE PLACEHOLDER - 400x160px */}
+                <div className="bg-gray-300 w-full h-40 rounded-lg mb-4 flex items-center justify-center text-gray-600 text-xs font-medium -mx-6 -mt-6 mb-4">
+                  <div className="text-center">
+                    <div className="font-bold">400 × 160px</div>
+                    <div className="text-xs mt-1">{q.category}</div>
+                  </div>
+                </div>
                 <div className="flex items-baseline gap-2 mb-3">
                   <span className="text-2xl font-bold text-accent">{q.metric}</span>
                   <span className="text-xs text-muted-foreground">{q.label}</span>

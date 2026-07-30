@@ -12,13 +12,6 @@ export default function Hero() {
 
   return (
     <section className="hero-gradient pt-40 pb-28 px-4 text-center min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
-      {/* HERO BACKGROUND IMAGE - Replace with Cloudflare R2 URL */}
-      {/* <img 
-        src="https://your-r2-bucket.com/hero-background.jpg" 
-        alt="Hero background" 
-        className="absolute inset-0 w-full h-full object-cover -z-10 opacity-20"
-      /> */}
-      
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,7 +47,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-        className="flex flex-col sm:flex-row items-center justify-center gap-4"
+        className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
       >
         <Button size="lg" className="text-base font-semibold px-8 h-12">
           Start Exploring
@@ -70,11 +63,27 @@ export default function Hero() {
         </Button>
       </motion.div>
 
+      {/* HERO BANNER IMAGE PLACEHOLDER - 1200x600px */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.4, ease: [0.23, 1, 0.32, 1] }}
+        className="w-full max-w-4xl mx-auto mt-16 rounded-2xl overflow-hidden shadow-lg"
+      >
+        <div className="bg-gray-300 w-full h-96 flex items-center justify-center text-gray-600 text-sm font-medium">
+          <div className="text-center">
+            <div className="text-lg font-bold mb-2">Image Placeholder</div>
+            <div>1200 × 600px</div>
+            <div className="text-xs mt-1">Replace with R2 URL: hero-banner.jpg</div>
+          </div>
+        </div>
+      </motion.div>
+
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="text-xs text-muted-foreground mt-8"
+        className="text-xs text-muted-foreground mt-12"
       >
         Educational research content. Not medical advice. For adults 21+.
       </motion.p>
