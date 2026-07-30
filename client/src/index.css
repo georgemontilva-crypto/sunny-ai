@@ -43,15 +43,15 @@
 }
 
 :root {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
+  --primary: oklch(0.7587 0.153 74.46); /* Sol - matches --accent, the brand's one CTA color */
+  --primary-foreground: oklch(0.2275 0.0197 73.54); /* Tinta */
+  --sidebar-primary: oklch(0.7587 0.153 74.46);
+  --sidebar-primary-foreground: oklch(0.2275 0.0197 73.54);
+  --chart-1: oklch(0.7587 0.153 74.46); /* Sol */
+  --chart-2: oklch(0.6536 0.1201 78.15); /* Dorado, same value already used in .gradient-desert */
+  --chart-3: oklch(0.2275 0.0197 73.54); /* Tinta */
+  --chart-4: oklch(0.4677 0.0866 77.22); /* Dorado Texto */
+  --chart-5: oklch(0.8802 0.0352 82.9); /* Arena Media */
   --radius: 0.65rem;
   /* Desert Palette - Sunny AI */
   --background: oklch(0.9598 0.016 82.79); /* Arena - Light sand */
@@ -80,10 +80,10 @@
 }
 
 .dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
+  --primary: oklch(0.7587 0.153 74.46);
+  --primary-foreground: oklch(0.2275 0.0197 73.54);
+  --sidebar-primary: oklch(0.7587 0.153 74.46);
+  --sidebar-primary-foreground: oklch(0.2275 0.0197 73.54);
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.85 0.005 65);
   --card: oklch(0.21 0.006 285.885);
@@ -101,11 +101,11 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
+  --chart-1: oklch(0.7587 0.153 74.46);
+  --chart-2: oklch(0.6536 0.1201 78.15);
+  --chart-3: oklch(0.85 0.005 65);
+  --chart-4: oklch(0.705 0.015 286.067);
+  --chart-5: oklch(0.24 0.006 286.033);
   --sidebar: oklch(0.21 0.006 285.885);
   --sidebar-foreground: oklch(0.85 0.005 65);
   --sidebar-accent: oklch(0.274 0.006 286.033);

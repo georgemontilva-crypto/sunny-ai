@@ -7,93 +7,92 @@ export default function Terms() {
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10">
           <ArrowLeft className="w-4 h-4" />
-          Volver al inicio
+          Back to home
         </Link>
 
         <div className="mb-10">
-          <p className="text-sm text-muted-foreground mb-2">Última actualización: 29 de julio de 2026</p>
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Términos de Servicio</h1>
+          <p className="text-sm text-muted-foreground mb-2">Last updated: July 29, 2026</p>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Terms of Service</h1>
           <p className="text-muted-foreground leading-relaxed">
-            Estos Términos de Servicio rigen el acceso y uso del sitio web de Sunny ("el Servicio"). Al usar
-            este sitio aceptas estos términos. Si no estás de acuerdo, por favor no continúes usando el Servicio.
+            These Terms of Service govern access to and use of the Sunny website ("the Service"). By using
+            this site you accept these terms. If you disagree, please do not continue using the Service.
           </p>
         </div>
 
         <div className="space-y-10 text-sm leading-relaxed text-foreground/90">
           <section>
-            <h2 className="text-xl font-semibold mb-3">1. Naturaleza del Servicio</h2>
+            <h2 className="text-xl font-semibold mb-3">1. Nature of the Service</h2>
             <p>
-              Sunny es un sitio informativo que publica contenido educativo y de investigación sobre péptidos.
-              No vendemos compuestos, no operamos una tienda en línea ni prestamos servicios médicos. El
-              contenido publicado (artículos, biblioteca de compuestos, respuestas a formularios) tiene un
-              propósito exclusivamente educativo y de investigación.
+              Sunny is an informational site that publishes educational and research content about
+              peptides. We do not sell compounds, operate an online store, or provide medical services.
+              The published content (articles, compound library, form responses) is exclusively for
+              educational and research purposes.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">2. Uso permitido</h2>
+            <h2 className="text-xl font-semibold mb-3">2. Permitted use</h2>
             <p>
-              Puedes usar este sitio para informarte. No debes usarlo para obtener indicaciones de dosificación,
-              diagnóstico o tratamiento de ninguna condición médica, ni para sustituir el criterio de un
-              profesional de la salud cualificado.
+              You may use this site to inform yourself. You must not use it to obtain dosing guidance,
+              diagnosis, or treatment for any medical condition, nor as a substitute for the judgment of a
+              qualified health professional.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">3. Edad mínima</h2>
+            <h2 className="text-xl font-semibold mb-3">3. Minimum age</h2>
             <p>
-              El acceso a este sitio y el uso del formulario de contacto están destinados a personas
-              mayores de 21 años. Si tienes menos de 21 años, te pedimos que no envíes información a través
-              de nuestros formularios.
+              Access to this site and use of the contact form are intended for people 21 years of age or
+              older. If you are under 21, please do not submit information through our forms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">4. Sin consejo médico</h2>
+            <h2 className="text-xl font-semibold mb-3">4. No medical advice</h2>
             <p>
-              Nada en este sitio constituye consejo médico. Sunny no diagnostica, trata, cura ni previene
-              ninguna enfermedad. Consulta siempre a un profesional de la salud cualificado antes de tomar
-              cualquier decisión relacionada con tu salud.
+              Nothing on this site constitutes medical advice. Sunny does not diagnose, treat, cure, or
+              prevent any disease. Always consult a qualified health professional before making any
+              decision related to your health.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">5. Limitación de responsabilidad</h2>
+            <h2 className="text-xl font-semibold mb-3">5. Limitation of liability</h2>
             <p>
-              Sunny no asume responsabilidad por decisiones que tomes basándote en el contenido de este sitio.
-              El uso de la información publicada aquí es bajo tu propio riesgo y criterio.
+              Sunny assumes no responsibility for decisions you make based on the content of this site. Use
+              of the information published here is at your own risk and judgment.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">6. Propiedad intelectual</h2>
+            <h2 className="text-xl font-semibold mb-3">6. Intellectual property</h2>
             <p>
-              El contenido, diseño y marca de Sunny están protegidos por derechos de autor. No está permitido
-              reproducir el contenido de este sitio sin autorización previa.
+              Sunny's content, design, and brand are protected by copyright. Reproducing this site's
+              content without prior authorization is not permitted.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">7. Cambios a estos términos</h2>
+            <h2 className="text-xl font-semibold mb-3">7. Changes to these terms</h2>
             <p>
-              Podemos actualizar estos términos ocasionalmente. Los cambios entran en vigor al publicarse en
-              esta página.
+              We may update these terms occasionally. Changes take effect as soon as they are published on
+              this page.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-3">8. Contacto</h2>
+            <h2 className="text-xl font-semibold mb-3">8. Contact</h2>
             <p>
-              Para preguntas sobre estos términos, escríbenos desde nuestra{" "}
-              <Link href="/contact" className="text-primary hover:underline">página de contacto</Link>.
+              For questions about these terms, reach out through our{" "}
+              <Link href="/contact" className="text-primary hover:underline">contact page</Link>.
             </p>
           </section>
         </div>
 
         <div className="mt-16 pt-8 border-t border-border/40 flex flex-wrap gap-4 text-xs text-muted-foreground">
-          <Link href="/legal/privacy" className="hover:text-foreground transition-colors">Privacidad</Link>
+          <Link href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
           <Link href="/legal/cookies" className="hover:text-foreground transition-colors">Cookies</Link>
-          <Link href="/legal/disclaimer" className="hover:text-foreground transition-colors">Aviso legal</Link>
+          <Link href="/legal/disclaimer" className="hover:text-foreground transition-colors">Disclaimer</Link>
         </div>
       </div>
     </div>

@@ -7,29 +7,49 @@ import { Mail, Send, CheckCircle, AlertCircle } from "lucide-react";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined;
+
 export default function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", goal: "", message: "", website: "" });
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Honeypot: real visitors never fill this hidden field.
+    if (form.website) return;
+
     if (!form.name || !form.email || !form.message) {
       setStatus("error");
-      setErrorMsg("Please fill in all fields.");
+      setErrorMsg("Please fill in all required fields.");
+      return;
+    }
+    if (!CONTACT_ENDPOINT) {
+      setStatus("error");
+      setErrorMsg("The contact form isn't configured yet. Please email us directly.");
       return;
     }
 
     setStatus("sending");
     try {
-      // Simulated submission - replace with actual endpoint
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await fetch(CONTACT_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          goal: form.goal || undefined,
+          message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error(`status ${res.status}`);
       setStatus("sent");
     } catch (err) {
+      console.error(err);
       setStatus("error");
       setErrorMsg("Failed to send message. Please try again.");
     }
@@ -74,7 +94,7 @@ export default function Contact() {
                 size="sm"
                 onClick={() => {
                   setStatus("idle");
-                  setForm({ name: "", email: "", message: "" });
+                  setForm({ name: "", email: "", goal: "", message: "", website: "" });
                 }}
               >
                 Send another message
@@ -82,6 +102,18 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-2xl p-8 space-y-5 shadow-sm">
+              {/* Honeypot — hidden from real visitors, bots tend to fill every field */}
+              <input
+                type="text"
+                name="website"
+                value={form.website}
+                onChange={(e) => setForm({ ...form, website: e.target.value })}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+              />
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -109,6 +141,18 @@ export default function Contact() {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Research goal
+                </label>
+                <Input
+                  placeholder="E.g. recovery, longevity, body composition..."
+                  value={form.goal}
+                  onChange={(e) => setForm({ ...form, goal: e.target.value })}
+                  className="rounded-lg border-border/60 focus:border-accent/50"
+                />
               </div>
 
               <div className="space-y-1.5">
@@ -151,4 +195,3 @@ export default function Contact() {
     </section>
   );
 }
-

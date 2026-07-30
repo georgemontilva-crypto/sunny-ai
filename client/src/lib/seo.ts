@@ -25,19 +25,19 @@ export function getMetaForPath(path: string): HeadMeta {
   const clean = path.replace(/\/+$/, "") || "/";
 
   if (clean === "/") {
-    return withNoindex({ title: `${NAME} — Consultora de péptidos con IA`, description: SITE.description, canonicalPath: "/" });
+    return withNoindex({ title: `${NAME} — AI Peptide Research`, description: SITE.description, canonicalPath: "/" });
   }
   if (clean === "/contact") {
     return withNoindex({
-      title: `Contacto — ${NAME}`,
-      description: "Escríbenos para hablar de tu objetivo de investigación. Respuesta educativa, sin diagnóstico ni prescripción.",
+      title: `Contact — ${NAME}`,
+      description: "Tell us about your research goal. Educational response, no diagnosis or prescription.",
       canonicalPath: "/contact",
     });
   }
   if (clean === "/blog") {
     return withNoindex({
-      title: `Blog de ${NAME} — Investigación sobre péptidos`,
-      description: "Artículos educativos sobre péptidos: qué dice la evidencia, qué no, y cómo leer el panorama de investigación.",
+      title: `${NAME} Blog — Peptide Research`,
+      description: "Educational articles about peptides: what the evidence says, what it doesn't, and how to read the research landscape.",
       canonicalPath: "/blog",
     });
   }
@@ -52,17 +52,17 @@ export function getMetaForPath(path: string): HeadMeta {
     });
   }
   if (clean === "/legal/terms") {
-    return withNoindex({ title: `Términos de Servicio — ${NAME}`, description: `Términos y condiciones de uso de ${NAME}.`, canonicalPath: clean });
+    return withNoindex({ title: `Terms of Service — ${NAME}`, description: `Terms and conditions of use for ${NAME}.`, canonicalPath: clean });
   }
   if (clean === "/legal/privacy") {
-    return withNoindex({ title: `Política de Privacidad — ${NAME}`, description: `Cómo ${NAME} trata tus datos personales.`, canonicalPath: clean });
+    return withNoindex({ title: `Privacy Policy — ${NAME}`, description: `How ${NAME} handles your personal data.`, canonicalPath: clean });
   }
   if (clean === "/legal/cookies") {
-    return withNoindex({ title: `Política de Cookies — ${NAME}`, description: `Uso de cookies en ${NAME}.`, canonicalPath: clean });
+    return withNoindex({ title: `Cookie Policy — ${NAME}`, description: `Cookie usage on ${NAME}.`, canonicalPath: clean });
   }
   if (clean === "/legal/disclaimer") {
-    return withNoindex({ title: `Aviso Legal — ${NAME}`, description: `Aviso educativo y de investigación de ${NAME}.`, canonicalPath: clean });
+    return withNoindex({ title: `Legal Disclaimer — ${NAME}`, description: `Educational and research disclaimer for ${NAME}.`, canonicalPath: clean });
   }
 
-  return withNoindex({ title: `Página no encontrada — ${NAME}`, description: SITE.description, canonicalPath: clean, notFound: true });
+  return withNoindex({ title: `Page not found — ${NAME}`, description: SITE.description, canonicalPath: clean, notFound: true });
 }

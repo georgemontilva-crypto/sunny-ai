@@ -6,12 +6,17 @@ import MeetSunny from "@/components/landing/MeetSunny";
 import ChatDemo from "@/components/landing/ChatDemo";
 import Compounds from "@/components/landing/Compounds";
 import Goals from "@/components/landing/Goals";
+import B2BWhiteLabel from "@/components/landing/B2BWhiteLabel";
+import FAQ from "@/components/landing/FAQ";
 import Contact from "@/components/landing/Contact";
+import LegalNotice from "@/components/landing/LegalNotice";
 import Footer from "@/components/landing/Footer";
+import SchemaMarkup from "@/components/landing/SchemaMarkup";
 
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <SchemaMarkup />
       <Navbar />
       <Hero />
       <Questions />
@@ -20,7 +25,10 @@ export default function Home() {
       <ChatDemo />
       <Compounds />
       <Goals />
+      <B2BWhiteLabel />
+      <FAQ />
       <Contact />
+      <LegalNotice />
       <Footer />
     </div>
   );

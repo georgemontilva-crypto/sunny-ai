@@ -1,4 +1,5 @@
 import { Mail, Github, Twitter } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Footer() {
   return (
@@ -22,9 +23,10 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold text-sm mb-4">Legal</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Disclaimer</a></li>
+              <li><Link href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</Link></li>
+              <li><Link href="/legal/terms" className="hover:text-foreground transition-colors">Terms</Link></li>
+              <li><Link href="/legal/cookies" className="hover:text-foreground transition-colors">Cookies</Link></li>
+              <li><Link href="/legal/disclaimer" className="hover:text-foreground transition-colors">Disclaimer</Link></li>
             </ul>
           </div>
         </div>
