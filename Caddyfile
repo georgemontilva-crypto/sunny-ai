@@ -1,14 +1,22 @@
 :{$PORT}
 
 root * dist
-encode gzip
+encode gzip zstd
 
-file_server
+handle /api/* {
+	reverse_proxy localhost:3001
+}
+
+handle /admin* {
+	try_files {path} /index.html
+	file_server
+}
+
+handle {
+	file_server
+}
 
 handle_errors {
-	@404 {
-		expression `{http.error.status_code} == 404`
-	}
-	rewrite @404 /404.html
+	rewrite * /404.html
 	file_server
 }
