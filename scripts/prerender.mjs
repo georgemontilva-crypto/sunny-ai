@@ -84,8 +84,8 @@ async function main() {
     console.log(`[prerender] wrote ${route}`);
   }
 
-  // Empty SPA shell for /admin/* (Caddy falls back here for any unmatched
-  // /admin path). Deliberately NOT the prerendered "/" page — reusing that
+  // Empty SPA shell for /admin/* (server/index.ts falls back here for any
+  // unmatched /admin path). Deliberately NOT the prerendered "/" page — reusing that
   // would hand React a DOM full of Home page markup to hydrate into on an
   // admin route, a guaranteed hydration mismatch. Never listed in `routes`,
   // the sitemap, or robots.txt's Allow — /admin is off-limits to both.
