@@ -1,8 +1,10 @@
 // DB-backed sessions. The cookie carries only the opaque session id (a
-// gen_random_uuid(), 122 bits of entropy) — it's a lookup key, not a token
-// that encodes trust, so nothing needs signing. Every request re-validates
-// against the sessions table and checks the owning user is still active,
-// which is what makes revocation (logout, deactivating a user) actually work.
+// crypto.randomUUID(), 122 bits of entropy) — it's a lookup key, not a
+// token that encodes trust, so nothing needs signing. Every request
+// re-validates against the sessions table and checks the owning user is
+// still active, which is what makes revocation (logout, deactivating a
+// user) actually work.
+import { randomUUID } from "node:crypto";
 import { and, eq, gt, lte } from "drizzle-orm";
 import { parseCookie, stringifySetCookie } from "cookie";
 import type { Db } from "./db.ts";
@@ -46,13 +48,13 @@ export async function createSession(
   db: Db,
   input: { userId: string; ip?: string; userAgent?: string }
 ): Promise<string> {
+  const id = randomUUID();
   const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  const [row] = await db
+  await db
     .insert(sessions)
-    .values({ userId: input.userId, expiresAt, ip: input.ip, userAgent: input.userAgent })
-    .returning({ id: sessions.id });
+    .values({ id, userId: input.userId, expiresAt, ip: input.ip, userAgent: input.userAgent });
 
-  return cookieFor(row.id, SESSION_TTL_MS / 1000);
+  return cookieFor(id, SESSION_TTL_MS / 1000);
 }
 
 export async function destroySession(db: Db, cookieHeader: string | undefined): Promise<string> {

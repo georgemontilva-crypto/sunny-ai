@@ -15,14 +15,12 @@ export const settingsRouter = router({
   update: adminProcedure
     .input(z.object({ key: settingsKey, value: z.string().min(1).max(500) }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
+      // MySQL has no RETURNING or Postgres-style onConflictDoUpdate —
+      // upsert via ON DUPLICATE KEY UPDATE, then re-select the fresh row.
+      await ctx.db
         .insert(settings)
         .values({ key: input.key, value: input.value })
-        .onConflictDoUpdate({
-          target: settings.key,
-          set: { value: input.value, updatedAt: new Date() },
-        })
-        .returning();
+        .onDuplicateKeyUpdate({ set: { value: input.value, updatedAt: new Date() } });
 
       await writeAudit(ctx.db, {
         userId: ctx.session.userId,
@@ -31,6 +29,7 @@ export const settingsRouter = router({
         detail: { value: input.value },
       });
 
+      const [row] = await ctx.db.select().from(settings).where(eq(settings.key, input.key));
       return row;
     }),
 });

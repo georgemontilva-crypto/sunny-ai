@@ -1,10 +1,10 @@
 // Public, unauthenticated endpoint the contact-form Worker posts to. Gated
 // by a shared secret (not a user session) because the caller is a server,
 // not a browser.
-import { timingSafeEqual } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { Router } from "express";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { z } from "zod";
 import { SITE } from "../shared/site.ts";
 import { getDb, type Db } from "./db.ts";
@@ -54,7 +54,10 @@ const publicLimiter = rateLimit({
   limit: 5,
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.get("x-forwarded-client-ip") || req.ip || "unknown",
+  keyGenerator: (req) => {
+    const ip = req.get("x-forwarded-client-ip") || req.ip;
+    return ip ? ipKeyGenerator(ip) : "unknown";
+  },
   message: { error: "Too many requests" },
 });
 
@@ -89,6 +92,7 @@ publicRoutes.post("/request", publicLimiter, async (req, res) => {
   }
 
   await db.insert(requests).values({
+    id: randomUUID(),
     name: parsed.data.name,
     email: parsed.data.email,
     goal: parsed.data.goal,

@@ -36,13 +36,12 @@ export const requestsRouter = router({
   setStatus: adminProcedure
     .input(z.object({ id: z.uuid(), status: statusEnum }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
-        .update(requests)
-        .set({ status: input.status })
-        .where(eq(requests.id, input.id))
-        .returning();
+      // MySQL has no RETURNING — check existence first, update, then
+      // re-select the fresh row.
+      const [existing] = await ctx.db.select({ id: requests.id }).from(requests).where(eq(requests.id, input.id));
+      if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
 
-      if (!row) throw new TRPCError({ code: "NOT_FOUND" });
+      await ctx.db.update(requests).set({ status: input.status }).where(eq(requests.id, input.id));
 
       await writeAudit(ctx.db, {
         userId: ctx.session.userId,
@@ -51,19 +50,17 @@ export const requestsRouter = router({
         detail: { status: input.status },
       });
 
+      const [row] = await ctx.db.select().from(requests).where(eq(requests.id, input.id));
       return row;
     }),
 
   setNotes: adminProcedure
     .input(z.object({ id: z.uuid(), notes: z.string().max(5000) }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
-        .update(requests)
-        .set({ notes: input.notes })
-        .where(eq(requests.id, input.id))
-        .returning();
+      const [existing] = await ctx.db.select({ id: requests.id }).from(requests).where(eq(requests.id, input.id));
+      if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
 
-      if (!row) throw new TRPCError({ code: "NOT_FOUND" });
+      await ctx.db.update(requests).set({ notes: input.notes }).where(eq(requests.id, input.id));
 
       await writeAudit(ctx.db, {
         userId: ctx.session.userId,
@@ -71,13 +68,15 @@ export const requestsRouter = router({
         entity: input.id,
       });
 
+      const [row] = await ctx.db.select().from(requests).where(eq(requests.id, input.id));
       return row;
     }),
 
   delete: adminProcedure.input(z.object({ id: z.uuid() })).mutation(async ({ ctx, input }) => {
-    const [row] = await ctx.db.delete(requests).where(eq(requests.id, input.id)).returning();
+    const [existing] = await ctx.db.select({ id: requests.id }).from(requests).where(eq(requests.id, input.id));
+    if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
 
-    if (!row) throw new TRPCError({ code: "NOT_FOUND" });
+    await ctx.db.delete(requests).where(eq(requests.id, input.id));
 
     await writeAudit(ctx.db, {
       userId: ctx.session.userId,

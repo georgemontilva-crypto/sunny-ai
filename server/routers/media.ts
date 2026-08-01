@@ -11,13 +11,14 @@ export const mediaRouter = router({
   updateAlt: adminProcedure
     .input(z.object({ slot: z.string().min(1), alt: z.string().max(300) }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
+      // MySQL has no RETURNING — check existence first, update, re-select.
+      const [existing] = await ctx.db.select({ slot: media.slot }).from(media).where(eq(media.slot, input.slot));
+      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "No image uploaded for this slot yet" });
+
+      await ctx.db
         .update(media)
         .set({ alt: input.alt, updatedAt: new Date(), updatedBy: ctx.session.userId })
-        .where(eq(media.slot, input.slot))
-        .returning();
-
-      if (!row) throw new TRPCError({ code: "NOT_FOUND", message: "No image uploaded for this slot yet" });
+        .where(eq(media.slot, input.slot));
 
       await writeAudit(ctx.db, {
         userId: ctx.session.userId,
@@ -25,6 +26,7 @@ export const mediaRouter = router({
         entity: input.slot,
       });
 
+      const [row] = await ctx.db.select().from(media).where(eq(media.slot, input.slot));
       return row;
     }),
 
