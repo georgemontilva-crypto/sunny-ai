@@ -8,5 +8,8 @@ compatibility_date = "2026-07-29"
 CONTACT_TO_EMAIL = "hola@sunnypeptides.com"
 CONTACT_FROM_EMAIL = "Sunny <noreply@sunnypeptides.com>"
 
-# RESEND_API_KEY is a secret, not a var — set it with:
+# RESEND_API_KEY and WORKER_SECRET are secrets, not vars — set them with:
 #   wrangler secret put RESEND_API_KEY
+#   wrangler secret put WORKER_SECRET
+# WORKER_SECRET must match the site's own WORKER_SECRET env var (Railway) —
+# it's what lets the Worker call POST /api/public/request on the site.

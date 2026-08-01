@@ -2,14 +2,17 @@ export interface Env {
   RESEND_API_KEY: string;
   CONTACT_TO_EMAIL: string;
   CONTACT_FROM_EMAIL: string;
+  WORKER_SECRET: string;
 }
 
 // Add the production domain here once it's confirmed — see the note in
 // shared/site.ts (SITE.domain) in the main repo, this list should match it.
+// Also doubles as the base URL for the site's own API (same domain).
 const ALLOWED_ORIGINS = [
   "https://sunny-ai-production.up.railway.app",
   // "https://your-final-domain.com",
 ];
+const SITE_API_URL = ALLOWED_ORIGINS[0];
 
 function corsHeaders(origin: string | null): HeadersInit {
   const allowOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
@@ -26,6 +29,7 @@ interface ContactPayload {
   email?: string;
   goal?: string;
   message?: string;
+  website?: string; // honeypot, passed through untouched
 }
 
 function isValidEmail(email: string): boolean {
@@ -37,6 +41,40 @@ function json(body: unknown, status: number, headers: HeadersInit): Response {
     status,
     headers: { ...headers, "Content-Type": "application/json" },
   });
+}
+
+// Registers the message in the site's DB and resolves who it should be
+// emailed to (settings.contact_email, with its own fallback baked in
+// server-side). Email is the primary channel — if this call fails for any
+// reason, we log it and fall back to the Worker's own CONTACT_TO_EMAIL so
+// the email still goes out.
+async function registerRequest(
+  request: Request,
+  env: Env,
+  payload: { name: string; email: string; goal: string; message: string; website?: string }
+): Promise<string> {
+  try {
+    const res = await fetch(`${SITE_API_URL}/api/public/request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Worker-Secret": env.WORKER_SECRET,
+        "X-Forwarded-Client-IP": request.headers.get("CF-Connecting-IP") ?? "",
+      },
+      body: JSON.stringify({ ...payload, source: "contact" }),
+    });
+
+    if (!res.ok) {
+      console.error("registerRequest failed:", res.status, await res.text());
+      return env.CONTACT_TO_EMAIL;
+    }
+
+    const data = (await res.json()) as { contactEmail?: string };
+    return data.contactEmail || env.CONTACT_TO_EMAIL;
+  } catch (err) {
+    console.error("registerRequest error:", err);
+    return env.CONTACT_TO_EMAIL;
+  }
 }
 
 export default {
@@ -67,10 +105,20 @@ export default {
     const email = (payload.email ?? "").trim();
     const goal = (payload.goal ?? "").trim();
     const message = (payload.message ?? "").trim();
+    const website = (payload.website ?? "").trim();
 
     if (!name || !email || !message || !isValidEmail(email)) {
       return json({ error: "Missing or invalid required fields" }, 400, headers);
     }
+
+    // Honeypot: a real visitor never fills this (the site's form hides and
+    // never even submits it — this only fires for bots that skip the
+    // frontend and POST here directly). Look successful, send nothing.
+    if (website) {
+      return json({ ok: true }, 200, headers);
+    }
+
+    const contactTo = await registerRequest(request, env, { name, email, goal, message, website });
 
     const resendResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -80,7 +128,7 @@ export default {
       },
       body: JSON.stringify({
         from: env.CONTACT_FROM_EMAIL,
-        to: env.CONTACT_TO_EMAIL,
+        to: contactTo,
         reply_to: email,
         subject: `New contact form message from ${name}`,
         text: [`Name: ${name}`, `Email: ${email}`, goal ? `Research goal: ${goal}` : null, "", message]

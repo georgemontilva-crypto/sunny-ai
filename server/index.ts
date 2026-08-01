@@ -6,6 +6,7 @@
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { authRoutes } from "./authRoutes.ts";
+import { publicRoutes } from "./publicRoutes.ts";
 import { appRouter } from "./routers/_app.ts";
 import { createContext } from "./trpc.ts";
 
@@ -17,6 +18,7 @@ app.set("trust proxy", "loopback");
 app.use(express.json({ limit: "1mb" }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/public", publicRoutes);
 app.use(
   "/api/trpc",
   createExpressMiddleware({

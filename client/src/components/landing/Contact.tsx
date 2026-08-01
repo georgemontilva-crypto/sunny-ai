@@ -44,6 +44,7 @@ export default function Contact() {
           email: form.email,
           goal: form.goal || undefined,
           message: form.message,
+          website: form.website || undefined,
         }),
       });
       if (!res.ok) throw new Error(`status ${res.status}`);

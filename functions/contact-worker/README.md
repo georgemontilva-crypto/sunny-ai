@@ -1,8 +1,11 @@
 # Sunny contact form — Cloudflare Worker
 
-Receives the POST from the site's contact form (`VITE_CONTACT_ENDPOINT`) and
-sends it as an email via Resend. Not part of the main Vite build — deployed
-separately.
+Receives the POST from the site's contact form (`VITE_CONTACT_ENDPOINT`),
+registers it on the site via `POST /api/public/request` (best-effort — a
+failure there is logged but never blocks the email), then sends it as an
+email via Resend to the address that call resolves (`settings.contact_email`,
+falling back to `CONTACT_TO_EMAIL` below if the site call fails). Not part of
+the main Vite build — deployed separately.
 
 ## Deploy
 
@@ -11,6 +14,7 @@ cd functions/contact-worker
 npm install
 npx wrangler login
 npx wrangler secret put RESEND_API_KEY   # paste your Resend API key when prompted
+npx wrangler secret put WORKER_SECRET    # must match WORKER_SECRET on the site (Railway)
 npx wrangler deploy
 ```
 
