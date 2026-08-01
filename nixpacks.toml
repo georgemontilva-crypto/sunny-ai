@@ -5,4 +5,4 @@ nixPkgs = ["nodejs_22", "caddy"]
 cmds = ["corepack enable", "pnpm install --frozen-lockfile", "pnpm build"]
 
 [start]
-cmd = "caddy run --config Caddyfile --adapter caddyfile"
+cmd = "pnpm start"
