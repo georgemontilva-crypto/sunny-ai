@@ -54,7 +54,7 @@ export default function RequestDetailSheet({
     }, NOTES_SAVE_DELAY_MS);
   };
 
-  const mailtoHref = `mailto:${request.email}?subject=${encodeURIComponent("Re: tu mensaje a Sunny")}`;
+  const mailtoHref = `mailto:${request.email}?subject=${encodeURIComponent("Re: your message to Sunny")}`;
 
   return (
     <Sheet open onOpenChange={onOpenChange}>
@@ -70,27 +70,27 @@ export default function RequestDetailSheet({
           {request.goal && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                Objetivo de investigación
+                Research goal
               </p>
               <p className="text-sm text-foreground">{request.goal}</p>
             </div>
           )}
 
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Mensaje</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">Message</p>
             <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed">{request.message}</p>
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notas internas</p>
-              {savedState === "saving" && <span className="text-xs text-muted-foreground">Guardando…</span>}
-              {savedState === "saved" && <span className="text-xs text-muted-foreground">Guardado</span>}
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Internal notes</p>
+              {savedState === "saving" && <span className="text-xs text-muted-foreground">Saving…</span>}
+              {savedState === "saved" && <span className="text-xs text-muted-foreground">Saved</span>}
             </div>
             <Textarea
               value={draftNotes}
               onChange={(e) => handleNotesChange(e.target.value)}
-              placeholder="Notas visibles solo para el equipo…"
+              placeholder="Notes visible to the team only…"
               className="rounded-lg border-border/60 focus:border-accent/50 min-h-[120px] resize-none"
             />
           </div>
@@ -100,7 +100,7 @@ export default function RequestDetailSheet({
           <Button asChild className="w-full font-semibold rounded-lg gap-2">
             <a href={mailtoHref}>
               <Mail className="w-4 h-4" />
-              Responder por correo
+              Reply by email
             </a>
           </Button>
         </div>

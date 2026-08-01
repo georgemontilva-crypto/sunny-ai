@@ -22,11 +22,11 @@ function withNoindex(meta: Omit<HeadMeta, "noindex">): HeadMeta {
 }
 
 const ADMIN_LABELS: Record<string, string> = {
-  "/admin/login": "Iniciar sesión",
-  "/admin/requests": "Solicitudes",
-  "/admin/media": "Medios",
-  "/admin/settings": "Ajustes",
-  "/admin/audit": "Registro",
+  "/admin/login": "Sign in",
+  "/admin/requests": "Requests",
+  "/admin/media": "Media",
+  "/admin/settings": "Settings",
+  "/admin/audit": "Audit log",
 };
 
 export function getMetaForPath(path: string): HeadMeta {

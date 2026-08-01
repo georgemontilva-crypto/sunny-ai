@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo iniciar sesión. Probá de nuevo.");
+      setError(err instanceof Error ? err.message : "Couldn't log in. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -37,12 +37,12 @@ export default function AdminLoginPage() {
         </div>
         <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-2xl p-8 space-y-5 shadow-sm">
           <div className="text-center mb-2">
-            <h1 className="text-xl font-bold text-foreground">Acceder al panel</h1>
-            <p className="text-sm text-muted-foreground mt-1">Solo para el equipo de Sunny.</p>
+            <h1 className="text-xl font-bold text-foreground">Sign in to the panel</h1>
+            <p className="text-sm text-muted-foreground mt-1">Sunny team only.</p>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Correo</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</label>
             <Input
               type="email"
               autoComplete="username"
@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Contraseña</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
             <Input
               type="password"
               autoComplete="current-password"
@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
           )}
 
           <Button type="submit" disabled={submitting} className="w-full font-semibold rounded-lg px-6">
-            {submitting ? "Entrando…" : "Entrar"}
+            {submitting ? "Signing in…" : "Sign in"}
           </Button>
         </form>
       </div>

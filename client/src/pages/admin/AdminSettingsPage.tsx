@@ -3,8 +3,8 @@ import AdminPlaceholderPage from "@/components/admin/AdminPlaceholderPage";
 export default function AdminSettingsPage() {
   return (
     <AdminPlaceholderPage
-      title="Ajustes"
-      description="Correo de contacto, correo del boletín y el estado de indexación del sitio van a vivir acá. Llega en una fase siguiente."
+      title="Settings"
+      description="Contact email, newsletter email, and the site's indexing status will live here. Coming in a later phase."
     />
   );
 }

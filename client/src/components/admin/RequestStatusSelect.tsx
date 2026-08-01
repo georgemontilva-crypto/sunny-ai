@@ -2,8 +2,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { STATUS_LABELS, STATUS_ORDER } from "./requestLabels";
 
-// Trigger itself is colored like the status it represents — nueva = sol
-// (primary), contactada = arena media (secondary), cerrada/spam = tenue.
+// Trigger itself is colored like the status it represents — new = sol
+// (primary), contacted = arena media (secondary), closed/spam = muted.
 const TRIGGER_CLASS: Record<string, string> = {
   new: "bg-primary/10 text-primary border-primary/20",
   contacted: "bg-secondary text-secondary-foreground border-transparent",

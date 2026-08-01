@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 const NAV_ITEMS = [
-  { href: "/admin/requests", label: "Solicitudes" },
-  { href: "/admin/media", label: "Medios" },
-  { href: "/admin/settings", label: "Ajustes" },
-  { href: "/admin/audit", label: "Registro" },
+  { href: "/admin/requests", label: "Requests" },
+  { href: "/admin/media", label: "Media" },
+  { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/audit", label: "Audit log" },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -51,7 +51,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             className="w-full justify-start gap-2 text-muted-foreground hover:text-foreground"
           >
             <LogOut className="w-4 h-4" />
-            Salir
+            Log out
           </Button>
         </div>
       </aside>

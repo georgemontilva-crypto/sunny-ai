@@ -17,7 +17,7 @@ export function useAdminAuth() {
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(data.error || "No se pudo iniciar sesión. Probá de nuevo en un momento.");
+        throw new Error(data.error || "Couldn't log in. Please try again in a moment.");
       }
       await utils.auth.me.invalidate();
     },

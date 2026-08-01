@@ -20,7 +20,7 @@ function excerpt(message: string, max = 90): string {
 }
 
 function formatDate(value: string): string {
-  return new Date(value).toLocaleString("es-AR", { dateStyle: "medium", timeStyle: "short" });
+  return new Date(value).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 }
 
 function csvEscape(value: string): string {
@@ -28,7 +28,7 @@ function csvEscape(value: string): string {
 }
 
 function toCsv(rows: RequestRow[]): string {
-  const headers = ["Fecha", "Nombre", "Correo", "Origen", "Estado", "Objetivo", "Mensaje", "Notas"];
+  const headers = ["Date", "Name", "Email", "Source", "Status", "Goal", "Message", "Notes"];
   const lines = [headers.map(csvEscape).join(",")];
   for (const row of rows) {
     lines.push(
@@ -101,9 +101,9 @@ export default function AdminRequestsPage() {
     setExporting(true);
     try {
       const rows = await utils.requests.export.fetch(filters);
-      downloadCsv(toCsv(rows), `solicitudes-${new Date().toISOString().slice(0, 10)}.csv`);
+      downloadCsv(toCsv(rows), `requests-${new Date().toISOString().slice(0, 10)}.csv`);
     } catch {
-      alert("No pudimos generar el CSV. Probá de nuevo en un momento.");
+      alert("Couldn't generate the CSV. Please try again in a moment.");
     } finally {
       setExporting(false);
     }
@@ -112,9 +112,9 @@ export default function AdminRequestsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Solicitudes</h1>
+        <h1 className="text-2xl font-bold text-foreground">Requests</h1>
         <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
-          {exporting ? "Exportando…" : "Exportar CSV"}
+          {exporting ? "Exporting…" : "Export CSV"}
         </Button>
       </div>
 
@@ -124,7 +124,7 @@ export default function AdminRequestsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
+            <SelectItem value="all">All statuses</SelectItem>
             {STATUS_ORDER.map((s) => (
               <SelectItem key={s} value={s}>
                 {STATUS_LABELS[s]}
@@ -138,7 +138,7 @@ export default function AdminRequestsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos los orígenes</SelectItem>
+            <SelectItem value="all">All sources</SelectItem>
             {Object.entries(SOURCE_LABELS).map(([value, label]) => (
               <SelectItem key={value} value={value}>
                 {label}
@@ -152,7 +152,7 @@ export default function AdminRequestsPage() {
           <Input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Buscar por nombre o correo…"
+            placeholder="Search by name or email…"
             className="pl-9 rounded-lg border-border/60 focus:border-accent/50"
           />
         </div>
@@ -160,38 +160,36 @@ export default function AdminRequestsPage() {
 
       <Card className="overflow-hidden py-0">
         {isLoading ? (
-          <div className="py-16 text-center text-sm text-muted-foreground">Cargando solicitudes…</div>
+          <div className="py-16 text-center text-sm text-muted-foreground">Loading requests…</div>
         ) : isError ? (
           <div className="py-16 text-center space-y-3">
-            <p className="text-sm text-foreground">No pudimos cargar las solicitudes.</p>
-            <p className="text-sm text-muted-foreground">Revisá tu conexión e intentá de nuevo.</p>
+            <p className="text-sm text-foreground">We couldn't load the requests.</p>
+            <p className="text-sm text-muted-foreground">Check your connection and try again.</p>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Reintentar
+              Retry
             </Button>
           </div>
         ) : !data || data.rows.length === 0 ? (
           <div className="py-16 text-center max-w-sm mx-auto">
             <p className="text-sm text-foreground">
-              {hasActiveFilters
-                ? "No encontramos solicitudes con estos filtros."
-                : "Todavía no llegó ninguna solicitud."}
+              {hasActiveFilters ? "No requests match these filters." : "No requests yet."}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
               {hasActiveFilters
-                ? "Probá cambiar el estado, el origen o la búsqueda."
-                : "En cuanto alguien escriba desde el formulario de contacto del sitio, va a aparecer acá."}
+                ? "Try changing the status, source, or search."
+                : "As soon as someone writes in through the site's contact form, it'll show up here."}
             </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Fecha</TableHead>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Correo</TableHead>
-                <TableHead>Origen</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Mensaje</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Message</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -221,7 +219,7 @@ export default function AdminRequestsPage() {
       {data && data.rows.length > 0 && (
         <div className="flex items-center justify-between mt-4">
           <p className="text-sm text-muted-foreground">
-            Página {data.page} de {totalPages} · {data.total} en total
+            Page {data.page} of {totalPages} · {data.total} total
           </p>
           <div className="flex gap-2">
             <Button
@@ -230,7 +228,7 @@ export default function AdminRequestsPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
             >
-              Anterior
+              Previous
             </Button>
             <Button
               variant="outline"
@@ -238,7 +236,7 @@ export default function AdminRequestsPage() {
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
             >
-              Siguiente
+              Next
             </Button>
           </div>
         </div>

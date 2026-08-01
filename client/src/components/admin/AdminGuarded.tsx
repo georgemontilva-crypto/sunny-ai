@@ -9,7 +9,7 @@ export default function AdminGuarded({ children }: { children: ReactNode }) {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Cargando el panel…</p>
+        <p className="text-sm text-muted-foreground">Loading the panel…</p>
       </div>
     );
   }
