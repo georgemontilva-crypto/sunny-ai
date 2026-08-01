@@ -1,42 +1,22 @@
-// Stateless, signed session cookie — no session table. The cookie carries
-// {userId, role, exp} plus an HMAC-SHA256 signature keyed by SESSION_SECRET;
-// logout just clears the cookie (nothing to revoke server-side, so a copied
-// cookie stays valid for the rest of its 8h window).
-import { createHmac, timingSafeEqual } from "node:crypto";
+// DB-backed sessions. The cookie carries only the opaque session id (a
+// gen_random_uuid(), 122 bits of entropy) — it's a lookup key, not a token
+// that encodes trust, so nothing needs signing. Every request re-validates
+// against the sessions table and checks the owning user is still active,
+// which is what makes revocation (logout, deactivating a user) actually work.
+import { and, eq, gt, lte } from "drizzle-orm";
 import { parseCookie, stringifySetCookie } from "cookie";
+import type { Db } from "./db.ts";
+import { sessions, users } from "./schema.ts";
 
 const COOKIE_NAME = "sunny_session";
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-export interface SessionPayload {
+export interface SessionContext {
+  sessionId: string;
   userId: string;
+  email: string;
   role: string;
-  exp: number;
-}
-
-function getSecret(): string {
-  const secret = process.env.SESSION_SECRET;
-  if (!secret) {
-    throw new Error("SESSION_SECRET is not set");
-  }
-  return secret;
-}
-
-// Throws at startup (called from server/index.ts before listen()) rather
-// than lazily on first request, so a misconfigured deploy fails loudly.
-export function assertSessionSecret(): void {
-  getSecret();
-}
-
-function sign(value: string): string {
-  return createHmac("sha256", getSecret()).update(value).digest("base64url");
-}
-
-function safeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return timingSafeEqual(bufA, bufB);
 }
 
 // Secure requires HTTPS, which is only how the site is actually reached in
@@ -44,57 +24,74 @@ function safeEqual(a: string, b: string): boolean {
 // against localhost:3001 in dev has no HTTPS to send the cookie back over.
 const SECURE_COOKIE = process.env.NODE_ENV === "production";
 
-export function createSessionCookie(payload: Omit<SessionPayload, "exp">): string {
-  const full: SessionPayload = { ...payload, exp: Date.now() + SESSION_TTL_MS };
-  const data = Buffer.from(JSON.stringify(full), "utf-8").toString("base64url");
-  const signature = sign(data);
-  const value = `${data}.${signature}`;
-
+function cookieFor(sessionId: string, maxAgeSeconds: number): string {
   return stringifySetCookie({
     name: COOKIE_NAME,
-    value,
+    value: sessionId,
     httpOnly: true,
     secure: SECURE_COOKIE,
     sameSite: "lax",
     path: "/",
-    maxAge: SESSION_TTL_MS / 1000,
+    maxAge: maxAgeSeconds,
   });
 }
 
-export function clearSessionCookie(): string {
-  return stringifySetCookie({
-    name: COOKIE_NAME,
-    value: "",
-    httpOnly: true,
-    secure: SECURE_COOKIE,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 0,
-  });
-}
-
-export function readSession(cookieHeader: string | undefined): SessionPayload | null {
+export function readSessionCookie(cookieHeader: string | undefined): string | null {
   if (!cookieHeader) return null;
-  const cookies = parseCookie(cookieHeader);
-  const value = cookies[COOKIE_NAME];
-  if (!value) return null;
+  const value = parseCookie(cookieHeader)[COOKIE_NAME];
+  return value && UUID_RE.test(value) ? value : null;
+}
 
-  const dotIndex = value.lastIndexOf(".");
-  if (dotIndex === -1) return null;
-  const data = value.slice(0, dotIndex);
-  const signature = value.slice(dotIndex + 1);
+export async function createSession(
+  db: Db,
+  input: { userId: string; ip?: string; userAgent?: string }
+): Promise<string> {
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+  const [row] = await db
+    .insert(sessions)
+    .values({ userId: input.userId, expiresAt, ip: input.ip, userAgent: input.userAgent })
+    .returning({ id: sessions.id });
 
-  if (!safeEqual(sign(data), signature)) return null;
+  return cookieFor(row.id, SESSION_TTL_MS / 1000);
+}
 
-  let payload: SessionPayload;
-  try {
-    payload = JSON.parse(Buffer.from(data, "base64url").toString("utf-8"));
-  } catch {
+export async function destroySession(db: Db, cookieHeader: string | undefined): Promise<string> {
+  const sessionId = readSessionCookie(cookieHeader);
+  if (sessionId) {
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+  }
+  return cookieFor("", 0);
+}
+
+export async function validateSession(
+  db: Db,
+  cookieHeader: string | undefined
+): Promise<SessionContext | null> {
+  const sessionId = readSessionCookie(cookieHeader);
+  if (!sessionId) return null;
+
+  const now = new Date();
+
+  // Lazy cleanup: sweep this user's expired rows whenever we hit one, no
+  // separate cron needed for a table this small.
+  const [row] = await db
+    .select({
+      sessionId: sessions.id,
+      userId: users.id,
+      email: users.email,
+      role: users.role,
+      isActive: users.isActive,
+    })
+    .from(sessions)
+    .innerJoin(users, eq(sessions.userId, users.id))
+    .where(and(eq(sessions.id, sessionId), gt(sessions.expiresAt, now)));
+
+  if (!row) {
+    await db.delete(sessions).where(and(eq(sessions.id, sessionId), lte(sessions.expiresAt, now)));
     return null;
   }
 
-  if (typeof payload.exp !== "number" || Date.now() > payload.exp) return null;
-  if (typeof payload.userId !== "string" || typeof payload.role !== "string") return null;
+  if (!row.isActive) return null;
 
-  return payload;
+  return { sessionId: row.sessionId, userId: row.userId, email: row.email, role: row.role };
 }

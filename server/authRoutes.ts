@@ -5,7 +5,7 @@ import rateLimit from "express-rate-limit";
 import { z } from "zod";
 import { getDb } from "./db.ts";
 import { users } from "./schema.ts";
-import { clearSessionCookie, createSessionCookie } from "./session.ts";
+import { createSession, destroySession } from "./session.ts";
 
 // Argon2id hash of an unguessable fixed string, verified against on every
 // "user not found" login attempt so that path takes as long as a real
@@ -43,22 +43,36 @@ authRoutes.post("/login", loginLimiter, async (req, res) => {
 
   const [user] = await db.select().from(users).where(eq(users.email, parsed.data.email));
 
+  // Always verify against a real hash — the user's own, or the dummy one —
+  // so a nonexistent email or a deactivated account takes exactly as long
+  // to reject as a wrong password does.
   const valid = await argon2
     .verify(user?.passwordHash ?? DUMMY_HASH, parsed.data.password)
     .catch(() => false);
 
-  if (!user || !valid) {
+  if (!user || !valid || !user.isActive) {
     res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 
   await db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
 
-  res.setHeader("Set-Cookie", createSessionCookie({ userId: user.id, role: user.role }));
+  const cookie = await createSession(db, {
+    userId: user.id,
+    ip: req.ip,
+    userAgent: req.get("user-agent"),
+  });
+  res.setHeader("Set-Cookie", cookie);
   res.json({ id: user.id, email: user.email, role: user.role });
 });
 
-authRoutes.post("/logout", (_req, res) => {
-  res.setHeader("Set-Cookie", clearSessionCookie());
+authRoutes.post("/logout", async (req, res) => {
+  const db = getDb();
+  if (!db) {
+    res.status(500).json({ error: "Server not configured" });
+    return;
+  }
+
+  res.setHeader("Set-Cookie", await destroySession(db, req.headers.cookie));
   res.json({ ok: true });
 });

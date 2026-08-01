@@ -76,9 +76,6 @@ importers:
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.3.1
-      tsx:
-        specifier: ^4.23.1
-        version: 4.23.1
       wouter:
         specifier: ^3.3.5
         version: 3.7.1(patch_hash=4e16e6ff3fde7d6c1024d3e0c8605dc9eb6afb690d0d49958c2f449091813072)(react@19.2.1)
@@ -116,6 +113,9 @@ importers:
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
+      esbuild:
+        specifier: ^0.28.1
+        version: 0.28.1
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -128,6 +128,9 @@ importers:
       tailwindcss:
         specifier: ^4.1.14
         version: 4.1.14
+      tsx:
+        specifier: ^4.23.1
+        version: 4.23.1
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0

@@ -7,11 +7,7 @@ import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { authRoutes } from "./authRoutes.ts";
 import { appRouter } from "./routers/_app.ts";
-import { assertSessionSecret } from "./session.ts";
 import { createContext } from "./trpc.ts";
-
-// Fail fast on a missing secret rather than limping along with broken auth.
-assertSessionSecret();
 
 const app = express();
 
