@@ -21,8 +21,29 @@ function withNoindex(meta: Omit<HeadMeta, "noindex">): HeadMeta {
   return { ...meta, noindex: !SITE.indexable || meta.notFound === true };
 }
 
+const ADMIN_LABELS: Record<string, string> = {
+  "/admin/login": "Iniciar sesión",
+  "/admin/requests": "Solicitudes",
+  "/admin/media": "Medios",
+  "/admin/settings": "Ajustes",
+  "/admin/audit": "Registro",
+};
+
 export function getMetaForPath(path: string): HeadMeta {
   const clean = path.replace(/\/+$/, "") || "/";
+
+  // The admin panel is never indexed, regardless of SITE.indexable — unlike
+  // withNoindex()'s per-route defaults, this doesn't flip once the site goes
+  // public.
+  if (clean === "/admin" || clean.startsWith("/admin/")) {
+    const label = ADMIN_LABELS[clean] ?? "Panel";
+    return {
+      title: `${label} — Panel — ${NAME}`,
+      description: `${NAME} admin panel.`,
+      canonicalPath: clean,
+      noindex: true,
+    };
+  }
 
   if (clean === "/") {
     return withNoindex({ title: `${NAME} — AI Peptide Research`, description: SITE.description, canonicalPath: "/" });

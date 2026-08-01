@@ -84,6 +84,20 @@ async function main() {
     console.log(`[prerender] wrote ${route}`);
   }
 
+  // Empty SPA shell for /admin/* (Caddy falls back here for any unmatched
+  // /admin path). Deliberately NOT the prerendered "/" page — reusing that
+  // would hand React a DOM full of Home page markup to hydrate into on an
+  // admin route, a guaranteed hydration mismatch. Never listed in `routes`,
+  // the sitemap, or robots.txt's Allow — /admin is off-limits to both.
+  const adminHeadHtml = [
+    `<title>Panel — ${SITE.name}</title>`,
+    `<meta name="robots" content="noindex, nofollow" />`,
+  ].join("\n    ");
+  const adminShell = template.replace("<!--app-html-->", "").replace("<!--app-head-->", adminHeadHtml);
+  fs.mkdirSync(path.join(DIST_DIR, "admin"), { recursive: true });
+  fs.writeFileSync(path.join(DIST_DIR, "admin", "index.html"), adminShell, "utf-8");
+  console.log("[prerender] wrote /admin/index.html (empty shell)");
+
   // Explicit 404 page for static hosts (Netlify/Vercel/S3 convention)
   const notFound = render("/__not_found__");
   const notFoundHeadHtml = `<title>${escapeHtml(notFound.head.title)}</title>\n    <meta name="robots" content="noindex, nofollow" />`;
@@ -105,7 +119,7 @@ async function main() {
   // robots.txt: fully generated from SITE.indexable — overwrites whatever
   // vite build copied from client/public/robots.txt.
   const robotsTxt = SITE.indexable
-    ? `User-agent: *\nAllow: /\n\nSitemap: ${SITE.domain}/sitemap.xml\n`
+    ? `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: ${SITE.domain}/sitemap.xml\n`
     : `User-agent: *\nDisallow: /\n`;
   fs.writeFileSync(path.join(DIST_DIR, "robots.txt"), robotsTxt, "utf-8");
   console.log(`[prerender] wrote /robots.txt (indexable: ${SITE.indexable})`);

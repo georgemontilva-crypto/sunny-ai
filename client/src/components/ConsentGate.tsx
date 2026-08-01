@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { ShieldCheck } from "lucide-react";
 
 const STORAGE_KEY = "sunny-consent";
@@ -38,6 +38,12 @@ function saveConsent() {
 }
 
 export default function ConsentGate() {
+  // The admin panel is a staff tool reached over an authenticated session,
+  // not a public visitor landing on the research site — the age/education
+  // consent gate doesn't apply there.
+  const [location] = useLocation();
+  const isAdmin = location.startsWith("/admin");
+
   // Renders nothing until client JS has taken over, so the prerendered HTML
   // for every route ships with no gate baked in.
   const [mounted, setMounted] = useState(false);
@@ -60,10 +66,10 @@ export default function ConsentGate() {
   }, []);
 
   useEffect(() => {
-    if (!mounted || hasValidConsent()) return;
+    if (!mounted || isAdmin || hasValidConsent()) return;
     const timer = setTimeout(() => setVisible(true), 1000);
     return () => clearTimeout(timer);
-  }, [mounted]);
+  }, [mounted, isAdmin]);
 
   useEffect(() => {
     if (!visible) return;
@@ -81,7 +87,7 @@ export default function ConsentGate() {
     checkTermsScrollPosition();
   }, [visible, declined]);
 
-  if (!mounted || !visible) return null;
+  if (!mounted || isAdmin || !visible) return null;
 
   const canAccept = ageConfirmed && termsConfirmed;
 

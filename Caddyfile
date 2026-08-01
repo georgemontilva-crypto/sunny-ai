@@ -8,7 +8,7 @@ handle /api/* {
 }
 
 handle /admin* {
-	try_files {path} /index.html
+	try_files {path} /admin/index.html
 	file_server
 }
 
