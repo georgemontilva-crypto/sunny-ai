@@ -31,7 +31,7 @@ export default function MeetSunny() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-24 px-4 bg-gradient-to-b from-background to-secondary/10" ref={ref}>
+    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* LEFT SIDE - TEXT CONTENT */}

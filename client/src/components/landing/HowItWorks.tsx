@@ -44,7 +44,7 @@ export default function HowItWorks() {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
             Four steps to clarity

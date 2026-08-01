@@ -27,7 +27,7 @@ export default function B2BWhiteLabel() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section id="white-label" className="py-24 px-4 bg-secondary/20" ref={ref}>
+    <section id="white-label" className="py-24 px-4 bg-secondary/30" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,7 +71,7 @@ export default function B2BWhiteLabel() {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <Card className="p-8 h-full border-accent/30">
+            <Card className="p-8 h-full">
               <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5">
                 <Palette className="w-5 h-5 text-accent" />
               </div>
@@ -93,7 +93,7 @@ export default function B2BWhiteLabel() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="p-8 bg-secondary/40">
+          <Card className="p-8">
             <div className="text-xs text-muted-foreground mb-6 text-center">What partners get</div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {partnerBenefits.map((benefit, i) => (

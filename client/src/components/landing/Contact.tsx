@@ -56,8 +56,8 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-secondary/20" ref={ref}>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <section id="contact" className="py-24 px-4 bg-secondary/30" ref={ref}>
+      <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -69,7 +69,7 @@ export default function Contact() {
             Get in touch
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Have a question?</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             Tell us about your research interests. We'll provide educational guidance, no medical advice.
           </p>
         </motion.div>

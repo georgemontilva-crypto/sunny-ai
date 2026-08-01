@@ -41,7 +41,7 @@ export default function Compounds() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="compounds" className="py-24 px-4 bg-secondary/20" ref={ref}>
+    <section id="compounds" className="py-24 px-4 bg-secondary/30" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

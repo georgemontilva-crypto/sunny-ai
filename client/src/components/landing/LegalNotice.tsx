@@ -9,14 +9,14 @@ export default function LegalNotice() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-16 px-4 bg-background" ref={ref}>
+    <section className="py-24 px-4 bg-background" ref={ref}>
       <div className="container mx-auto max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <Card className="p-8 border-accent/30">
+          <Card className="p-8">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5 text-accent" />
