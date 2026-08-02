@@ -95,6 +95,23 @@ async function main() {
     const pngHref = mediaMap["favicon-png"]?.base;
     if (svgHref) template = template.replace('href="/favicon.svg"', `href="${svgHref}"`);
     if (pngHref) template = template.replace('href="/favicon.png"', `href="${pngHref}"`);
+
+    // The CLIENT bundle (dist/assets/*.js) is built once by `vite build` and
+    // never rebuilt by a republish — only this script and the SSR bundle
+    // are. It statically imports media-map.json, so its copy goes stale the
+    // moment an image changes through the panel; hydrating with that frozen
+    // import overwrote the correct src attributes this same script had just
+    // rendered into the HTML below. Injecting the map that's actually fresh
+    // right now lets client/src/lib/media.ts read window.__MEDIA_MAP__
+    // instead of its bundled import — placed before the module script tag
+    // so it's defined before any component reads it.
+    // `<` -> `\u003c` prevents a `</script>` (or `<!--`) inside a URL from
+    // closing this script tag early.
+    const mediaMapScript = `<script>window.__MEDIA_MAP__ = ${JSON.stringify(mediaMap).replace(/</g, "\\u003c")};</script>`;
+    if (!template.includes('<script type="module"')) {
+      throw new Error('Expected a <script type="module"> tag in the cached template to inject window.__MEDIA_MAP__ before.');
+    }
+    template = template.replace('<script type="module"', `${mediaMapScript}\n    <script type="module"`);
   }
 
   for (const route of routes) {
