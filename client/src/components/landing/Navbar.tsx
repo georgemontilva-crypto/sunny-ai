@@ -70,6 +70,12 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <Link
+              href="/signin"
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              Sign in
+            </Link>
             <Button size="sm" className="text-sm font-medium" asChild>
               <a href="/partner#pricing">Get Started</a>
             </Button>
@@ -111,6 +117,13 @@ export default function Navbar() {
                 className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/10 transition-colors text-left"
               >
                 For brands
+              </Link>
+              <Link
+                href="/signin"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/10 transition-colors text-left"
+              >
+                Sign in
               </Link>
               <div className="pt-3">
                 <Button size="sm" className="w-full" asChild>

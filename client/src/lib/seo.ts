@@ -46,6 +46,19 @@ export function getMetaForPath(path: string): HeadMeta {
     };
   }
 
+  // Member account pages, same reasoning as /admin above: never indexed,
+  // regardless of SITE.indexable, and not part of withNoindex()'s per-route
+  // defaults that flip once the site goes public.
+  if (clean === "/signin" || clean === "/signup" || clean === "/chat" || clean === "/account") {
+    const labels: Record<string, string> = { "/signin": "Sign in", "/signup": "Create account", "/chat": "Chat", "/account": "Account" };
+    return {
+      title: `${labels[clean]} — ${NAME}`,
+      description: `${NAME} account.`,
+      canonicalPath: clean,
+      noindex: true,
+    };
+  }
+
   if (clean === "/") {
     return withNoindex({ title: `${NAME} — AI Peptide Research`, description: SITE.description, canonicalPath: "/" });
   }

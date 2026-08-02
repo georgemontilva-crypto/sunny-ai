@@ -1,28 +1,21 @@
 import { AlertCircle } from "lucide-react";
 import { type FormEvent, useState } from "react";
-import { Redirect } from "wouter";
-import { getSlotUrl } from "@/lib/media";
+import { Link, Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useMemberAuth } from "@/hooks/useMemberAuth";
+import { getSlotUrl } from "@/lib/media";
+import { SITE } from "@shared/site.ts";
 
-export default function AdminLoginPage() {
-  const { user, isLoading, login } = useAdminAuth();
-  // A signed-in member has nothing to do on the staff login form — this is
-  // the same "member session → home, not /admin/anything" rule AdminGuarded
-  // applies to the rest of the panel.
-  const { user: memberUser, isLoading: memberLoading } = useMemberAuth();
+export default function SignInPage() {
+  const { user, isLoading, login } = useMemberAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   if (!isLoading && user) {
-    return <Redirect to="/admin/requests" />;
-  }
-  if (!memberLoading && memberUser) {
-    return <Redirect to="/" />;
+    return <Redirect to="/chat" />;
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -32,8 +25,7 @@ export default function AdminLoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't log in. Please try again.");
-    } finally {
+      setError(err instanceof Error ? err.message : "Couldn't sign in. Please try again.");
       setSubmitting(false);
     }
   };
@@ -42,12 +34,14 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-6">
-          <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" />
+          <Link href="/">
+            <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" />
+          </Link>
         </div>
         <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-2xl p-8 space-y-5 shadow-sm">
           <div className="text-center mb-2">
-            <h1 className="text-xl font-bold text-foreground">Sign in to the panel</h1>
-            <p className="text-sm text-muted-foreground mt-1">Sunny team only.</p>
+            <h1 className="text-xl font-bold text-foreground">Sign in</h1>
+            <p className="text-sm text-muted-foreground mt-1">Welcome back.</p>
           </div>
 
           <div className="space-y-1.5">
@@ -63,7 +57,12 @@ export default function AdminLoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
+              <a href={`mailto:${SITE.contactEmail}?subject=Forgot%20my%20password`} className="text-xs text-accent hover:underline">
+                Forgot password?
+              </a>
+            </div>
             <Input
               type="password"
               autoComplete="current-password"
@@ -84,6 +83,13 @@ export default function AdminLoginPage() {
           <Button type="submit" disabled={submitting} className="w-full font-semibold rounded-lg px-6">
             {submitting ? "Signing in…" : "Sign in"}
           </Button>
+
+          <p className="text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link href="/signup" className="text-accent hover:underline font-medium">
+              Create one
+            </Link>
+          </p>
         </form>
       </div>
     </div>

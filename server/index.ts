@@ -25,6 +25,7 @@ import compression from "compression";
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { authRoutes } from "./authRoutes.ts";
+import { memberAuthRoutes } from "./memberAuthRoutes.ts";
 import { publicRoutes } from "./publicRoutes.ts";
 import { appRouter } from "./routers/_app.ts";
 import { createContext } from "./trpc.ts";
@@ -48,6 +49,7 @@ app.use(compression());
 app.use(express.json({ limit: "1mb" }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/member-auth", memberAuthRoutes);
 app.use("/api/public", publicRoutes);
 app.use(
   "/api/trpc",
@@ -99,6 +101,20 @@ app.use((req, res, next) => {
 
   res.setHeader("Cache-Control", HTML_CACHE_CONTROL);
   res.sendFile(path.join(DIST_DIR, "admin", "index.html"));
+});
+
+// /signin, /signup, /chat, /account: member account pages, never
+// prerendered (scripts/prerender.mjs writes one shared empty shell for all
+// four — see its comment). A client-side <Link> between them never hits
+// this at all; this only matters for a direct hit (typed URL, refresh,
+// bookmark).
+const MEMBER_APP_PATHS = new Set(["/signin", "/signup", "/chat", "/account"]);
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  if (!MEMBER_APP_PATHS.has(req.path)) return next();
+
+  res.setHeader("Cache-Control", HTML_CACHE_CONTROL);
+  res.sendFile(path.join(DIST_DIR, "app-shell.html"));
 });
 
 app.use((_req, res) => {

@@ -24,6 +24,11 @@ import AdminMediaPage from "@/pages/admin/AdminMediaPage";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
 import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminAuditPage from "@/pages/admin/AdminAuditPage";
+import MemberGuarded from "@/components/member/MemberGuarded";
+import SignInPage from "@/pages/SignInPage";
+import SignUpPage from "@/pages/SignUpPage";
+import ChatPage from "@/pages/ChatPage";
+import AccountPage from "@/pages/AccountPage";
 
 function Router() {
   useSeoMeta();
@@ -38,6 +43,21 @@ function Router() {
       <Route path={"/legal/privacy"} component={Privacy} />
       <Route path={"/legal/cookies"} component={Cookies} />
       <Route path={"/legal/disclaimer"} component={Disclaimer} />
+      {/* /signin, /signup, /chat, /account are never in scripts/prerender.mjs's
+          routes list or the sitemap — server/index.ts serves dist/app-shell.html
+          (a generic noindex empty shell, same idea as /admin's) for a direct hit. */}
+      <Route path={"/signin"} component={SignInPage} />
+      <Route path={"/signup"} component={SignUpPage} />
+      <Route path={"/chat"}>
+        <MemberGuarded>
+          <ChatPage />
+        </MemberGuarded>
+      </Route>
+      <Route path={"/account"}>
+        <MemberGuarded>
+          <AccountPage />
+        </MemberGuarded>
+      </Route>
       {/* /admin/* is never in scripts/prerender.mjs's routes list or the
           sitemap — see that script's dedicated dist/admin/index.html shell. */}
       <Route path={"/admin/login"} component={AdminLoginPage} />

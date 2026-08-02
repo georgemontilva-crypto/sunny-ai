@@ -169,6 +169,18 @@ async function main() {
   fs.writeFileSync(path.join(DIST_DIR, "admin", "index.html"), adminShell, "utf-8");
   console.log("[prerender] wrote /admin/index.html (empty shell)");
 
+  // Same idea, one level up, for /signin /signup /chat /account —
+  // account-management routes shown to signed-in visitors, not admin
+  // staff, so a neutral title instead of "Panel". Also never in `routes`,
+  // the sitemap, or robots.txt's Allow. server/index.ts serves this single
+  // file for a direct hit on any of the four paths.
+  const appShellHeadHtml = [`<title>${SITE.name}</title>`, `<meta name="robots" content="noindex, nofollow" />`].join(
+    "\n    "
+  );
+  const appShell = template.replace("<!--app-html-->", "").replace("<!--app-head-->", appShellHeadHtml);
+  fs.writeFileSync(path.join(DIST_DIR, "app-shell.html"), appShell, "utf-8");
+  console.log("[prerender] wrote /app-shell.html (empty shell for /signin, /signup, /chat, /account)");
+
   // Explicit 404 page for static hosts (Netlify/Vercel/S3 convention)
   const notFound = render("/__not_found__");
   const notFoundHeadHtml = `<title>${escapeHtml(notFound.head.title)}</title>\n    <meta name="robots" content="noindex, nofollow" />`;
@@ -190,7 +202,7 @@ async function main() {
   // robots.txt: fully generated from SITE.indexable — overwrites whatever
   // vite build copied from client/public/robots.txt.
   const robotsTxt = SITE.indexable
-    ? `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: ${SITE.domain}/sitemap.xml\n`
+    ? `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /signin\nDisallow: /signup\nDisallow: /chat\nDisallow: /account\n\nSitemap: ${SITE.domain}/sitemap.xml\n`
     : `User-agent: *\nDisallow: /\n`;
   fs.writeFileSync(path.join(DIST_DIR, "robots.txt"), robotsTxt, "utf-8");
   console.log(`[prerender] wrote /robots.txt (indexable: ${SITE.indexable})`);

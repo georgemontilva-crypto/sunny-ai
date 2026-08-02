@@ -9,10 +9,16 @@ export const users = mysqlTable("users", {
   id: uuidPk(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  role: varchar("role", { length: 20 }).notNull().default("admin"), // 'admin' | 'editor'
+  role: varchar("role", { length: 20 }).notNull().default("admin"), // 'admin' | 'editor' | 'member'
   isActive: boolean("is_active").notNull().default(true),
   lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+  // Panel accounts (admin/editor) don't collect this — only public signup
+  // does, so it's nullable rather than backfilled.
+  name: text("name"),
+  // Not read anywhere yet — reserved for when email verification ships.
+  // Public signup grants full access immediately without it.
+  emailVerified: boolean("email_verified").notNull().default(false),
 });
 
 export const sessions = mysqlTable(
@@ -79,6 +85,36 @@ export const settings = mysqlTable("settings", {
   value: text("value").notNull(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+// A member's own data — deleting either of these (AccountPage's "delete
+// history", or the whole account) is a real DELETE, never a soft flag, per
+// the privacy commitment in /legal/privacy. onDelete: "cascade" on both FKs
+// means deleting the user row alone is enough to remove every message.
+export const conversations = mysqlTable(
+  "conversations",
+  {
+    id: uuidPk(),
+    userId: varchar("user_id", { length: 36 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [index("conversations_user_id_idx").on(table.userId)]
+);
+
+export const messages = mysqlTable(
+  "messages",
+  {
+    id: uuidPk(),
+    conversationId: varchar("conversation_id", { length: 36 })
+      .notNull()
+      .references(() => conversations.id, { onDelete: "cascade" }),
+    role: varchar("role", { length: 20 }).notNull(), // 'user' | 'assistant'
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [index("messages_conversation_id_idx").on(table.conversationId)]
+);
 
 export const auditLog = mysqlTable("audit_log", {
   id: uuidPk(),

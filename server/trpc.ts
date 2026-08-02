@@ -3,11 +3,16 @@ import type { CreateExpressContextOptions } from "@trpc/server/adapters/express"
 import { getDb } from "./db.ts";
 import { validateSession } from "./session.ts";
 
-export async function createContext({ req }: CreateExpressContextOptions) {
+export async function createContext({ req, res }: CreateExpressContextOptions) {
   const db = getDb();
   return {
     db,
-    session: db ? await validateSession(db, req.headers.cookie) : null,
+    res,
+    // Resolved independently, from their own cookie — an admin session is
+    // never even looked up while handling a member-scoped call, and vice
+    // versa. See server/session.ts's top comment for the full reasoning.
+    adminSession: db ? await validateSession(db, req.headers.cookie, "admin") : null,
+    memberSession: db ? await validateSession(db, req.headers.cookie, "member") : null,
     ip: req.ip,
   };
 }
@@ -19,16 +24,29 @@ const t = initTRPC.context<Context>().create();
 export const router = t.router;
 export const publicProcedure = t.procedure;
 
-// Requires a valid, unexpired session cookie whose user is still active
-// (validateSession already filters out deactivated users). Both panel roles
-// ('admin' and 'editor') pass this gate — it's the boundary between public
-// and authenticated, not a strict admin-only check.
+// Requires a valid, unexpired admin-cookie session whose user is still
+// active AND isn't a 'member' role. The cookie-name separation alone would
+// stop a member's session id from ever being *read* here, but this checks
+// the actual resolved role too — don't assume a session found under the
+// admin cookie is automatically an admin/editor.
 export const adminProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx.session) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
   if (!ctx.db) {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not configured" });
   }
-  return next({ ctx: { ...ctx, session: ctx.session, db: ctx.db } });
+  if (!ctx.adminSession || ctx.adminSession.role === "member") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({ ctx: { ...ctx, session: ctx.adminSession, db: ctx.db } });
+});
+
+// Mirror of adminProcedure for the public member realm: valid member-cookie
+// session, active user, and — explicitly, not assumed — role === 'member'.
+export const memberProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.db) {
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not configured" });
+  }
+  if (!ctx.memberSession || ctx.memberSession.role !== "member") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({ ctx: { ...ctx, session: ctx.memberSession, db: ctx.db } });
 });

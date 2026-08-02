@@ -50,14 +50,17 @@ authRoutes.post("/login", loginLimiter, async (req, res) => {
     .verify(user?.passwordHash ?? DUMMY_HASH, parsed.data.password)
     .catch(() => false);
 
-  if (!user || !valid || !user.isActive) {
+  // A member's credentials are valid, just not for this realm — rejected
+  // here rather than left to adminProcedure's role check so a member never
+  // gets an (unusable but real) admin-cookie session in the first place.
+  if (!user || !valid || !user.isActive || user.role === "member") {
     res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 
   await db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
 
-  const cookie = await createSession(db, {
+  const cookie = await createSession(db, "admin", {
     userId: user.id,
     ip: req.ip,
     userAgent: req.get("user-agent"),
@@ -73,6 +76,6 @@ authRoutes.post("/logout", async (req, res) => {
     return;
   }
 
-  res.setHeader("Set-Cookie", await destroySession(db, req.headers.cookie));
+  res.setHeader("Set-Cookie", await destroySession(db, "admin", req.headers.cookie));
   res.json({ ok: true });
 });
