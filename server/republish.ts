@@ -26,6 +26,15 @@ const DIST_DIR = path.join(ROOT, "dist");
 // works identically invoked with `node` on any OS).
 const TSX_CLI = path.join(ROOT, "node_modules", "tsx", "dist", "cli.mjs");
 
+// A container restart mid-republish kills the child processes with it,
+// possibly leaving a partial dist-tmp/ behind — dist/ was never touched at
+// that point (the copy only happens after both children exit 0), so it's
+// still fully consistent. republish() already wipes TEMP_DIR at both its
+// start and end, so an orphaned dist-tmp/ can't block the next run either
+// way; this just clears it proactively at boot instead of leaving it on
+// disk until the next upload happens to trigger one.
+fs.rmSync(TEMP_DIR, { recursive: true, force: true });
+
 export type PublishStatus = "idle" | "pending" | "publishing" | "published" | "error";
 
 let status: PublishStatus = "idle";
