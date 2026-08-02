@@ -44,6 +44,12 @@ function writeRouteHtml(route, html) {
 }
 
 async function main() {
+  // Compared against server/index.ts's own logged DIST_DIR at startup — a
+  // full `pnpm build` run (PRERENDER_OUT_DIR unset) must resolve to the
+  // exact same absolute path the running server serves static files from,
+  // or nothing this script writes is ever actually served.
+  console.log(`[prerender] ROOT=${ROOT}`);
+  console.log(`[prerender] writing to DIST_DIR=${DIST_DIR}`);
   console.log("[prerender] building SSR bundle...");
   // Entry path is resolved relative to Vite's configured `root` (client/), not cwd.
   execSync(

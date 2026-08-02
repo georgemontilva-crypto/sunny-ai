@@ -107,13 +107,43 @@ app.use((_req, res) => {
 
 // Logged first, before anything else, so a stale-content report starts by
 // checking this line against the latest pushed commit rather than guessing.
+let buildInfo: { commit?: string; branch?: string; deploymentId?: string; builtAt?: string } | null = null;
 try {
-  const buildInfo = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, ".build-info.json"), "utf-8"));
+  buildInfo = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, ".build-info.json"), "utf-8"));
   console.log(
-    `[server] build: commit=${buildInfo.commit} branch=${buildInfo.branch} deploymentId=${buildInfo.deploymentId} builtAt=${buildInfo.builtAt}`
+    `[server] build: commit=${buildInfo?.commit} branch=${buildInfo?.branch} deploymentId=${buildInfo?.deploymentId} builtAt=${buildInfo?.builtAt}`
   );
 } catch {
   console.log("[server] build: no .build-info.json found (local dev without a full `pnpm build`?)");
+}
+
+// If dist/index.html predates .build-info.json's builtAt, the two didn't
+// come from the same build pass — something is serving files from outside
+// what this process's own build wrote, whether that's a volume mount
+// shadowing DIST_DIR at container start, or a build-cache layer that skipped
+// rewriting it.
+console.log(`[server] DIST_DIR=${DIST_DIR}`);
+try {
+  const indexPath = path.join(DIST_DIR, "index.html");
+  const stat = fs.statSync(indexPath);
+  const content = fs.readFileSync(indexPath, "utf-8");
+  console.log(`[server] dist/index.html: mtime=${stat.mtime.toISOString()} size=${stat.size}`);
+  if (buildInfo?.builtAt && stat.mtime.toISOString() < buildInfo.builtAt) {
+    console.log(
+      `[server] WARNING: dist/index.html mtime (${stat.mtime.toISOString()}) is older than this build's builtAt (${buildInfo.builtAt}) — this file was not written by this build`
+    );
+  }
+  console.log(`[server] dist/index.html first 200 chars: ${JSON.stringify(content.slice(0, 200))}`);
+  const scriptSrcs = [...content.matchAll(/<script[^>]*\ssrc="([^"]+)"/g)].map((m) => m[1]);
+  console.log(`[server] dist/index.html script src(s): ${JSON.stringify(scriptSrcs)}`);
+  const unexpected = scriptSrcs.filter((src) => !src.startsWith("/assets/"));
+  if (unexpected.length > 0) {
+    console.log(
+      `[server] WARNING: script src(s) outside /assets/ — not produced by this project's Vite build: ${JSON.stringify(unexpected)}`
+    );
+  }
+} catch (err) {
+  console.error("[server] failed to read dist/index.html for startup diagnostics:", err);
 }
 
 const PORT = Number(process.env.PORT ?? 3001);

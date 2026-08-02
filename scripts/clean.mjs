@@ -12,7 +12,24 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+// Logs what it found *before* deleting it — a stale dist/ surviving a fresh
+// git checkout (dist/ is gitignored, so a real clone never has one) is
+// itself the evidence, whether or not the delete below actually sticks
+// (e.g. a volume remounting old content back over this path after the
+// build phase would make this log line show a deletion that didn't last).
 for (const dir of ["dist", "dist-server", ".ssr-tmp"]) {
-  fs.rmSync(path.join(ROOT, dir), { recursive: true, force: true });
+  const full = path.join(ROOT, dir);
+  if (fs.existsSync(full)) {
+    const entries = fs.readdirSync(full);
+    console.log(`[clean] found existing ${full} — ${entries.length} entries: ${entries.slice(0, 10).join(", ")}${entries.length > 10 ? ", ..." : ""}`);
+    const indexHtml = path.join(full, "index.html");
+    if (fs.existsSync(indexHtml)) {
+      const stat = fs.statSync(indexHtml);
+      console.log(`[clean]   ${indexHtml} mtime=${stat.mtime.toISOString()} size=${stat.size}`);
+    }
+  } else {
+    console.log(`[clean] ${full} did not exist`);
+  }
+  fs.rmSync(full, { recursive: true, force: true });
 }
 console.log("[clean] removed dist/, dist-server/, .ssr-tmp/");

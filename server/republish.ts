@@ -151,6 +151,7 @@ async function republish(): Promise<void> {
   const id = ++runCounter;
   const tempDir = path.join(ROOT, `dist-tmp-${id}`);
   console.log(`[republish#${id}] starting`);
+  console.log(`[republish#${id}] ROOT=${ROOT} DIST_DIR=${DIST_DIR} tempDir=${tempDir}`);
   logBuildInfo(id);
 
   let releaseLock: (() => Promise<void>) | null = null;
