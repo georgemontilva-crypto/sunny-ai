@@ -2,6 +2,8 @@
 // by a shared secret (not a user session) because the caller is a server,
 // not a browser.
 import { randomUUID, timingSafeEqual } from "node:crypto";
+import fs from "node:fs";
+import path from "node:path";
 import { eq } from "drizzle-orm";
 import { Router } from "express";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
@@ -9,6 +11,8 @@ import { z } from "zod";
 import { SITE } from "../shared/site.ts";
 import { getDb, type Db } from "./db.ts";
 import { requests, settings } from "./schema.ts";
+
+const BUILD_INFO_PATH = path.resolve(import.meta.dirname, ".build-info.json");
 
 const WORKER_SECRET = process.env.WORKER_SECRET;
 if (!WORKER_SECRET) {
@@ -62,6 +66,17 @@ const publicLimiter = rateLimit({
 });
 
 export const publicRoutes = Router();
+
+// Answers "is this container actually running today's code?" without
+// needing Railway dashboard/log access — curl it after a deploy or a
+// republish and compare `commit` against the latest push.
+publicRoutes.get("/build-info", (_req, res) => {
+  try {
+    res.json(JSON.parse(fs.readFileSync(BUILD_INFO_PATH, "utf-8")));
+  } catch {
+    res.status(404).json({ error: "No .build-info.json (local dev without a full `pnpm build`?)" });
+  }
+});
 
 publicRoutes.post("/request", publicLimiter, async (req, res) => {
   const secret = req.get("x-worker-secret") ?? "";

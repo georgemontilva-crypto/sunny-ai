@@ -105,6 +105,17 @@ app.use((_req, res) => {
   res.status(404).set("Cache-Control", HTML_CACHE_CONTROL).sendFile(path.join(DIST_DIR, "404.html"));
 });
 
+// Logged first, before anything else, so a stale-content report starts by
+// checking this line against the latest pushed commit rather than guessing.
+try {
+  const buildInfo = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, ".build-info.json"), "utf-8"));
+  console.log(
+    `[server] build: commit=${buildInfo.commit} branch=${buildInfo.branch} deploymentId=${buildInfo.deploymentId} builtAt=${buildInfo.builtAt}`
+  );
+} catch {
+  console.log("[server] build: no .build-info.json found (local dev without a full `pnpm build`?)");
+}
+
 const PORT = Number(process.env.PORT ?? 3001);
 app.listen(PORT, () => {
   console.log(`[server] listening on :${PORT}`);

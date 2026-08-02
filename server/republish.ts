@@ -131,10 +131,27 @@ async function acquireCrossProcessLock(id: number): Promise<(() => Promise<void>
   };
 }
 
+// Same fingerprint server/index.ts logs at startup, re-logged on every run
+// so a stale-content report can pin down exactly which build's source
+// prerender.mjs actually compiled from — this process never re-fetches or
+// re-checks-out code, so it's always the container's build, but logging it
+// here removes any doubt.
+function logBuildInfo(id: number): void {
+  try {
+    const info = JSON.parse(fs.readFileSync(path.join(ROOT, "dist-server", ".build-info.json"), "utf-8"));
+    console.log(
+      `[republish#${id}] build: commit=${info.commit} branch=${info.branch} deploymentId=${info.deploymentId} builtAt=${info.builtAt}`
+    );
+  } catch {
+    console.log(`[republish#${id}] build: no .build-info.json found`);
+  }
+}
+
 async function republish(): Promise<void> {
   const id = ++runCounter;
   const tempDir = path.join(ROOT, `dist-tmp-${id}`);
   console.log(`[republish#${id}] starting`);
+  logBuildInfo(id);
 
   let releaseLock: (() => Promise<void>) | null = null;
 
