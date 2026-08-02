@@ -10,6 +10,13 @@ dist-tmp/
 build/
 *.dist
 
+# Written by scripts/generate-media-map.ts before every build/republish —
+# committing it just re-freezes whatever URLs happened to be current at the
+# last commit into the client bundle (see client/src/lib/media.ts's
+# window.__MEDIA_MAP__ fallback path). `pnpm dev` writes an empty one on
+# first run if it's missing.
+client/src/generated/media-map.json
+
 # Environment variables
 .env
 .env.local

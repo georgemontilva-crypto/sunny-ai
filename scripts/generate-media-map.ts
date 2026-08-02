@@ -1,19 +1,26 @@
-// Resolves every catalog slot to a real URL (R2 if the DB answers,
-// client/public paths otherwise) into client/src/generated/media-map.json,
-// which client/src/lib/media.ts reads at build time.
+// Resolves every catalog slot to a real R2 URL into
+// client/src/generated/media-map.json, which client/src/lib/media.ts reads
+// at build time.
 //
-// Fallback philosophy: client/public is ONLY a legitimate answer for a slot
-// that has no database row at all — never for a slot that DOES have a row.
-// A row whose variants can't be turned into a usable R2 URL is a bug (bad
-// JSON shape, missing R2_PUBLIC_URL, whatever), not a degraded-but-fine
-// state, so it throws instead of quietly reverting that slot to
-// client/public. Three previous bugs all had the same symptom — a slot
-// silently falling back to its old image — because every one of them failed
-// toward the same safe-looking default. This fails loud instead.
+// No client/public fallback: a slot with no database row, or with no
+// DATABASE_URL/R2_PUBLIC_URL configured at all, resolves to an empty entry
+// — the component that reads it shows its own placeholder. There used to
+// be a fallback to a same-named file in client/public, but that's exactly
+// what let a stale image survive indefinitely: an upload failure, a
+// missing env var, or a DB hiccup all quietly resolved to *some* image
+// instead of *no* image, so the bug never looked like a bug. An empty
+// entry is loud — a visibly missing image, not a wrong one.
+//
+// Fallback philosophy for a row that DOES exist: client/public is gone as
+// a concept entirely now, but the underlying principle stays — a row whose
+// variants can't be turned into a usable R2 URL is a bug (bad JSON shape,
+// missing R2_PUBLIC_URL, whatever), not a degraded-but-fine state, so it
+// throws instead of quietly resolving to an empty entry that looks the
+// same as "nobody's uploaded here yet".
 //
 // Two callers, two failure modes:
 //   - `pnpm build` (no flag): a DB/R2 outage must NOT fail the build — logs
-//     the failure and falls back to client/public for every slot, exit 0.
+//     the failure and writes an empty entry for every slot, exit 0.
 //   - server/republish.ts (--strict-on-error): a DB/R2 outage, or a
 //     resolution failure for any slot that has a row, must NOT be
 //     swallowed. Leaves the existing media-map.json untouched and exits 1,
@@ -26,47 +33,15 @@ import { MEDIA_SLOTS, type VariantName } from "../server/mediaCatalog.ts";
 import { media } from "../server/schema.ts";
 
 const OUT_FILE = path.resolve(import.meta.dirname, "..", "client", "src", "generated", "media-map.json");
-const PUBLIC_DIR = path.resolve(import.meta.dirname, "..", "client", "public");
 const STRICT = process.argv.includes("--strict-on-error");
 
 type ResolvedMap = Record<string, Partial<Record<VariantName, string>>>;
 type StoredVariant = { key: string; width: number; height: number; bytes: number; hash?: string };
 type StoredVariants = Partial<Record<VariantName, StoredVariant>>;
 
-const SEED_OVERRIDES: Record<string, string> = {
-  logo: "logo.png",
-  "favicon-svg": "favicon.svg",
-  "favicon-png": "favicon.png",
-};
-
-function fallbackFileName(slot: string, variant: VariantName): string {
-  const base = SEED_OVERRIDES[slot] ?? `${slot}.webp`;
-  if (variant === "base") return base;
-  const ext = path.extname(base);
-  const stem = base.slice(0, -ext.length);
-  return variant === "2x" ? `${stem}@2x${ext}` : `${stem}-mobile${ext}`;
-}
-
-// Only adds an entry when the file actually exists — a slot with neither a
-// seed file in client/public nor a DB row (e.g. a brand-new catalog entry
-// nobody has uploaded to yet) should resolve to nothing, not a guessed path
-// that 404s. Components treat a missing entry as "show a placeholder."
-function fallbackEntry(slot: string, declaredVariants: VariantName[]): Partial<Record<VariantName, string>> {
-  const entry: Partial<Record<VariantName, string>> = {};
-  for (const variant of declaredVariants) {
-    const fileName = fallbackFileName(slot, variant);
-    if (fs.existsSync(path.join(PUBLIC_DIR, fileName))) {
-      entry[variant] = `/${fileName}`;
-    }
-  }
-  return entry;
-}
-
-function fallbackMap(): ResolvedMap {
+function emptyMap(): ResolvedMap {
   const map: ResolvedMap = {};
-  for (const slotDef of MEDIA_SLOTS) {
-    map[slotDef.slot] = fallbackEntry(slotDef.slot, Object.keys(slotDef.variants) as VariantName[]);
-  }
+  for (const slotDef of MEDIA_SLOTS) map[slotDef.slot] = {};
   return map;
 }
 
@@ -116,15 +91,14 @@ async function resolveFromDatabase(databaseUrl: string, publicUrl: string): Prom
   const rowsBySlot = new Map(rows.map((r) => [r.slot, r]));
   const resolved: ResolvedMap = {};
   let fromR2 = 0;
-  let fromFallback = 0;
+  let empty = 0;
 
   for (const slotDef of MEDIA_SLOTS) {
     const row = rowsBySlot.get(slotDef.slot);
-    const declaredVariants = Object.keys(slotDef.variants) as VariantName[];
 
     if (!row) {
-      resolved[slotDef.slot] = fallbackEntry(slotDef.slot, declaredVariants);
-      fromFallback++;
+      resolved[slotDef.slot] = {};
+      empty++;
       continue;
     }
 
@@ -148,7 +122,7 @@ async function resolveFromDatabase(databaseUrl: string, publicUrl: string): Prom
     fromR2++;
   }
 
-  console.log(`[media-map] resolved ${fromR2} slot(s) from R2, ${fromFallback} from client/public (no row in the database)`);
+  console.log(`[media-map] resolved ${fromR2} slot(s) from R2, ${empty} empty (no row in the database)`);
   for (const slot of ["hero-bg", "meet-sunny", "partner-hero"]) {
     if (resolved[slot]) console.log(`[media-map] ${slot} -> ${JSON.stringify(resolved[slot])}`);
   }
@@ -163,8 +137,8 @@ async function main() {
   const publicUrl = process.env.R2_PUBLIC_URL;
 
   if (!databaseUrl || !publicUrl) {
-    console.log("[media-map] DATABASE_URL or R2_PUBLIC_URL not set — every slot falls back to client/public");
-    write(fallbackMap());
+    console.log("[media-map] DATABASE_URL or R2_PUBLIC_URL not set — every slot is empty, components show their placeholder");
+    write(emptyMap());
     return;
   }
 
@@ -178,8 +152,8 @@ async function main() {
       process.exitCode = 1;
       return;
     }
-    console.error(`[media-map] FAILED, using client/public fallback for every slot: ${message}`);
-    write(fallbackMap());
+    console.error(`[media-map] FAILED, every slot empty for this build: ${message}`);
+    write(emptyMap());
   }
 }
 

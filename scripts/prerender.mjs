@@ -26,6 +26,13 @@ const DIST_DIR = process.env.PRERENDER_OUT_DIR ? path.resolve(process.env.PREREN
 const SSR_TMP_DIR = path.join(ROOT, ".ssr-tmp");
 const TEMPLATE_CACHE = path.join(ROOT, "dist-server", ".prerender-template.html");
 
+// manifest.json's colors, kept in sync by hand with client/src/index.css's
+// light-theme :root block — --background ("Arena") and --accent ("Sol").
+// Not worth parsing CSS at build time for two values that change on a
+// redesign, not a routine edit.
+const MANIFEST_BACKGROUND_COLOR = "oklch(0.9598 0.016 82.79)";
+const MANIFEST_THEME_COLOR = "oklch(0.7587 0.153 74.46)";
+
 function escapeHtml(s) {
   return s
     .replace(/&/g, "&amp;")
@@ -80,22 +87,55 @@ async function main() {
   }
   let template = fs.readFileSync(TEMPLATE_CACHE, "utf-8");
   fs.mkdirSync(DIST_DIR, { recursive: true });
-  const ogImageHref = `${SITE.domain}${SITE.ogImage}`;
 
-  // The favicon <link>s are static markup in the template, outside the
-  // per-route <!--app-head--> splice below, so a live republish (which never
-  // re-runs `vite build`, only this script) would otherwise keep serving
-  // whatever favicon-svg/favicon-png resolved to at the last full build —
-  // scripts/generate-media-map.ts always runs right before this script, so
-  // its output here is as fresh as the DB.
+  // Loaded once, used below for: the favicon/preload <link>s, resolving
+  // og:image, window.__MEDIA_MAP__ (so hydration doesn't clobber this
+  // render with the client bundle's frozen import — see
+  // client/src/lib/media.ts), and manifest.json's icons. Defaults to {}
+  // rather than failing the build: scripts/generate-media-map.ts always
+  // writes *something*, but every slot resolving empty (no DB, and
+  // client/public is no longer a fallback source) is a normal, supported
+  // state — everything below that depends on it is written conditionally,
+  // never left pointing at a file that doesn't exist.
   const mediaMapPath = path.join(ROOT, "client", "src", "generated", "media-map.json");
-  if (fs.existsSync(mediaMapPath)) {
-    const mediaMap = JSON.parse(fs.readFileSync(mediaMapPath, "utf-8"));
-    const svgHref = mediaMap["favicon-svg"]?.base;
-    const pngHref = mediaMap["favicon-png"]?.base;
-    if (svgHref) template = template.replace('href="/favicon.svg"', `href="${svgHref}"`);
-    if (pngHref) template = template.replace('href="/favicon.png"', `href="${pngHref}"`);
+  const mediaMap = fs.existsSync(mediaMapPath) ? JSON.parse(fs.readFileSync(mediaMapPath, "utf-8")) : {};
 
+  // Removes a whole <link> line (including its indentation and trailing
+  // newline) rather than leaving a blank line — used whenever a slot below
+  // has nothing to point the tag at.
+  function dropLink(html, literalTag) {
+    return html.replace(new RegExp(`[ \\t]*${literalTag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\r?\\n`), "");
+  }
+
+  // The favicon <link>s and the hero-sunny preload hint are static markup
+  // in the template, outside the per-route <!--app-head--> splice below,
+  // so a live republish (which never re-runs `vite build`, only this
+  // script) would otherwise keep serving whatever they resolved to at the
+  // last full build. Removed outright when the slot is empty — the whole
+  // point of this pass is that nothing here falls back to a client/public
+  // file that may no longer exist.
+  const svgHref = mediaMap["favicon-svg"]?.base;
+  template = svgHref
+    ? template.replace('href="/favicon.svg"', `href="${svgHref}"`)
+    : dropLink(template, '<link rel="icon" type="image/svg+xml" href="/favicon.svg" />');
+
+  const pngHref = mediaMap["favicon-png"]?.base;
+  template = pngHref
+    ? template.replace('href="/favicon.png"', `href="${pngHref}"`)
+    : dropLink(template, '<link rel="icon" type="image/png" href="/favicon.png" />');
+
+  const heroPreloadHref = mediaMap["hero-sunny"]?.base;
+  template = heroPreloadHref
+    ? template.replace('href="/hero-sunny.webp"', `href="${heroPreloadHref}"`)
+    : dropLink(template, '<link rel="preload" as="image" href="/hero-sunny.webp" />');
+
+  // Already an absolute R2 URL when set (client/public is no longer a
+  // fallback source, so there's no relative path to prepend SITE.domain
+  // to) — undefined omits the og:image/twitter:card meta tags below
+  // entirely instead of pointing them at nothing.
+  const ogImageHref = mediaMap["og-image"]?.base;
+
+  {
     // The CLIENT bundle (dist/assets/*.js) is built once by `vite build` and
     // never rebuilt by a republish — only this script and the SSR bundle
     // are. It statically imports media-map.json, so its copy goes stale the
@@ -138,12 +178,17 @@ async function main() {
       `<meta property="og:title" content="${escapeHtml(head.title)}" />`,
       `<meta property="og:description" content="${escapeHtml(head.description)}" />`,
       `<meta property="og:url" content="${escapeHtml(canonicalHref)}" />`,
-      `<meta property="og:image" content="${escapeHtml(ogImageHref)}" />`,
-      `<meta name="twitter:card" content="summary_large_image" />`,
+    ];
+    // No og-image slot set: omit the tag rather than point social crawlers
+    // at a URL that doesn't exist. "summary_large_image" needs an image to
+    // render as intended, so the card type downgrades along with it.
+    if (ogImageHref) headTags.push(`<meta property="og:image" content="${escapeHtml(ogImageHref)}" />`);
+    headTags.push(
+      `<meta name="twitter:card" content="${ogImageHref ? "summary_large_image" : "summary"}" />`,
       `<meta name="twitter:title" content="${escapeHtml(head.title)}" />`,
       `<meta name="twitter:description" content="${escapeHtml(head.description)}" />`,
-      `<link rel="canonical" href="${escapeHtml(canonicalHref)}" />`,
-    ];
+      `<link rel="canonical" href="${escapeHtml(canonicalHref)}" />`
+    );
     if (head.noindex) headTags.push(`<meta name="robots" content="noindex, nofollow" />`);
     const headHtml = headTags.join("\n    ");
 
@@ -206,6 +251,34 @@ async function main() {
     : `User-agent: *\nDisallow: /\n`;
   fs.writeFileSync(path.join(DIST_DIR, "robots.txt"), robotsTxt, "utf-8");
   console.log(`[prerender] wrote /robots.txt (indexable: ${SITE.indexable})`);
+
+  // Generated fresh every run, same as robots.txt/sitemap.xml above —
+  // client/public/manifest.json no longer exists, so this is the only
+  // source. Icons list is empty (not a broken reference) until icon-192/
+  // icon-512 have something uploaded.
+  const icon192Href = mediaMap["icon-192"]?.base;
+  const icon512Href = mediaMap["icon-512"]?.base;
+  const manifestIcons = [];
+  if (icon192Href) manifestIcons.push({ src: icon192Href, sizes: "192x192", type: "image/png", purpose: "any" });
+  if (icon512Href) {
+    manifestIcons.push({ src: icon512Href, sizes: "512x512", type: "image/png", purpose: "any" });
+    manifestIcons.push({ src: icon512Href, sizes: "512x512", type: "image/png", purpose: "maskable" });
+  }
+  const manifest = {
+    name: SITE.name,
+    short_name: SITE.name,
+    description: SITE.description,
+    start_url: "/",
+    display: "standalone",
+    background_color: MANIFEST_BACKGROUND_COLOR,
+    theme_color: MANIFEST_THEME_COLOR,
+    lang: "en",
+    orientation: "portrait-primary",
+    categories: ["education", "medical"],
+    icons: manifestIcons,
+  };
+  fs.writeFileSync(path.join(DIST_DIR, "manifest.json"), JSON.stringify(manifest, null, 2), "utf-8");
+  console.log(`[prerender] wrote /manifest.json (${manifestIcons.length} icon(s))`);
 
   fs.rmSync(SSR_TMP_DIR, { recursive: true, force: true });
 }

@@ -7,7 +7,9 @@ export const SITE = {
   domain: "https://sunny-ai-production.up.railway.app",
   description:
     "Sunny is an AI-powered peptide research consultancy: educational, research-focused information about compounds — no diagnosing, no prescribing.",
-  ogImage: "/og-image.png",
+  // No fixed path here on purpose — scripts/prerender.mjs resolves
+  // og:image from the "og-image" media slot instead, so it's never a file
+  // baked into client/public.
   contactEmail: "hola@sunnypeptides.com",
   // false mientras el sitio viva en el dominio temporal de Railway: fuerza
   // robots.txt a "Disallow: /" y <meta name="robots" content="noindex"> en

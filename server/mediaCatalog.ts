@@ -141,6 +141,21 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
   { slot: "logo", label: "Logo", variants: { base: { recommended: { width: 886, height: 300 } } } },
   { slot: "favicon-svg", label: "Favicon (SVG)", variants: { base: { recommended: { width: 100, height: 100 } } } },
   { slot: "favicon-png", label: "Favicon (PNG fallback)", variants: { base: { recommended: { width: 64, height: 64 } } } },
+  {
+    slot: "og-image",
+    label: "Social share preview (Open Graph)",
+    variants: { base: { width: 1200, height: 630, recommended: { width: 1200, height: 630 } } },
+  },
+  {
+    slot: "icon-192",
+    label: "App icon — 192×192",
+    variants: { base: { width: 192, height: 192, recommended: { width: 192, height: 192 } } },
+  },
+  {
+    slot: "icon-512",
+    label: "App icon — 512×512",
+    variants: { base: { width: 512, height: 512, recommended: { width: 512, height: 512 } } },
+  },
 ];
 
 const SLOT_MAP = new Map(MEDIA_SLOTS.map((def) => [def.slot, def]));
