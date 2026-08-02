@@ -33,6 +33,10 @@ import { createContext } from "./trpc.ts";
 // sibling of dist-server/, not of server/.
 const DIST_DIR = path.resolve(import.meta.dirname, "..", "dist");
 const ASSETS_DIR = `${path.sep}assets${path.sep}`;
+// Never let the browser serve a prerendered page from its own cache without
+// asking first — a republish after a media upload is invisible otherwise,
+// since the browser would just reuse the old HTML it already has.
+const HTML_CACHE_CONTROL = "no-cache, must-revalidate";
 
 const app = express();
 
@@ -66,7 +70,7 @@ app.use(
         "Cache-Control",
         filePath.includes(ASSETS_DIR)
           ? "public, max-age=31536000, immutable" // hashed filename, content never changes under this URL
-          : "public, max-age=0, must-revalidate" // HTML and unhashed public/ files — always revalidate
+          : HTML_CACHE_CONTROL // HTML and unhashed public/ files — always revalidate
       );
     },
   })
@@ -82,7 +86,7 @@ app.use((req, res, next) => {
 
   const candidate = path.join(DIST_DIR, decodeURIComponent(req.path), "index.html");
   if (fs.existsSync(candidate)) {
-    res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+    res.setHeader("Cache-Control", HTML_CACHE_CONTROL);
     res.sendFile(candidate);
     return;
   }
@@ -93,12 +97,12 @@ app.use((req, res, next) => {
   if (req.method !== "GET" && req.method !== "HEAD") return next();
   if (!req.path.startsWith("/admin")) return next();
 
-  res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+  res.setHeader("Cache-Control", HTML_CACHE_CONTROL);
   res.sendFile(path.join(DIST_DIR, "admin", "index.html"));
 });
 
 app.use((_req, res) => {
-  res.status(404).sendFile(path.join(DIST_DIR, "404.html"));
+  res.status(404).set("Cache-Control", HTML_CACHE_CONTROL).sendFile(path.join(DIST_DIR, "404.html"));
 });
 
 const PORT = Number(process.env.PORT ?? 3001);

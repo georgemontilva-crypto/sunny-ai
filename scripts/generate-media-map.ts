@@ -63,8 +63,12 @@ async function main() {
     for (const row of rows) {
       const variants = row.variants as Record<string, { key: string }>;
       const entry: Partial<Record<VariantName, string>> = { ...resolved[row.slot] };
+      // R2 serves the same key across replacements, so the URL itself has to
+      // change or the browser (and any CDN in front) just keeps the old
+      // bytes — updatedAt as a query param does that for free.
+      const version = new Date(row.updatedAt).getTime();
       for (const [variant, data] of Object.entries(variants)) {
-        entry[variant as VariantName] = `${publicUrl.replace(/\/$/, "")}/${data.key}`;
+        entry[variant as VariantName] = `${publicUrl.replace(/\/$/, "")}/${data.key}?v=${version}`;
       }
       resolved[row.slot] = entry;
     }

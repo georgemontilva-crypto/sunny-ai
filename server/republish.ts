@@ -3,10 +3,10 @@
 // restart. Regenerates HTML only: JS/CSS assets don't change, so there's
 // no need to re-run `vite build`, just the media map + prerender pass.
 //
-// Batches uploads: several in a row reset the 60s timer instead of each
-// triggering its own run. Single-flight: if a new upload lands while a
-// republish is actively running, it's queued (not run in parallel) and
-// re-arms the debounce once the current run finishes.
+// Fires immediately on confirmUpload, no debounce — the whole pass runs in
+// well under a second, so there's nothing to batch. Still single-flight: if
+// an upload lands while a republish is actively running, it's queued (not
+// run in parallel) and triggers one more pass once the current one finishes.
 //
 // prerender.mjs writes into a temp directory (never dist/ directly); only
 // once it exits successfully do we copy those files over dist/. A failed
@@ -15,7 +15,6 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 
-const DEBOUNCE_MS = 60_000;
 const ROOT = path.resolve(import.meta.dirname, ".."); // bundled to dist-server/index.mjs at runtime
 const TEMP_DIR = path.join(ROOT, "dist-tmp");
 const DIST_DIR = path.join(ROOT, "dist");
@@ -39,7 +38,6 @@ export type PublishStatus = "idle" | "pending" | "publishing" | "published" | "e
 
 let status: PublishStatus = "idle";
 let lastError: string | null = null;
-let timer: ReturnType<typeof setTimeout> | null = null;
 let running = false;
 let queued = false;
 
@@ -53,13 +51,7 @@ export function scheduleRepublish(): void {
     status = "pending";
     return;
   }
-  status = "pending";
-  lastError = null;
-  if (timer) clearTimeout(timer);
-  timer = setTimeout(() => {
-    timer = null;
-    void republish();
-  }, DEBOUNCE_MS);
+  void republish();
 }
 
 function runChild(command: string, args: string[], extraEnv?: NodeJS.ProcessEnv): Promise<void> {
