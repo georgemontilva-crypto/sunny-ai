@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import ContactPage from "@/pages/ContactPage";
+import PartnerPage from "@/pages/PartnerPage";
 import Terms from "@/pages/legal/Terms";
 import Privacy from "@/pages/legal/Privacy";
 import Cookies from "@/pages/legal/Cookies";
@@ -32,6 +33,7 @@ function Router() {
       <Route path={"/blog"} component={BlogPage} />
       <Route path={"/blog/:slug"} component={BlogPostPage} />
       <Route path={"/contact"} component={ContactPage} />
+      <Route path={"/partner"} component={PartnerPage} />
       <Route path={"/legal/terms"} component={Terms} />
       <Route path={"/legal/privacy"} component={Privacy} />
       <Route path={"/legal/cookies"} component={Cookies} />

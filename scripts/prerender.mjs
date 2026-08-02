@@ -58,6 +58,7 @@ async function main() {
     "/",
     "/blog",
     "/contact",
+    "/partner",
     "/legal/terms",
     "/legal/privacy",
     "/legal/cookies",

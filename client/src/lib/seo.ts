@@ -49,6 +49,14 @@ export function getMetaForPath(path: string): HeadMeta {
   if (clean === "/") {
     return withNoindex({ title: `${NAME} — AI Peptide Research`, description: SITE.description, canonicalPath: "/" });
   }
+  if (clean === "/partner") {
+    return withNoindex({
+      title: `Sunny for Brands — Research assistant for peptide catalogs`,
+      description:
+        "Sunny reads the literature on your catalog and explains it in your brand's voice — without dosing, protocols, or diagnosis. Embedded or fully white-labeled.",
+      canonicalPath: "/partner",
+    });
+  }
   if (clean === "/contact") {
     return withNoindex({
       title: `Contact — ${NAME}`,

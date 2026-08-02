@@ -61,6 +61,12 @@ export default function Navbar() {
                 {link.label}
               </button>
             ))}
+            <Link
+              href="/partner"
+              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-accent/10"
+            >
+              For brands
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-3">
@@ -99,6 +105,13 @@ export default function Navbar() {
                   {link.label}
                 </button>
               ))}
+              <Link
+                href="/partner"
+                onClick={() => setMobileOpen(false)}
+                className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/10 transition-colors text-left"
+              >
+                For brands
+              </Link>
               <div className="pt-3">
                 <Button size="sm" className="w-full">Get Started</Button>
               </div>
