@@ -19,12 +19,12 @@ const features = [
   {
     icon: Zap,
     title: "Smart research mapping",
-    description: "AI-powered peptide recommendations",
+    description: "AI-powered literature search",
   },
   {
     icon: Target,
-    title: "Personalized pathways",
-    description: "Tailored protocols for your goals",
+    title: "Research by goal",
+    description: "Literature mapped to what you're exploring",
   },
 ];
 
@@ -73,7 +73,7 @@ export default function MeetSunny() {
               transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="text-lg text-muted-foreground mb-8 max-w-lg"
             >
-              She's not a chatbot. She's a structured AI research assistant who conducts a professional intake — understanding your goals, biology, and experience before mapping the perfect peptide pathway.
+              He's not a chatbot. He's a structured AI research assistant who conducts a professional intake — understanding your goals, biology, and experience before mapping the perfect peptide pathway.
             </motion.p>
 
             {/* FEATURES GRID */}
