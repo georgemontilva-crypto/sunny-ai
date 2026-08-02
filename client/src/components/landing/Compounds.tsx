@@ -2,40 +2,8 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { compoundLibrary as compounds } from "@/lib/compoundLibrary";
 import { getSlotUrl } from "@/lib/media";
-
-const compounds = [
-  {
-    name: "BPC-157",
-    category: "Tissue Repair",
-    description: "Synthetic fragment from a gastric protective protein. Preclinical research explores its role in tendon, ligament, and gastrointestinal tissue repair.",
-    image: "compound-bpc-157",
-  },
-  {
-    name: "TB-500",
-    category: "Recovery",
-    description: "Synthetic version of thymosin beta-4 fragment. Studied in animal models for wound healing and cellular motility in basic cell biology.",
-    image: "compound-tb-500",
-  },
-  {
-    name: "GHK-Cu",
-    category: "Skin Health",
-    description: "Copper complex with naturally occurring tripeptide. Most published research in dermatology, focused on skin regeneration and collagen synthesis.",
-    image: "compound-ghk-cu",
-  },
-  {
-    name: "MOTS-c",
-    category: "Metabolism",
-    description: "Peptide derived from mitochondrial DNA. Preclinical studies explore its role in energy metabolism and insulin sensitivity.",
-    image: "compound-mots-c",
-  },
-  {
-    name: "Semax",
-    category: "Cognition",
-    description: "Synthetic heptapeptide. Research explores potential effects on cognitive function and neuroprotection in preclinical models.",
-    image: "compound-semax",
-  },
-];
 
 export default function Compounds() {
   const ref = useRef(null);

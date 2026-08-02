@@ -114,6 +114,21 @@ async function main() {
     template = template.replace('<script type="module"', `${mediaMapScript}\n    <script type="module"`);
   }
 
+  // Same problem, same fix, for PartnerPage's settings-backed pricing:
+  // client/src/lib/settings.ts statically imports settings-map.json, which
+  // goes stale in the client bundle the moment a price changes through the
+  // panel. scripts/generate-settings-map.ts always runs right before this
+  // script, so its output here is as fresh as the DB.
+  const settingsMapPath = path.join(ROOT, "client", "src", "generated", "settings-map.json");
+  if (fs.existsSync(settingsMapPath)) {
+    const settingsMap = JSON.parse(fs.readFileSync(settingsMapPath, "utf-8"));
+    const settingsMapScript = `<script>window.__SETTINGS_MAP__ = ${JSON.stringify(settingsMap).replace(/</g, "\\u003c")};</script>`;
+    if (!template.includes('<script type="module"')) {
+      throw new Error('Expected a <script type="module"> tag in the cached template to inject window.__SETTINGS_MAP__ before.');
+    }
+    template = template.replace('<script type="module"', `${settingsMapScript}\n    <script type="module"`);
+  }
+
   for (const route of routes) {
     const { html, head, canonicalHref } = render(route);
     const headTags = [

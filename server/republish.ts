@@ -161,12 +161,14 @@ async function republish(): Promise<void> {
 
     fs.rmSync(tempDir, { recursive: true, force: true });
 
-    // Refresh client/src/generated/media-map.json from the DB first — the
-    // SSR bundle prerender.mjs builds inlines that JSON at build time, so a
-    // stale map would prerender the *old* image URLs. --strict-on-error: a
-    // DB hiccup here must surface as a real failure, not a silent fallback
-    // that wipes every slot's URL and still reports "published".
+    // Refresh client/src/generated/media-map.json and settings-map.json
+    // from the DB first — prerender.mjs inlines both at build time, so
+    // stale copies would prerender old image URLs / old partner-page
+    // pricing. --strict-on-error: a DB hiccup here must surface as a real
+    // failure, not a silent fallback that wipes every value and still
+    // reports "published".
     await runChild(process.execPath, [TSX_CLI, "scripts/generate-media-map.ts", "--strict-on-error"]);
+    await runChild(process.execPath, [TSX_CLI, "scripts/generate-settings-map.ts", "--strict-on-error"]);
     await runChild(process.execPath, ["scripts/prerender.mjs"], { PRERENDER_OUT_DIR: tempDir });
 
     copyDirRecursive(tempDir, DIST_DIR);

@@ -70,8 +70,8 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
-            <Button size="sm" className="text-sm font-medium">
-              Get Started
+            <Button size="sm" className="text-sm font-medium" asChild>
+              <a href="/partner#pricing">Get Started</a>
             </Button>
           </div>
 
@@ -113,7 +113,9 @@ export default function Navbar() {
                 For brands
               </Link>
               <div className="pt-3">
-                <Button size="sm" className="w-full">Get Started</Button>
+                <Button size="sm" className="w-full" asChild>
+                  <a href="/partner#pricing" onClick={() => setMobileOpen(false)}>Get Started</a>
+                </Button>
               </div>
             </div>
           </motion.div>

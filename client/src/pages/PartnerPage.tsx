@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import ParticleBackground from "@/components/landing/ParticleBackground";
+import CatalogInsights from "@/components/partner/CatalogInsights";
 import { getSlotDef } from "@server/mediaCatalog.ts";
 import { getSlotUrl } from "@/lib/media";
+import { getSetting } from "@/lib/settings";
 import {
   ArrowRight, Sparkles, Boxes, Quote, Palette, ShieldCheck,
   BookOpenCheck, Ban, Stethoscope, ScrollText, UserCheck, Check,
@@ -144,6 +146,14 @@ export default function PartnerPage() {
   const partnerHero2xUrl = getSlotUrl("partner-hero", "2x");
   const partnerHeroRecommended = getSlotDef("partner-hero")?.variants.base?.recommended;
 
+  const embeddedPrice = getSetting("plan_embedded_price");
+  const embeddedPeriod = getSetting("plan_embedded_period") || "/month";
+  const embeddedSetup = getSetting("plan_embedded_setup");
+  const whitelabelPrice = getSetting("plan_whitelabel_price");
+  const whitelabelNote = getSetting("plan_whitelabel_note");
+  const contactPhone = getSetting("partner_contact_phone");
+  const contactEmail = getSetting("partner_contact_email");
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -272,6 +282,8 @@ export default function PartnerPage() {
         </motion.div>
       </div>
 
+      <CatalogInsights />
+
       {/* ── CAPABILITIES ───────────────────────────────────── */}
       <section className="py-24 px-4 bg-secondary/30">
         <div className="container mx-auto max-w-7xl">
@@ -355,7 +367,7 @@ export default function PartnerPage() {
       </section>
 
       {/* ── PLANS ──────────────────────────────────────────── */}
-      <section className="py-24 px-4 bg-background">
+      <section id="pricing" className="py-24 px-4 bg-background scroll-mt-24">
         <div className="container mx-auto max-w-7xl">
           <Reveal className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Two ways to run it.</h2>
@@ -371,11 +383,15 @@ export default function PartnerPage() {
                   The same assistant, embedded on your site and trained on your catalog, carrying a small
                   "Powered by Sunny" mark.
                 </p>
-                {/* TODO: replace with the real figure */}
                 <div className="mt-6 text-4xl font-bold tracking-tight">
-                  <span className="border border-dashed border-accent text-accent rounded px-2.5 py-0.5 text-base align-middle">price</span>
-                  <span className="text-base font-medium text-muted-foreground ml-2">/month</span>
+                  {embeddedPrice ? (
+                    <span>{embeddedPrice}</span>
+                  ) : (
+                    <span className="border border-dashed border-accent text-accent rounded px-2.5 py-0.5 text-base align-middle">price</span>
+                  )}
+                  <span className="text-base font-medium text-muted-foreground ml-2">{embeddedPeriod}</span>
                 </div>
+                {embeddedSetup && <p className="mt-1.5 text-xs text-muted-foreground">{embeddedSetup}</p>}
                 <ul className="mt-6 mb-8 space-y-0">
                   {["Trained on your full catalog", "One-line install", "Custom intake flow", "Lead capture to your CRM", "Monthly conversation report"].map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
@@ -399,10 +415,14 @@ export default function PartnerPage() {
                 <p className="text-muted-foreground mt-2.5">
                   Rename it, restyle it, run it on your own subdomain. Customers see your brand and nothing else.
                 </p>
-                {/* TODO: replace with the real figure */}
                 <div className="mt-6 text-4xl font-bold tracking-tight">
-                  <span className="border border-dashed border-accent text-accent rounded px-2.5 py-0.5 text-base align-middle">custom</span>
+                  {whitelabelPrice ? (
+                    <span>{whitelabelPrice}</span>
+                  ) : (
+                    <span className="border border-dashed border-accent text-accent rounded px-2.5 py-0.5 text-base align-middle">custom</span>
+                  )}
                 </div>
+                {whitelabelNote && <p className="mt-1.5 text-xs text-muted-foreground">{whitelabelNote}</p>}
                 <ul className="mt-6 mb-8 space-y-0">
                   {["Everything in Embedded", "Custom name, persona, avatar", "Your colors, fonts, and voice", "Your subdomain", "No Sunny badge", "Dedicated account manager"].map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
@@ -419,6 +439,28 @@ export default function PartnerPage() {
               </Card>
             </Reveal>
           </div>
+
+          {(contactPhone || contactEmail) && (
+            <Reveal delay={0.2} className="mt-10 text-center">
+              <p className="text-sm text-muted-foreground">
+                Questions?{" "}
+                {contactPhone && (
+                  <>
+                    Text us at{" "}
+                    <a href={`tel:${contactPhone.replace(/[^\d+]/g, "")}`} className="text-accent hover:underline">
+                      {contactPhone}
+                    </a>
+                  </>
+                )}
+                {contactPhone && contactEmail && " or email "}
+                {contactEmail && (
+                  <a href={`mailto:${contactEmail}`} className="text-accent hover:underline">
+                    {contactEmail}
+                  </a>
+                )}
+              </p>
+            </Reveal>
+          )}
         </div>
       </section>
 
