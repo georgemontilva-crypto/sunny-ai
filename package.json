@@ -15,7 +15,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "seed:admin": "node scripts/seed-admin.mjs",
-    "migrate:media": "tsx scripts/migrate-media-to-r2.ts"
+    "migrate:media": "tsx scripts/migrate-media-to-r2.ts",
+    "repair:media-base": "tsx scripts/repair-missing-base.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1101.0",

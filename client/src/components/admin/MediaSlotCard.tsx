@@ -29,6 +29,7 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [skippedNotice, setSkippedNotice] = useState<string[]>([]);
+  const [baseUndersizedNotice, setBaseUndersizedNotice] = useState<{ targetWidth: number } | null>(null);
 
   const variants = (row?.variants ?? {}) as Record<string, { key: string; width: number; height: number; bytes: number }>;
   const base = variants.base;
@@ -39,6 +40,7 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
     if (!file) return;
     setError("");
     setSkippedNotice([]);
+    setBaseUndersizedNotice(null);
     setPreviewFile(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
@@ -62,6 +64,7 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
 
       const result = await confirmUpload.mutateAsync({ slot: def.slot, tempKey });
       setSkippedNotice(result.skipped);
+      setBaseUndersizedNotice(result.baseUndersized);
       setPreviewFile(null);
       setPreviewUrl(null);
       await utils.media.list.invalidate();
@@ -150,11 +153,20 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
         </p>
       )}
 
+      {baseUndersizedNotice && (
+        <p className="flex items-start gap-1.5 text-xs text-amber-600">
+          <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          This image is smaller than recommended ({baseUndersizedNotice.targetWidth}w). It was saved, but it may
+          look soft on large screens.
+        </p>
+      )}
+
       {skippedNotice.length > 0 && (
         <p className="flex items-start gap-1.5 text-xs text-amber-600">
           <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-          The uploaded file is smaller than the declared {skippedNotice.join(", ")} variant, so it was skipped —
-          only the base image was saved.
+          The uploaded file is smaller than the declared {skippedNotice.join(", ")} variant
+          {skippedNotice.length > 1 ? "s" : ""}, so {skippedNotice.length > 1 ? "they were" : "it was"} skipped —
+          the base image was still saved.
         </p>
       )}
 

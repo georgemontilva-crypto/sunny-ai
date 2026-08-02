@@ -97,7 +97,7 @@ export const mediaRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST", message: "File is larger than 5 MB" });
       }
 
-      const { variants, skipped } = await generateVariants(slotDef, buffer, mimeType);
+      const { variants, skipped, baseUndersized } = await generateVariants(slotDef, buffer, mimeType);
 
       for (const variant of Object.values(variants)) {
         await r2.send(
@@ -134,12 +134,12 @@ export const mediaRouter = router({
         userId: ctx.session.userId,
         action: "media.replace",
         entity: input.slot,
-        detail: { variants: Object.keys(variants), skipped },
+        detail: { variants: Object.keys(variants), skipped, baseUndersized },
       });
 
       scheduleDeploy();
 
       const [row] = await ctx.db.select().from(media).where(eq(media.slot, input.slot));
-      return { row, skipped };
+      return { row, skipped, baseUndersized };
     }),
 });
