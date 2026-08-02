@@ -1,6 +1,7 @@
 import { LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
+import { getSlotUrl } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 
@@ -8,6 +9,7 @@ const NAV_ITEMS = [
   { href: "/admin/requests", label: "Requests" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/settings", label: "Settings" },
+  { href: "/admin/users", label: "Users" },
   { href: "/admin/audit", label: "Audit log" },
 ];
 
@@ -20,7 +22,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className="w-60 shrink-0 border-r border-border/60 bg-card flex flex-col">
         <div className="px-5 py-5 border-b border-border/60">
           <Link href="/admin/requests" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Sunny" className="h-7 w-auto" />
+            <img src={getSlotUrl("logo")} alt="Sunny" className="h-7 w-auto" />
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Panel</span>
           </Link>
         </div>

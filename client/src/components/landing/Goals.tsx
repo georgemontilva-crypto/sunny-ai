@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
+import { getSlotUrl } from "@/lib/media";
 import { ArrowRight } from "lucide-react";
 
 const goals = [
@@ -10,7 +11,7 @@ const goals = [
     label: "area of interest",
     description: "Tissue repair, injury support, faster bounce-back from training and surgery.",
     compounds: ["BPC-157", "TB-500", "GHK-Cu"],
-    image: "/goal-recovery.webp",
+    image: "goal-recovery",
   },
   {
     title: "Fat Loss & Metabolic",
@@ -18,7 +19,7 @@ const goals = [
     label: "area of interest",
     description: "Body recomposition, metabolic optimization, insulin sensitivity.",
     compounds: ["MOTS-c", "AOD-9604"],
-    image: "/goal-fat-loss.webp",
+    image: "goal-fat-loss",
   },
   {
     title: "Cognition & Focus",
@@ -26,7 +27,7 @@ const goals = [
     label: "area of interest",
     description: "Sharpen focus, memory, and mental clarity with nootropic peptide research.",
     compounds: ["Semax", "Selank", "Cerebrolysin"],
-    image: "/goal-cognition.webp",
+    image: "goal-cognition",
   },
   {
     title: "Longevity & Anti-Aging",
@@ -34,7 +35,7 @@ const goals = [
     label: "area of interest",
     description: "Cellular health, mitochondrial repair, biological age reversal protocols.",
     compounds: ["Epitalon", "NAD+", "Thymalin"],
-    image: "/goal-longevity.webp",
+    image: "goal-longevity",
   },
   {
     title: "Performance & Growth",
@@ -42,7 +43,7 @@ const goals = [
     label: "area of interest",
     description: "Growth hormone support, athletic output, lean mass and recovery.",
     compounds: ["CJC-1295", "Ipamorelin", "MK-677"],
-    image: "/goal-performance.webp",
+    image: "goal-performance",
   },
   {
     title: "Sleep & Hormones",
@@ -50,7 +51,7 @@ const goals = [
     label: "area of interest",
     description: "Deep sleep architecture, cortisol balance, libido, mood — the foundation.",
     compounds: ["DSIP", "PT-141", "Kisspeptin"],
-    image: "/goal-sleep.webp",
+    image: "goal-sleep",
   },
 ];
 
@@ -90,12 +91,12 @@ export default function Goals() {
                   transition={{ duration: 0.3 }}
                 >
                   <img
-                    src={goal.image}
+                    src={getSlotUrl(goal.image)}
                     width={400}
                     height={160}
                     loading="lazy"
                     decoding="async"
-                    alt={`Ilustración de la categoría ${goal.title}`}
+                    alt={`Illustration for the ${goal.title} category`}
                     className="w-full h-full object-cover rounded-xl"
                   />
                 </motion.div>

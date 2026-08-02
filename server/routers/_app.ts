@@ -3,6 +3,7 @@ import { authRouter } from "./auth.ts";
 import { mediaRouter } from "./media.ts";
 import { requestsRouter } from "./requests.ts";
 import { settingsRouter } from "./settings.ts";
+import { usersRouter } from "./users.ts";
 import { router } from "../trpc.ts";
 
 export const appRouter = router({
@@ -10,6 +11,7 @@ export const appRouter = router({
   requests: requestsRouter,
   media: mediaRouter,
   settings: settingsRouter,
+  users: usersRouter,
   audit: auditRouter,
 });
 

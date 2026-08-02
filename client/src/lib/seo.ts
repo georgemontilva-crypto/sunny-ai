@@ -26,6 +26,7 @@ const ADMIN_LABELS: Record<string, string> = {
   "/admin/requests": "Requests",
   "/admin/media": "Media",
   "/admin/settings": "Settings",
+  "/admin/users": "Users",
   "/admin/audit": "Audit log",
 };
 

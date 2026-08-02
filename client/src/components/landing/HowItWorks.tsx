@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
+import { getSlotUrl } from "@/lib/media";
 
 const steps = [
   {
@@ -66,8 +67,8 @@ export default function HowItWorks() {
                 <div className="w-full h-48 rounded-lg mb-6 overflow-hidden">
                   {step.hiRes ? (
                     <img
-                      src={`/${step.image}.webp`}
-                      srcSet={`/${step.image}.webp 500w, /${step.image}@2x.webp 1000w`}
+                      src={getSlotUrl(step.image)}
+                      srcSet={`${getSlotUrl(step.image)} 500w${getSlotUrl(step.image, "2x") ? `, ${getSlotUrl(step.image, "2x")} 1000w` : ""}`}
                       width={500}
                       height={300}
                       loading="lazy"
@@ -77,7 +78,7 @@ export default function HowItWorks() {
                     />
                   ) : (
                     <img
-                      src={`/${step.image}.webp`}
+                      src={getSlotUrl(step.image)}
                       width={500}
                       height={300}
                       loading="lazy"

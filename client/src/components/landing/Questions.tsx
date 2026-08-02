@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
+import { getSlotUrl } from "@/lib/media";
 import { ArrowRight } from "lucide-react";
 
 const questions = [
@@ -86,8 +87,8 @@ export default function Questions() {
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow cursor-pointer group overflow-hidden">
                 {q.hiRes ? (
                   <img
-                    src={`/card-${q.image}.webp`}
-                    srcSet={`/card-${q.image}.webp 800w, /card-${q.image}@2x.webp 1600w`}
+                    src={getSlotUrl(`card-${q.image}`)}
+                    srcSet={`${getSlotUrl(`card-${q.image}`)} 800w${getSlotUrl(`card-${q.image}`, "2x") ? `, ${getSlotUrl(`card-${q.image}`, "2x")} 1600w` : ""}`}
                     sizes="(max-width: 768px) 100vw, 400px"
                     width={800}
                     height={320}
@@ -98,7 +99,7 @@ export default function Questions() {
                   />
                 ) : (
                   <img
-                    src={`/card-${q.image}.webp`}
+                    src={getSlotUrl(`card-${q.image}`)}
                     width={400}
                     height={160}
                     loading="lazy"

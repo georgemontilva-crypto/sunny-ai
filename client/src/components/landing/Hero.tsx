@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { getSlotUrl } from "@/lib/media";
 import { ArrowRight, Sparkles } from "lucide-react";
 import ParticleBackground from "./ParticleBackground";
 
@@ -19,10 +20,13 @@ export default function Hero() {
       {/* 1. Background photo */}
       <div className="absolute inset-0 z-0">
         <picture className="block w-full h-full">
-          <source media="(max-width: 768px)" srcSet="/hero-bg-mobile.webp" />
-          <source srcSet="/hero-bg.webp 1600w, /hero-bg@2x.webp 2560w" sizes="100vw" />
+          <source media="(max-width: 768px)" srcSet={getSlotUrl("hero-bg", "mobile") ?? getSlotUrl("hero-bg")} />
+          <source
+            srcSet={`${getSlotUrl("hero-bg")} 1600w${getSlotUrl("hero-bg", "2x") ? `, ${getSlotUrl("hero-bg", "2x")} 2560w` : ""}`}
+            sizes="100vw"
+          />
           <img
-            src="/hero-bg.webp"
+            src={getSlotUrl("hero-bg")}
             alt=""
             className="w-full h-full object-cover object-right"
             decoding="async"
@@ -132,8 +136,8 @@ export default function Hero() {
                 className="w-full h-full"
               >
                 <img
-                  src="/hero-sunny.webp"
-                  srcSet="/hero-sunny.webp 1200w, /hero-sunny@2x.webp 2400w"
+                  src={getSlotUrl("hero-sunny")}
+                  srcSet={`${getSlotUrl("hero-sunny")} 1200w${getSlotUrl("hero-sunny", "2x") ? `, ${getSlotUrl("hero-sunny", "2x")} 2400w` : ""}`}
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   width={1200}
                   height={600}

@@ -1,6 +1,7 @@
 import { AlertCircle } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Redirect } from "wouter";
+import { getSlotUrl } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -33,7 +34,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
         <div className="flex justify-center mb-6">
-          <img src="/logo.png" alt="Sunny" className="h-10 w-auto" />
+          <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" />
         </div>
         <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-2xl p-8 space-y-5 shadow-sm">
           <div className="text-center mb-2">

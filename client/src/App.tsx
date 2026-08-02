@@ -21,6 +21,7 @@ import AdminLoginPage from "@/pages/admin/AdminLoginPage";
 import AdminRequestsPage from "@/pages/admin/AdminRequestsPage";
 import AdminMediaPage from "@/pages/admin/AdminMediaPage";
 import AdminSettingsPage from "@/pages/admin/AdminSettingsPage";
+import AdminUsersPage from "@/pages/admin/AdminUsersPage";
 import AdminAuditPage from "@/pages/admin/AdminAuditPage";
 
 function Router() {
@@ -51,6 +52,11 @@ function Router() {
       <Route path={"/admin/settings"}>
         <AdminGuarded>
           <AdminSettingsPage />
+        </AdminGuarded>
+      </Route>
+      <Route path={"/admin/users"}>
+        <AdminGuarded>
+          <AdminUsersPage />
         </AdminGuarded>
       </Route>
       <Route path={"/admin/audit"}>

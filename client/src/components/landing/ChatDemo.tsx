@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { getSlotUrl } from "@/lib/media";
 
 const chatMessages = [
   {
@@ -127,7 +128,7 @@ export default function ChatDemo() {
           className="max-w-2xl mx-auto bg-card border border-border rounded-2xl overflow-hidden shadow-lg"
         >
           <div className="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-b border-border flex items-center gap-2">
-            <img src="/logo.png" alt="Sunny" className="h-10 w-auto" loading="lazy" />
+            <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" loading="lazy" />
             <h3 className="font-semibold text-sm">AI Research Assistant</h3>
           </div>
 

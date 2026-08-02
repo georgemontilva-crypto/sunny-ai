@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { getSlotUrl } from "@/lib/media";
 
 const NEWSLETTER_ENDPOINT = import.meta.env.VITE_NEWSLETTER_ENDPOINT as string | undefined;
 
@@ -108,7 +109,7 @@ export default function Footer() {
       <div className="container mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <img src="/logo.png" alt="Sunny" className="h-14 w-auto mb-4" loading="lazy" />
+            <img src={getSlotUrl("logo")} alt="Sunny" className="h-14 w-auto mb-4" loading="lazy" />
             <p className="text-sm text-muted-foreground">
               AI-powered peptide research. Educational content, research-backed guidance.
             </p>

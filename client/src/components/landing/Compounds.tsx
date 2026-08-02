@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getSlotUrl } from "@/lib/media";
 
 const compounds = [
   {
@@ -69,7 +70,7 @@ export default function Compounds() {
               <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow overflow-hidden">
                 <div className="w-full h-32 rounded-lg mb-4 overflow-hidden">
                   <img
-                    src={`/${c.image}.webp`}
+                    src={getSlotUrl(c.image)}
                     width={350}
                     height={140}
                     loading="lazy"
