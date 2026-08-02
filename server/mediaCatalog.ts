@@ -46,6 +46,14 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     },
   },
   {
+    slot: "meet-sunny",
+    label: "Meet Sunny — profile image",
+    variants: {
+      base: { width: 800, recommended: { width: 800, height: 1000 } },
+      "2x": { width: 1600, recommended: { width: 1600, height: 2000 } },
+    },
+  },
+  {
     slot: "hero-sunny",
     label: "Hero — Sunny portrait",
     variants: {

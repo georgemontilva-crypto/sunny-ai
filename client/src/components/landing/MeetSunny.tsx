@@ -1,6 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { getSlotDef } from "@server/mediaCatalog.ts";
 import { Button } from "@/components/ui/button";
+import { getSlotUrl } from "@/lib/media";
 import { MessageCircle, FileText, Zap, Target } from "lucide-react";
 
 const features = [
@@ -29,6 +31,9 @@ const features = [
 export default function MeetSunny() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const meetSunnyUrl = getSlotUrl("meet-sunny");
+  const meetSunny2xUrl = getSlotUrl("meet-sunny", "2x");
+  const meetSunnyRecommended = getSlotDef("meet-sunny")?.variants.base?.recommended;
 
   return (
     <section className="py-24 px-4 bg-secondary/30" ref={ref}>
@@ -123,23 +128,42 @@ export default function MeetSunny() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="relative h-96 lg:h-full min-h-96"
           >
-            {/* SUNNY PROFILE IMAGE PLACEHOLDER - 600x700px */}
             <motion.div
-              className="bg-gradient-to-br from-accent/20 via-accent/10 to-gray-300 w-full h-full rounded-3xl flex items-center justify-center text-gray-600 shadow-2xl overflow-hidden border-2 border-accent/20"
+              className="w-full h-full rounded-3xl shadow-2xl overflow-hidden border-2 border-accent/20"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.5 }}
             >
-              <motion.div
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="text-center"
-              >
-                <div className="w-24 h-24 bg-accent/30 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-5xl">✨</span>
+              {meetSunnyUrl ? (
+                <img
+                  src={meetSunnyUrl}
+                  srcSet={meetSunny2xUrl ? `${meetSunnyUrl} 800w, ${meetSunny2xUrl} 1600w` : undefined}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  width={800}
+                  height={1000}
+                  loading="lazy"
+                  decoding="async"
+                  alt="Sunny, the AI peptide research assistant"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-gray-300 w-full h-full flex items-center justify-center text-gray-600">
+                  <motion.div
+                    animate={{ y: [0, -15, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    className="text-center"
+                  >
+                    <div className="w-24 h-24 bg-accent/30 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <span className="text-5xl">✨</span>
+                    </div>
+                    {meetSunnyRecommended && (
+                      <div className="font-bold text-lg">
+                        {meetSunnyRecommended.width} × {meetSunnyRecommended.height}
+                      </div>
+                    )}
+                    <div className="text-sm mt-2">Sunny Profile Image</div>
+                  </motion.div>
                 </div>
-                <div className="font-bold text-lg">600 × 700px</div>
-                <div className="text-sm mt-2">Sunny Profile Image</div>
-              </motion.div>
+              )}
             </motion.div>
           </motion.div>
         </div>
