@@ -4,6 +4,7 @@
     "2x": "/hero-bg@2x.webp",
     "mobile": "/hero-bg-mobile.webp"
   },
+  "partner-hero": {},
   "hero-sunny": {
     "base": "/hero-sunny.webp",
     "2x": "/hero-sunny@2x.webp"

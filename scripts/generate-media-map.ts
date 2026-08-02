@@ -10,6 +10,7 @@ import { MEDIA_SLOTS, type VariantName } from "../server/mediaCatalog.ts";
 import { media } from "../server/schema.ts";
 
 const OUT_FILE = path.resolve(import.meta.dirname, "..", "client", "src", "generated", "media-map.json");
+const PUBLIC_DIR = path.resolve(import.meta.dirname, "..", "client", "public");
 
 const SEED_OVERRIDES: Record<string, string> = {
   logo: "logo.png",
@@ -25,12 +26,19 @@ function fallbackFileName(slot: string, variant: VariantName): string {
   return variant === "2x" ? `${stem}@2x${ext}` : `${stem}-mobile${ext}`;
 }
 
+// Only adds an entry when the file actually exists — a slot with neither a
+// seed file in client/public nor a DB row (e.g. a brand-new catalog entry
+// nobody has uploaded to yet) should resolve to nothing, not a guessed path
+// that 404s. Components treat a missing entry as "show a placeholder."
 function fallbackMap(): Record<string, Partial<Record<VariantName, string>>> {
   const map: Record<string, Partial<Record<VariantName, string>>> = {};
   for (const slotDef of MEDIA_SLOTS) {
     const entry: Partial<Record<VariantName, string>> = {};
     for (const variant of Object.keys(slotDef.variants) as VariantName[]) {
-      entry[variant] = `/${fallbackFileName(slotDef.slot, variant)}`;
+      const fileName = fallbackFileName(slotDef.slot, variant);
+      if (fs.existsSync(path.join(PUBLIC_DIR, fileName))) {
+        entry[variant] = `/${fileName}`;
+      }
     }
     map[slotDef.slot] = entry;
   }

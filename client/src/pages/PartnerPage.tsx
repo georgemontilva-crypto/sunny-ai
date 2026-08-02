@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import ParticleBackground from "@/components/landing/ParticleBackground";
+import { getSlotDef } from "@server/mediaCatalog.ts";
 import { getSlotUrl } from "@/lib/media";
 import {
   ArrowRight, Sparkles, Boxes, Quote, Palette, ShieldCheck,
@@ -139,6 +140,9 @@ function RoutingDemo() {
 
 export default function PartnerPage() {
   const reduce = useReducedMotion();
+  const partnerHeroUrl = getSlotUrl("partner-hero");
+  const partnerHero2xUrl = getSlotUrl("partner-hero", "2x");
+  const partnerHeroRecommended = getSlotDef("partner-hero")?.variants.base?.recommended;
 
   return (
     <div className="min-h-screen bg-background">
@@ -224,33 +228,27 @@ export default function PartnerPage() {
               <motion.div
                 animate={reduce ? {} : { y: [0, -14, 0] }}
                 transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
-                className="relative w-[min(300px,74vw)] aspect-[1/1.62] rounded-t-xl rounded-b-2xl glass-effect flex flex-col justify-end pb-8"
+                className="relative w-full max-w-lg aspect-[8/5] rounded-2xl shadow-2xl overflow-hidden"
               >
-                <span
-                  aria-hidden="true"
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 w-[44%] h-8 rounded gradient-desert"
-                />
-                <div className="mx-4 rounded bg-background text-foreground pt-5 px-4 text-center">
-                  <div className="text-[9px] uppercase tracking-[0.22em] text-accent font-medium">Your brand here</div>
-                  <div className="text-3xl font-bold tracking-tight mt-1.5">SUNNY</div>
-                  <div className="text-[9px] uppercase tracking-[0.16em] text-muted-foreground">Research assistant</div>
-                  <div className="flex mt-3.5 -mx-4 border-t border-border">
-                    {["Your catalog", "Your voice", "Your domain"].map((s, i) => (
-                      <motion.div
-                        key={s}
-                        initial={reduce ? false : { opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 1.1 + i * 0.15 }}
-                        className="flex-1 py-2 px-1 border-r border-border last:border-r-0 text-[8.5px] uppercase tracking-wider text-accent font-semibold"
-                      >
-                        {s}
-                      </motion.div>
-                    ))}
+                {partnerHeroUrl ? (
+                  <img
+                    src={partnerHeroUrl}
+                    srcSet={partnerHero2xUrl ? `${partnerHeroUrl} 1200w, ${partnerHero2xUrl} 2400w` : undefined}
+                    sizes="(max-width: 1024px) 100vw, 520px"
+                    width={1200}
+                    height={750}
+                    fetchPriority="high"
+                    decoding="async"
+                    alt="Sunny, white-labeled with a partner brand's own identity"
+                    className="w-full h-full object-cover rounded-2xl shadow-2xl"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-secondary/40 text-xs text-muted-foreground text-center px-4">
+                    {partnerHeroRecommended
+                      ? `Recommended: ${partnerHeroRecommended.width} × ${partnerHeroRecommended.height}`
+                      : "No image yet"}
                   </div>
-                </div>
-                <div className="mx-4 bg-accent text-accent-foreground text-[9px] font-bold uppercase tracking-[0.24em] text-center py-2 rounded-b">
-                  For research use only
-                </div>
+                )}
               </motion.div>
             </motion.div>
           </div>

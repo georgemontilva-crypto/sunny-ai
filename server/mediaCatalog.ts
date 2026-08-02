@@ -38,6 +38,14 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     },
   },
   {
+    slot: "partner-hero",
+    label: "Partner page — hero",
+    variants: {
+      base: { width: 1200, recommended: { width: 1200, height: 750 } },
+      "2x": { width: 2400, recommended: { width: 2400, height: 1500 } },
+    },
+  },
+  {
     slot: "hero-sunny",
     label: "Hero — Sunny portrait",
     variants: {

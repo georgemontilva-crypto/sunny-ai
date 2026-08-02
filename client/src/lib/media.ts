@@ -9,8 +9,10 @@ type SlotEntry = Partial<Record<VariantName, string>>;
 
 const map = mediaMap as Record<string, SlotEntry>;
 
+// No guessed fallback here on purpose: generate-media-map.ts only ever puts
+// a real entry in the map for a variant that exists on disk (client/public)
+// or in the DB, so a missing entry means the slot is genuinely empty — a
+// component can render a placeholder instead of a broken <img>.
 export function getSlotUrl(slot: string, variant: VariantName = "base"): string | undefined {
-  const url = map[slot]?.[variant];
-  if (url) return url;
-  return variant === "base" ? `/${slot}.webp` : undefined;
+  return map[slot]?.[variant];
 }
