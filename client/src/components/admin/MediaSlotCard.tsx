@@ -1,6 +1,6 @@
 import { AlertTriangle, Upload } from "lucide-react";
 import { useRef, useState } from "react";
-import type { MediaSlotDef } from "@server/mediaCatalog.ts";
+import { formatAspectRatio, type MediaSlotDef, type VariantName, type VariantSpec } from "@server/mediaCatalog.ts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +13,10 @@ type MediaRow = RouterOutputs["media"]["list"][number];
 function formatBytes(bytes?: number): string {
   if (!bytes) return "—";
   return `${(bytes / 1024).toFixed(0)} KB`;
+}
+
+function formatDims(d: { width: number; height: number }): string {
+  return `${d.width} × ${d.height}`;
 }
 
 export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: MediaRow | undefined }) {
@@ -28,19 +32,16 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
   const [alt, setAlt] = useState(row?.alt ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
-  const [skippedNotice, setSkippedNotice] = useState<string[]>([]);
-  const [baseUndersizedNotice, setBaseUndersizedNotice] = useState<{ targetWidth: number } | null>(null);
 
   const variants = (row?.variants ?? {}) as Record<string, { key: string; width: number; height: number; bytes: number }>;
   const base = variants.base;
   const currentUrl = getSlotUrl(def.slot);
-  const declaredVariants = Object.keys(def.variants);
+  const declaredVariantEntries = Object.entries(def.variants) as [VariantName, VariantSpec][];
+  const baseRecommended = def.variants.base?.recommended;
 
   const pickFile = (file: File | undefined) => {
     if (!file) return;
     setError("");
-    setSkippedNotice([]);
-    setBaseUndersizedNotice(null);
     setPreviewFile(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
@@ -62,9 +63,7 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
       });
       if (!putRes.ok) throw new Error("Upload to storage failed");
 
-      const result = await confirmUpload.mutateAsync({ slot: def.slot, tempKey });
-      setSkippedNotice(result.skipped);
-      setBaseUndersizedNotice(result.baseUndersized);
+      await confirmUpload.mutateAsync({ slot: def.slot, tempKey });
       setPreviewFile(null);
       setPreviewUrl(null);
       await utils.media.list.invalidate();
@@ -86,6 +85,13 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
       <div>
         <p className="text-sm font-semibold text-foreground">{def.label}</p>
         <p className="text-xs text-muted-foreground">{def.slot}</p>
+        {/* Always visible, loaded or not — so there's something to prepare
+            before picking a file, not an error to react to afterward. */}
+        <p className="text-xs text-muted-foreground/80 mt-1">
+          {declaredVariantEntries.length > 1
+            ? declaredVariantEntries.map(([name, spec]) => `${name} ${formatDims(spec.recommended)}`).join(" · ")
+            : `Recommended: ${baseRecommended ? formatDims(baseRecommended) : "—"}`}
+        </p>
       </div>
 
       <div className="w-full h-32 rounded-lg overflow-hidden bg-secondary/40 flex items-center justify-center">
@@ -99,17 +105,28 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
       </div>
 
       <div className="flex flex-wrap gap-1">
-        {declaredVariants.map((name) => (
-          <Badge key={name} variant={variants[name] ? "secondary" : "outline"} className="text-[10px]">
+        {declaredVariantEntries.map(([name]) => (
+          <Badge
+            key={name}
+            variant="outline"
+            className={variants[name] ? "text-[10px]" : "text-[10px] text-muted-foreground/70 border-border/60"}
+          >
             {name}
-            {!variants[name] && " (missing)"}
           </Badge>
         ))}
       </div>
 
+      {declaredVariantEntries
+        .filter(([name]) => name !== "base" && !variants[name])
+        .map(([name, spec]) => (
+          <p key={name} className="text-xs text-muted-foreground">
+            Upload {formatDims(spec.recommended)} or larger to also generate the {name} variant
+          </p>
+        ))}
+
       {base && (
         <p className="text-xs text-muted-foreground">
-          {base.width}×{base.height} · {formatBytes(base.bytes)}
+          {base.width}×{base.height} · {formatAspectRatio(base.width, base.height)} · {formatBytes(base.bytes)}
         </p>
       )}
 
@@ -130,7 +147,9 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
         }`}
       >
         <Upload className="w-4 h-4" />
-        {previewFile ? previewFile.name : "Drag & drop or click to choose a file"}
+        {previewFile
+          ? previewFile.name
+          : `Drag & drop${baseRecommended ? ` — ${formatDims(baseRecommended)} recommended` : ""}`}
         <input
           ref={fileInputRef}
           type="file"
@@ -150,23 +169,6 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
         <p className="flex items-start gap-1.5 text-xs text-red-600">
           <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           {error}
-        </p>
-      )}
-
-      {baseUndersizedNotice && (
-        <p className="flex items-start gap-1.5 text-xs text-amber-600">
-          <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-          This image is smaller than recommended ({baseUndersizedNotice.targetWidth}w). It was saved, but it may
-          look soft on large screens.
-        </p>
-      )}
-
-      {skippedNotice.length > 0 && (
-        <p className="flex items-start gap-1.5 text-xs text-amber-600">
-          <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-          The uploaded file is smaller than the declared {skippedNotice.join(", ")} variant
-          {skippedNotice.length > 1 ? "s" : ""}, so {skippedNotice.length > 1 ? "they were" : "it was"} skipped —
-          the base image was still saved.
         </p>
       )}
 
