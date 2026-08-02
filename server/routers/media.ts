@@ -5,11 +5,11 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { writeAudit } from "../auditLog.ts";
-import { isDeployPending, scheduleDeploy } from "../deployHook.ts";
 import { getSlotDef, isValidSlot } from "../mediaCatalog.ts";
 import { generateVariants } from "../mediaVariants.ts";
 import { ALLOWED_MIME_TYPES, MAX_UPLOAD_BYTES, sniffMimeType } from "../mediaValidation.ts";
 import { getR2Bucket, getR2Client } from "../r2.ts";
+import { getPublishStatus, scheduleRepublish } from "../republish.ts";
 import { media } from "../schema.ts";
 import { adminProcedure, router } from "../trpc.ts";
 
@@ -24,7 +24,7 @@ async function streamToBuffer(stream: unknown): Promise<Buffer> {
 export const mediaRouter = router({
   list: adminProcedure.query(({ ctx }) => ctx.db.select().from(media)),
 
-  deployStatus: adminProcedure.query(() => ({ pending: isDeployPending() })),
+  publishStatus: adminProcedure.query(() => getPublishStatus()),
 
   updateAlt: adminProcedure
     .input(z.object({ slot: z.string().min(1), alt: z.string().max(300) }))
@@ -137,7 +137,7 @@ export const mediaRouter = router({
         detail: { variants: Object.keys(variants), skipped, baseUndersized },
       });
 
-      scheduleDeploy();
+      scheduleRepublish();
 
       const [row] = await ctx.db.select().from(media).where(eq(media.slot, input.slot));
       return { row, skipped, baseUndersized };

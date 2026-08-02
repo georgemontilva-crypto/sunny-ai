@@ -1,19 +1,30 @@
-// Static prerender pass, run after `vite build`.
+// Static prerender pass. Two callers:
+//   1. `pnpm build`, right after `vite build` — writes into dist/ directly.
+//   2. server/republish.ts, after a media upload — writes into a temp dir
+//      (PRERENDER_OUT_DIR) that the caller swaps into dist/ atomically, so a
+//      failed run never leaves dist/ half-written.
 //
 // Why not vite-react-ssg: it hard-requires react-router-dom as a peer
 // dependency, which conflicts with this project's "wouter puro" routing.
 // Instead we build a throwaway SSR bundle of entry-server.tsx, render every
 // known route with react-dom/server, and splice the markup + head tags into
-// the already-built dist/index.html template (which still contains the
-// <!--app-html--> / <!--app-head--> placeholders vite build doesn't touch).
+// the vite-built index.html template (still has the unreplaced
+// <!--app-html--> / <!--app-head--> placeholders).
+//
+// The template is read from a cached copy (scripts/cache-template.mjs),
+// never from dist/index.html directly — by the time a live republish runs,
+// dist/index.html is already a *previously rendered* page, not the pristine
+// template, so re-reading it would just re-splice into already-spliced
+// markup and silently do nothing.
 import { execSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const DIST_DIR = path.join(ROOT, "dist");
+const DIST_DIR = process.env.PRERENDER_OUT_DIR ? path.resolve(process.env.PRERENDER_OUT_DIR) : path.join(ROOT, "dist");
 const SSR_TMP_DIR = path.join(ROOT, ".ssr-tmp");
+const TEMPLATE_CACHE = path.join(ROOT, "dist-server", ".prerender-template.html");
 
 function escapeHtml(s) {
   return s
@@ -55,7 +66,13 @@ async function main() {
   const blogRoutes = getAllPosts().map((p) => `/blog/${p.slug}`);
   const routes = [...staticRoutes, ...blogRoutes];
 
-  const template = fs.readFileSync(path.join(DIST_DIR, "index.html"), "utf-8");
+  if (!fs.existsSync(TEMPLATE_CACHE)) {
+    throw new Error(
+      `No cached template at ${TEMPLATE_CACHE} — run \`vite build\` + scripts/cache-template.mjs first (a plain \`pnpm build\` does this).`
+    );
+  }
+  const template = fs.readFileSync(TEMPLATE_CACHE, "utf-8");
+  fs.mkdirSync(DIST_DIR, { recursive: true });
   const ogImageHref = `${SITE.domain}${SITE.ogImage}`;
 
   for (const route of routes) {
