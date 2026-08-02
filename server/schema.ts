@@ -1,4 +1,4 @@
-import { boolean, index, int, json, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, index, json, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 // MySQL has no built-in random-uuid column default (unlike Postgres'
 // gen_random_uuid()) — every id is generated in application code via
@@ -33,14 +33,16 @@ export const sessions = mysqlTable(
   ]
 );
 
+// One file per slot, but a slot can need more than one rendition of that
+// file (retina, a cropped mobile version) — `variants` holds those as
+// { base, "2x"?, mobile? }, each { key, width, height, bytes, hash }. See
+// server/mediaVariants.ts for how they're generated and
+// server/mediaCatalog.ts for which slots need which variants.
 export const media = mysqlTable("media", {
   id: uuidPk(),
   slot: varchar("slot", { length: 100 }).notNull().unique(), // 'hero-bg', 'card-sleep-quality', etc.
-  r2Key: text("r2_key").notNull(),
+  variants: json("variants").notNull(),
   alt: text("alt").notNull().default(""),
-  width: int("width"),
-  height: int("height"),
-  bytes: int("bytes"),
   mimeType: varchar("mime_type", { length: 100 }),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   updatedBy: varchar("updated_by", { length: 36 }).references(() => users.id),

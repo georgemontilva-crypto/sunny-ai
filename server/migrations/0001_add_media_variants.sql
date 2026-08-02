@@ -1,0 +1,1 @@
+ALTER TABLE `media` ADD `variants` json NOT NULL;

@@ -8,6 +8,20 @@
       "when": 1785624411577,
       "tag": "0000_curious_robbie_robertson",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1785629082342,
+      "tag": "0001_add_media_variants",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1785629186966,
+      "tag": "0002_drop_media_flat_columns",
+      "breakpoints": true
     }
   ]
 }
