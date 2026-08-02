@@ -72,9 +72,24 @@ async function main() {
       `No cached template at ${TEMPLATE_CACHE} — run \`vite build\` + scripts/cache-template.mjs first (a plain \`pnpm build\` does this).`
     );
   }
-  const template = fs.readFileSync(TEMPLATE_CACHE, "utf-8");
+  let template = fs.readFileSync(TEMPLATE_CACHE, "utf-8");
   fs.mkdirSync(DIST_DIR, { recursive: true });
   const ogImageHref = `${SITE.domain}${SITE.ogImage}`;
+
+  // The favicon <link>s are static markup in the template, outside the
+  // per-route <!--app-head--> splice below, so a live republish (which never
+  // re-runs `vite build`, only this script) would otherwise keep serving
+  // whatever favicon-svg/favicon-png resolved to at the last full build —
+  // scripts/generate-media-map.ts always runs right before this script, so
+  // its output here is as fresh as the DB.
+  const mediaMapPath = path.join(ROOT, "client", "src", "generated", "media-map.json");
+  if (fs.existsSync(mediaMapPath)) {
+    const mediaMap = JSON.parse(fs.readFileSync(mediaMapPath, "utf-8"));
+    const svgHref = mediaMap["favicon-svg"]?.base;
+    const pngHref = mediaMap["favicon-png"]?.base;
+    if (svgHref) template = template.replace('href="/favicon.svg"', `href="${svgHref}"`);
+    if (pngHref) template = template.replace('href="/favicon.png"', `href="${pngHref}"`);
+  }
 
   for (const route of routes) {
     const { html, head, canonicalHref } = render(route);

@@ -33,9 +33,16 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const variants = (row?.variants ?? {}) as Record<string, { key: string; width: number; height: number; bytes: number }>;
+  const variants = (row?.variants ?? {}) as Record<
+    string,
+    { key: string; width: number; height: number; bytes: number; url: string | null }
+  >;
   const base = variants.base;
-  const currentUrl = getSlotUrl(def.slot);
+  // The row's own resolved+cache-busted R2 URL reflects what was *just*
+  // uploaded — lib/media.ts's getSlotUrl is frozen at the last build or
+  // republish and would show stale bytes right after a confirmUpload.
+  // Only fall back to it when there's no row yet (nothing uploaded).
+  const currentUrl = base?.url ?? (row ? undefined : getSlotUrl(def.slot));
   const declaredVariantEntries = Object.entries(def.variants) as [VariantName, VariantSpec][];
   const baseRecommended = def.variants.base?.recommended;
 

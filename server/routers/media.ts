@@ -8,7 +8,7 @@ import { writeAudit } from "../auditLog.ts";
 import { getSlotDef, isValidSlot } from "../mediaCatalog.ts";
 import { generateVariants } from "../mediaVariants.ts";
 import { ALLOWED_MIME_TYPES, MAX_UPLOAD_BYTES, sniffMimeType } from "../mediaValidation.ts";
-import { getR2Bucket, getR2Client } from "../r2.ts";
+import { getR2Bucket, getR2Client, tryR2PublicUrl } from "../r2.ts";
 import { getPublishStatus, scheduleRepublish } from "../republish.ts";
 import { media } from "../schema.ts";
 import { adminProcedure, router } from "../trpc.ts";
@@ -21,8 +21,28 @@ async function streamToBuffer(stream: unknown): Promise<Buffer> {
   return Buffer.concat(chunks);
 }
 
+// The panel needs today's actual R2 image, not the one baked into the
+// client bundle at the last build/republish (that's what public pages use
+// — fine for them, since they're static until the next republish, but the
+// panel is live and must reflect a confirmUpload that just happened).
+// Cache-busted with updatedAt because R2 serves the same key on every
+// replace and the browser would otherwise keep showing the old bytes.
+function withResolvedUrls<T extends { variants: unknown; updatedAt: Date }>(row: T) {
+  const variants = row.variants as Record<string, { key: string; width: number; height: number; bytes: number }>;
+  const version = new Date(row.updatedAt).getTime();
+  const resolved: Record<string, { key: string; width: number; height: number; bytes: number; url: string | null }> = {};
+  for (const [name, v] of Object.entries(variants)) {
+    const url = tryR2PublicUrl(v.key);
+    resolved[name] = { ...v, url: url ? `${url}?v=${version}` : null };
+  }
+  return { ...row, variants: resolved };
+}
+
 export const mediaRouter = router({
-  list: adminProcedure.query(({ ctx }) => ctx.db.select().from(media)),
+  list: adminProcedure.query(async ({ ctx }) => {
+    const rows = await ctx.db.select().from(media);
+    return rows.map(withResolvedUrls);
+  }),
 
   publishStatus: adminProcedure.query(() => getPublishStatus()),
 
@@ -40,7 +60,7 @@ export const mediaRouter = router({
       await writeAudit(ctx.db, { userId: ctx.session.userId, action: "media.updateAlt", entity: input.slot });
 
       const [row] = await ctx.db.select().from(media).where(eq(media.slot, input.slot));
-      return row;
+      return withResolvedUrls(row);
     }),
 
   requestUploadUrl: adminProcedure
@@ -140,6 +160,6 @@ export const mediaRouter = router({
       scheduleRepublish();
 
       const [row] = await ctx.db.select().from(media).where(eq(media.slot, input.slot));
-      return { row, skipped, baseUndersized };
+      return { row: withResolvedUrls(row), skipped, baseUndersized };
     }),
 });

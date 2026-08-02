@@ -36,3 +36,10 @@ export function r2PublicUrl(key: string): string {
   if (!base) throw new Error("R2_PUBLIC_URL is not set");
   return `${base.replace(/\/$/, "")}/${key}`;
 }
+
+// Non-throwing version for read paths (the admin media list) that should
+// still render — minus live thumbnails — when R2_PUBLIC_URL isn't set.
+export function tryR2PublicUrl(key: string): string | null {
+  const base = process.env.R2_PUBLIC_URL;
+  return base ? `${base.replace(/\/$/, "")}/${key}` : null;
+}
