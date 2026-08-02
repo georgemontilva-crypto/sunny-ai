@@ -88,8 +88,10 @@ async function republish(): Promise<void> {
 
     // Refresh client/src/generated/media-map.json from the DB first — the
     // SSR bundle prerender.mjs builds inlines that JSON at build time, so a
-    // stale map would prerender the *old* image URLs.
-    await runChild(process.execPath, [TSX_CLI, "scripts/generate-media-map.ts"]);
+    // stale map would prerender the *old* image URLs. --strict-on-error: a
+    // DB hiccup here must surface as a real failure, not a silent fallback
+    // that wipes every slot's URL and still reports "published".
+    await runChild(process.execPath, [TSX_CLI, "scripts/generate-media-map.ts", "--strict-on-error"]);
     await runChild(process.execPath, ["scripts/prerender.mjs"], { PRERENDER_OUT_DIR: TEMP_DIR });
 
     copyDirRecursive(TEMP_DIR, DIST_DIR);

@@ -1,7 +1,18 @@
-// Pre-build step: resolves every catalog slot to a real URL (R2 if the DB
-// answers, client/public paths otherwise) into
-// client/src/generated/media-map.json, which client/src/lib/media.ts reads
-// at build time. Must never throw — a DB/R2 outage here can't fail the build.
+// Resolves every catalog slot to a real URL (R2 if the DB answers,
+// client/public paths otherwise) into client/src/generated/media-map.json,
+// which client/src/lib/media.ts reads at build time. Two callers, two
+// failure modes:
+//   - `pnpm build` (no flag): a DB/R2 outage must NOT fail the build —
+//     falls back to client/public and exits 0, same as always.
+//   - server/republish.ts (--strict-on-error): a DB/R2 outage here must NOT
+//     be swallowed. Overwriting the map with the fallback on a transient
+//     failure would silently wipe every slot's real URL back to
+//     client/public (or empty, for slots with no seed file) the moment
+//     *any* upload triggers a republish — exactly the bug that shipped:
+//     the panel reported "Published" while media-map.json quietly reverted
+//     to blank. In strict mode, a DB failure leaves the existing file
+//     untouched and exits 1, so republish() surfaces a real error instead
+//     of a false "published".
 import fs from "node:fs";
 import path from "node:path";
 import { drizzle } from "drizzle-orm/mysql2";
@@ -11,6 +22,7 @@ import { media } from "../server/schema.ts";
 
 const OUT_FILE = path.resolve(import.meta.dirname, "..", "client", "src", "generated", "media-map.json");
 const PUBLIC_DIR = path.resolve(import.meta.dirname, "..", "client", "public");
+const STRICT = process.argv.includes("--strict-on-error");
 
 const SEED_OVERRIDES: Record<string, string> = {
   logo: "logo.png",
@@ -51,13 +63,12 @@ function write(data: unknown) {
 }
 
 async function main() {
-  const fallback = fallbackMap();
   const databaseUrl = process.env.DATABASE_URL;
   const publicUrl = process.env.R2_PUBLIC_URL;
 
   if (!databaseUrl || !publicUrl) {
     console.log("[media-map] DATABASE_URL or R2_PUBLIC_URL not set, using client/public fallback");
-    write(fallback);
+    write(fallbackMap());
     return;
   }
 
@@ -67,7 +78,7 @@ async function main() {
     const rows = await db.select().from(media);
     await connection.end();
 
-    const resolved = { ...fallback };
+    const resolved = fallbackMap();
     for (const row of rows) {
       const variants = row.variants as Record<string, { key: string }>;
       const entry: Partial<Record<VariantName, string>> = { ...resolved[row.slot] };
@@ -83,11 +94,15 @@ async function main() {
     write(resolved);
     console.log(`[media-map] resolved ${rows.length} slot(s) from the database`);
   } catch (err) {
-    console.error(
-      "[media-map] DB/R2 lookup failed, using client/public fallback:",
-      err instanceof Error ? err.message : err
-    );
-    write(fallback);
+    const message = err instanceof Error ? err.message : String(err);
+    if (STRICT) {
+      console.error(`[media-map] DB/R2 lookup failed: ${message}`);
+      console.error("[media-map] --strict-on-error: leaving the existing media-map.json untouched, failing");
+      process.exitCode = 1;
+      return;
+    }
+    console.error(`[media-map] DB/R2 lookup failed, using client/public fallback: ${message}`);
+    write(fallbackMap());
   }
 }
 
