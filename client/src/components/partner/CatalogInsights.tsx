@@ -27,7 +27,7 @@ function AnimatedCounter({ value, reduce }: { value: number; reduce: boolean }) 
     return () => controls.stop();
   }, [inView, reduce, value]);
 
-  return <span>{display}</span>;
+  return <span ref={ref}>{display}</span>;
 }
 
 function EvidenceBar({
