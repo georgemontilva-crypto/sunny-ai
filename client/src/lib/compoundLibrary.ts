@@ -60,11 +60,39 @@ export interface CategoryCount {
   count: number;
 }
 
-// Real, derived, and — with today's 5 compounds each in their own category
-// — flat (every bar comes out equal). That's an accurate picture of a small
-// catalog, not a bug to disguise with an invented "volume" number.
+// Kept for the "research categories" counter — with today's 5 compounds
+// each in their own category, a bar chart of this would be flat (every
+// category = 1), so evidenceLevelCounts() below is what actually renders
+// as bars. This is still real, still derived, just not what the chart
+// shows.
 export function categoryCounts(): CategoryCount[] {
   const counts = new Map<string, number>();
   for (const c of compoundLibrary) counts.set(c.category, (counts.get(c.category) ?? 0) + 1);
   return [...counts.entries()].map(([category, count]) => ({ category, count }));
+}
+
+export interface EvidenceLevelCount {
+  level: EvidenceLevel;
+  label: string;
+  count: number;
+}
+
+const EVIDENCE_LEVEL_ORDER: EvidenceLevel[] = ["human trials", "animal models", "preclinical"];
+const EVIDENCE_LEVEL_LABELS: Record<EvidenceLevel, string> = {
+  "human trials": "Human trials",
+  "animal models": "Animal models",
+  preclinical: "Preclinical only",
+};
+
+// The distribution that actually varies today (1 / 1 / 3) — and the one a
+// clinic evaluating Sunny actually cares about: how much real evidence
+// stands behind the catalog, not how many categories it's sorted into.
+export function evidenceLevelCounts(): EvidenceLevelCount[] {
+  const counts = new Map<EvidenceLevel, number>();
+  for (const c of compoundLibrary) counts.set(c.evidenceLevel, (counts.get(c.evidenceLevel) ?? 0) + 1);
+  return EVIDENCE_LEVEL_ORDER.map((level) => ({
+    level,
+    label: EVIDENCE_LEVEL_LABELS[level],
+    count: counts.get(level) ?? 0,
+  }));
 }

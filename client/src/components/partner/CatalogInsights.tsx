@@ -1,7 +1,7 @@
 import { animate, motion, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { categoryCounts, compoundLibrary } from "@/lib/compoundLibrary";
+import { categoryCounts, compoundLibrary, evidenceLevelCounts } from "@/lib/compoundLibrary";
 import { getAllPosts } from "@/lib/blog";
 
 const EASE = [0.23, 1, 0.32, 1] as const;
@@ -30,14 +30,14 @@ function AnimatedCounter({ value, reduce }: { value: number; reduce: boolean }) 
   return <span>{display}</span>;
 }
 
-function CategoryBar({
-  category,
+function EvidenceBar({
+  label,
   count,
   max,
   delay,
   reduce,
 }: {
-  category: string;
+  label: string;
   count: number;
   max: number;
   delay: number;
@@ -50,7 +50,7 @@ function CategoryBar({
 
   return (
     <div ref={ref} className="flex items-center gap-4">
-      <span className="w-36 shrink-0 text-sm text-muted-foreground truncate">{category}</span>
+      <span className="w-36 shrink-0 text-sm text-muted-foreground truncate">{label}</span>
       <div className="flex-1 h-3 rounded-full bg-secondary/50 overflow-hidden">
         <motion.div
           className="h-full rounded-full bg-accent"
@@ -69,8 +69,9 @@ export default function CatalogInsights() {
   const headingRef = useRef(null);
   const headingInView = useInView(headingRef, { once: true, margin: "-80px" });
 
-  const bars = categoryCounts();
+  const bars = evidenceLevelCounts();
   const maxCount = Math.max(...bars.map((b) => b.count), 1);
+  const categoryCount = categoryCounts().length;
   const postCount = getAllPosts().length;
 
   return (
@@ -93,13 +94,13 @@ export default function CatalogInsights() {
 
         <Card className="p-8">
           <h3 className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-6">
-            Compounds indexed, by category
+            Compounds indexed, by evidence level
           </h3>
           <div className="space-y-5">
             {bars.map((b, i) => (
-              <CategoryBar
-                key={b.category}
-                category={b.category}
+              <EvidenceBar
+                key={b.level}
+                label={b.label}
                 count={b.count}
                 max={maxCount}
                 delay={i * 0.1}
@@ -118,7 +119,7 @@ export default function CatalogInsights() {
           </div>
           <div>
             <div className="text-4xl font-bold text-accent tabular-nums">
-              <AnimatedCounter value={bars.length} reduce={reduce} />
+              <AnimatedCounter value={categoryCount} reduce={reduce} />
             </div>
             <div className="text-sm text-muted-foreground mt-1">Research categories</div>
           </div>
