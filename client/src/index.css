@@ -40,6 +40,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-noche: var(--noche);
 }
 
 :root {
@@ -53,6 +54,8 @@
   --chart-4: oklch(0.4677 0.0866 77.22); /* Dorado Texto */
   --chart-5: oklch(0.8802 0.0352 82.9); /* Arena Media */
   --radius: 0.65rem;
+  --font-display: "Clash Display", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --noche: oklch(0.16 0.03 75); /* Noche - warm near-black, dark hero/navbar surfaces */
   /* Desert Palette - Sunny AI */
   --background: oklch(0.9598 0.016 82.79); /* Arena - Light sand */
   --foreground: oklch(0.2275 0.0197 73.54); /* Tinta - Dark ink */
@@ -125,6 +128,11 @@
     font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
     font-weight: 700;
     letter-spacing: -0.02em;
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    line-height: 1.03;
   }
   body {
     font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
@@ -214,5 +222,214 @@
       padding-right: 2rem;
       max-width: 1280px; /* Standard content width */
     }
+  }
+}
+
+/* Floating glass navbar (Navbar.tsx) */
+@layer components {
+  .navbar-pill {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    z-index: 50;
+    width: min(1180px, calc(100% - 28px));
+    transform: translateX(-50%);
+    border-radius: 99px;
+    background: oklch(from var(--noche) l c h / 55%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    backdrop-filter: blur(18px) saturate(160%);
+    border: 1px solid oklch(from var(--background) l c h / 12%);
+    box-shadow:
+      0 16px 40px -12px oklch(from var(--noche) l c h / 45%),
+      inset 0 1px 0 oklch(1 0 0 / 10%);
+    transition:
+      top 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+      width 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .navbar-pill.is-scrolled {
+    top: 10px;
+    width: min(1080px, calc(100% - 28px));
+    background: oklch(from var(--noche) l c h / 82%);
+  }
+
+  .pill-link {
+    transition: background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1), color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .pill-link:hover {
+    background: oklch(from var(--background) l c h / 9%);
+  }
+
+  /* Mobile full-screen menu panel (Navbar.tsx, <900px) */
+  .mobile-menu-panel {
+    background: oklch(from var(--noche) l c h / 92%);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    backdrop-filter: blur(26px) saturate(160%);
+  }
+
+  .mobile-menu-link {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 8vw, 42px);
+    letter-spacing: -0.025em;
+  }
+}
+
+/* Hero background: radial gold light layers + grain (Hero.tsx) */
+@layer components {
+  .hero-light {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform, opacity;
+  }
+
+  .hero-light-1 {
+    top: -260px;
+    right: -220px;
+    width: 1100px;
+    height: 1100px;
+    background: radial-gradient(
+      circle,
+      oklch(from var(--accent) l c h / 32%) 0%,
+      oklch(from var(--accent) l c h / 10%) 45%,
+      transparent 70%
+    );
+    animation: hero-drift-1 24s ease-in-out infinite;
+  }
+
+  .hero-light-2 {
+    bottom: -200px;
+    left: -200px;
+    width: 820px;
+    height: 820px;
+    background: radial-gradient(circle, oklch(from var(--accent) l c h / 20%) 0%, transparent 70%);
+    animation: hero-drift-2 30s ease-in-out infinite;
+  }
+
+  .hero-light-3 {
+    top: 38%;
+    left: 6%;
+    width: 560px;
+    height: 560px;
+    background: radial-gradient(circle, oklch(from var(--chart-5) l c h / 14%) 0%, transparent 70%);
+    animation: hero-drift-3 19s ease-in-out infinite;
+  }
+
+  .hero-grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Portrait: floating frame + breathing aura behind it (Hero.tsx) */
+  .hero-portrait-wrap {
+    position: relative;
+    animation: hero-float 8s ease-in-out infinite;
+  }
+
+  .hero-portrait-wrap::before {
+    content: "";
+    position: absolute;
+    inset: -16%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      oklch(from var(--accent) l c h / 55%) 0%,
+      oklch(from var(--accent) l c h / 18%) 50%,
+      transparent 75%
+    );
+    filter: blur(48px);
+    animation: hero-breathe 5.5s ease-in-out infinite alternate;
+  }
+
+  .hero-portrait-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    border: 1px solid oklch(from var(--accent) l c h / 30%);
+    box-shadow: 0 40px 80px -20px oklch(0 0 0 / 55%);
+  }
+
+  .hero-portrait-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .pulse-dot {
+    position: relative;
+    display: inline-flex;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse-dot-ring 2s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+  }
+
+  .hero-cta-glow {
+    box-shadow: 0 8px 30px -6px oklch(from var(--accent) l c h / 45%);
+    transition: box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .hero-cta-glow:hover {
+    box-shadow: 0 14px 44px -6px oklch(from var(--accent) l c h / 65%);
+  }
+}
+
+@keyframes hero-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-44px, 34px) scale(1.08); }
+}
+
+@keyframes hero-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(32px, -28px) scale(1.06); }
+}
+
+@keyframes hero-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+  50% { transform: translate(22px, -18px) scale(1.1); opacity: 0.55; }
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes hero-breathe {
+  0% { opacity: 0.6; transform: scale(0.94); }
+  100% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes pulse-dot-ring {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* prefers-reduced-motion: no drift, no breathing, no floating — every
+   keyframe animation declared above is disabled outright rather than
+   shortened, per the redesign brief. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-light-1,
+  .hero-light-2,
+  .hero-light-3,
+  .hero-portrait-wrap,
+  .hero-portrait-wrap::before,
+  .pulse-dot::after {
+    animation: none !important;
   }
 }

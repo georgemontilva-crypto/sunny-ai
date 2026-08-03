@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "wouter";
 import { getSlotUrl } from "@/lib/media";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
@@ -12,16 +13,30 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
+const EASE = [0.23, 1, 0.32, 1] as const;
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [location] = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    handleScroll();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Locks the page underneath the full-screen mobile panel so it can't be
+  // scrolled while open — same approach as ConsentGate's modal.
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen]);
 
   // These sections (how-it-works, compounds, goals, contact) only exist on
   // Home — from any other route (e.g. /partner) there's nothing local to
@@ -42,108 +57,127 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
-          : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex items-center justify-between h-16">
+    <>
+      <nav className={cn("navbar-pill", scrolled && "is-scrolled")}>
+        <div className="flex items-center justify-between h-14 pl-4 pr-2 sm:pl-5 sm:pr-3">
           <Link href="/">
             <motion.div
               className="flex items-center gap-2 cursor-pointer"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <img src={getSlotUrl("logo")} alt="Sunny" className="h-12 w-auto max-w-xs" loading="lazy" />
+              <img src={getSlotUrl("logo")} alt="Sunny" className="h-9 w-auto max-w-[9rem]" loading="lazy" />
             </motion.div>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden min-[900px]:flex items-center gap-1">
             {navLinks.map((link) => (
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-accent/10"
+                className="pill-link px-4 py-2 text-sm text-background/85 hover:text-background rounded-full"
               >
                 {link.label}
               </button>
             ))}
             <Link
               href="/partner"
-              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-accent/10"
+              className="pill-link px-4 py-2 text-sm text-background/85 hover:text-background rounded-full"
             >
               For brands
             </Link>
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden min-[900px]:flex items-center gap-3">
             <Link
               href="/signin"
-              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+              className="pill-link px-3 py-2 text-sm text-background/85 hover:text-background rounded-full"
             >
               Sign in
             </Link>
-            <Button size="sm" className="text-sm font-medium" asChild>
+            <Button size="sm" className="text-sm font-medium rounded-full" asChild>
               <a href="/partner#pricing">Get Started</a>
             </Button>
           </div>
 
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex min-[900px]:hidden items-center gap-2">
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="w-9 h-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent/10"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-background/85 hover:text-background hover:bg-background/9 transition-colors"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25 }}
-            className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            className="mobile-menu-panel fixed inset-0 z-40 min-[900px]:hidden flex flex-col"
           >
-            <div className="container px-4 py-4 flex flex-col gap-1">
-              {navLinks.map((link) => (
-                <button
+            <div className="h-14 shrink-0" aria-hidden="true" />
+            <div className="flex-1 flex flex-col justify-center px-8 gap-2">
+              {navLinks.map((link, i) => (
+                <motion.button
                   key={link.href}
                   onClick={() => scrollToSection(link.href)}
-                  className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/10 transition-colors text-left"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06, duration: 0.4, ease: EASE }}
+                  className="mobile-menu-link text-left text-background py-2"
                 >
                   {link.label}
-                </button>
+                </motion.button>
               ))}
-              <Link
-                href="/partner"
-                onClick={() => setMobileOpen(false)}
-                className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/10 transition-colors text-left"
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: navLinks.length * 0.06, duration: 0.4, ease: EASE }}
               >
-                For brands
-              </Link>
-              <Link
-                href="/signin"
-                onClick={() => setMobileOpen(false)}
-                className="px-4 py-3 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-accent/10 transition-colors text-left"
+                <Link
+                  href="/partner"
+                  onClick={() => setMobileOpen(false)}
+                  className="mobile-menu-link block text-background/70 py-2"
+                >
+                  For brands
+                </Link>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: (navLinks.length + 1) * 0.06, duration: 0.4, ease: EASE }}
               >
-                Sign in
-              </Link>
-              <div className="pt-3">
-                <Button size="sm" className="w-full" asChild>
-                  <a href="/partner#pricing" onClick={() => setMobileOpen(false)}>Get Started</a>
-                </Button>
-              </div>
+                <Link
+                  href="/signin"
+                  onClick={() => setMobileOpen(false)}
+                  className="mobile-menu-link block text-background/70 py-2"
+                >
+                  Sign in
+                </Link>
+              </motion.div>
             </div>
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: (navLinks.length + 2) * 0.06, duration: 0.4, ease: EASE }}
+              className="px-8 pb-10 shrink-0"
+            >
+              <Button size="lg" className="w-full rounded-full font-semibold" asChild>
+                <a href="/partner#pricing" onClick={() => setMobileOpen(false)}>
+                  Get Started
+                </a>
+              </Button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }
