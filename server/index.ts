@@ -27,6 +27,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { authRoutes } from "./authRoutes.ts";
 import { memberAuthRoutes } from "./memberAuthRoutes.ts";
 import { publicRoutes } from "./publicRoutes.ts";
+import { republishIfGeneratedMapsAreEmpty } from "./republish.ts";
 import { appRouter } from "./routers/_app.ts";
 import { createContext } from "./trpc.ts";
 
@@ -165,4 +166,8 @@ try {
 const PORT = Number(process.env.PORT ?? 3001);
 app.listen(PORT, () => {
   console.log(`[server] listening on :${PORT}`);
+  // Runs once per process start, here rather than earlier in this file, so
+  // the "listening" log always lands first — see republishIfGeneratedMapsAreEmpty
+  // for why this check exists and why it's safe to run unconditionally.
+  republishIfGeneratedMapsAreEmpty();
 });

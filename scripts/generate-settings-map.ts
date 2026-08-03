@@ -77,7 +77,13 @@ async function main() {
       process.exitCode = 1;
       return;
     }
-    console.error(`[settings-map] FAILED, using empty fallback for every key: ${message}`);
+    console.error(`[settings-map] FAILED during build: ${message}`);
+    console.error(
+      "[settings-map] every key will be empty in this build — expected if the database isn't reachable at build " +
+        "time (e.g. Railway's mysql.railway.internal only resolves at runtime, not during the build phase). " +
+        "This resolves automatically: server/republish.ts re-runs this at server startup once the private " +
+        "network is up (see republishIfGeneratedMapsAreEmpty in server/republish.ts)."
+    );
     write({});
   }
 }

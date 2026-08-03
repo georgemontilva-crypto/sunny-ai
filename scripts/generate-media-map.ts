@@ -152,7 +152,13 @@ async function main() {
       process.exitCode = 1;
       return;
     }
-    console.error(`[media-map] FAILED, every slot empty for this build: ${message}`);
+    console.error(`[media-map] FAILED during build: ${message}`);
+    console.error(
+      "[media-map] every slot will be empty in this build — expected if the database isn't reachable at build " +
+        "time (e.g. Railway's mysql.railway.internal only resolves at runtime, not during the build phase). " +
+        "This resolves automatically: server/republish.ts re-runs this at server startup once the private " +
+        "network is up (see republishIfGeneratedMapsAreEmpty in server/republish.ts)."
+    );
     write(emptyMap());
   }
 }

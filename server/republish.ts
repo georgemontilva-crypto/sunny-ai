@@ -147,6 +147,59 @@ function logBuildInfo(id: number): void {
   }
 }
 
+type GeneratedMap = Record<string, unknown>;
+
+function readGeneratedMap(fileName: string): GeneratedMap | null {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(ROOT, "client", "src", "generated", fileName), "utf-8"));
+  } catch {
+    return null; // missing or corrupt — treated the same as "empty" below
+  }
+}
+
+function isMediaMapEmpty(map: GeneratedMap | null): boolean {
+  if (!map) return true;
+  return Object.values(map).every((entry) => entry !== null && typeof entry === "object" && Object.keys(entry).length === 0);
+}
+
+function isSettingsMapEmpty(map: GeneratedMap | null): boolean {
+  if (!map) return true;
+  return Object.keys(map).length === 0;
+}
+
+// Guards against exactly the failure this project hit on Railway:
+// mysql.railway.internal only resolves once the container is actually
+// running, not during the build phase, so a build with no DB access bakes
+// empty media-map.json/settings-map.json into the static build — no
+// images, no settings-backed pricing/copy — and nothing regenerates them
+// until the next deploy touches those scripts again. Called once at server
+// startup (server/index.ts) where the private network IS reachable, so
+// this succeeds with real data within seconds of boot, no manual
+// intervention needed. A false-positive republish (maps that are
+// legitimately empty — nothing uploaded/configured yet) is harmless: it
+// just regenerates the same empty output.
+export function republishIfGeneratedMapsAreEmpty(): void {
+  if (!process.env.DATABASE_URL) {
+    console.log("[republish] startup check skipped: DATABASE_URL not set");
+    return;
+  }
+
+  const mediaEmpty = isMediaMapEmpty(readGeneratedMap("media-map.json"));
+  const settingsEmpty = isSettingsMapEmpty(readGeneratedMap("settings-map.json"));
+
+  if (!mediaEmpty && !settingsEmpty) {
+    console.log("[republish] startup check: media-map and settings-map both have data, no republish needed");
+    return;
+  }
+
+  console.log(
+    `[republish] startup check: media-map empty=${mediaEmpty} settings-map empty=${settingsEmpty} — ` +
+      "this build likely ran without access to the private database host (resolves only at runtime, not at " +
+      "build time). Scheduling a republish now."
+  );
+  scheduleRepublish();
+}
+
 async function republish(): Promise<void> {
   const id = ++runCounter;
   const tempDir = path.join(ROOT, `dist-tmp-${id}`);
