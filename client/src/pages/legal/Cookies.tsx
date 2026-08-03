@@ -11,19 +11,28 @@ export default function Cookies() {
         </Link>
 
         <div className="mb-10">
-          <p className="text-sm text-muted-foreground mb-2">Last updated: July 29, 2026</p>
+          <p className="text-sm text-muted-foreground mb-2">Last updated: August 3, 2026</p>
           <h1 className="text-4xl font-bold tracking-tight mb-4">Cookie Policy</h1>
           <p className="text-muted-foreground leading-relaxed">
-            Sunny is a static site. We don't use advertising or third-party tracking cookies.
+            Sunny sets one cookie to keep you signed in if you have an account. We don't use advertising or
+            third-party tracking cookies.
           </p>
         </div>
 
         <div className="space-y-10 text-sm leading-relaxed text-foreground/90">
           <section>
-            <h2 className="text-xl font-semibold mb-3">1. What we use</h2>
+            <h2 className="text-xl font-semibold mb-3">1. The cookies we set</h2>
             <p>
-              This site does not set any cookies of its own. We have no login system, shopping carts, or
-              advertising tracking.
+              If you sign in — as a Sunny member, or separately as staff through the admin panel — we set a
+              session cookie (<code>sunny_member_session</code> or <code>sunny_session</code>, depending
+              which) so you stay signed in as you move between pages. It stores only a random session
+              identifier, never your email, password, or any other personal data, and is checked against
+              your session in our database on every request. It expires automatically 8 hours after you
+              sign in, and we delete it immediately when you sign out.
+            </p>
+            <p className="mt-3">
+              If you never create an account or sign in, this site sets no cookies of its own. We have no
+              shopping carts or advertising tracking.
             </p>
           </section>
 

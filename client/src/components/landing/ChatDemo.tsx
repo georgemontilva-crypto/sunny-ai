@@ -117,7 +117,7 @@ export default function ChatDemo() {
             Chat with Sunny
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Natural conversations about your health goals. Sunny analyzes research and maps peptide pathways tailored to you.
+            Ask questions in plain language. Sunny organizes published research around your topic — no diagnosis, no protocols.
           </p>
         </motion.div>
 

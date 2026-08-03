@@ -11,7 +11,7 @@ export default function Privacy() {
         </Link>
 
         <div className="mb-10">
-          <p className="text-sm text-muted-foreground mb-2">Last updated: August 2, 2026</p>
+          <p className="text-sm text-muted-foreground mb-2">Last updated: August 3, 2026</p>
           <h1 className="text-4xl font-bold tracking-tight mb-4">Privacy Policy</h1>
           <p className="text-muted-foreground leading-relaxed">
             At Sunny we care about how your information is handled. This policy explains what data we
@@ -30,6 +30,14 @@ export default function Privacy() {
               we never store your password itself, only a one-way hash it's not possible to reverse. Once
               you're signed in, we also store the conversations you have with Sunny, so you can pick a
               conversation back up and so you can review or delete what you've shared.
+            </p>
+            <p className="mt-3">
+              To keep you signed in, we also set a session cookie that stores a random session identifier —
+              see our{" "}
+              <Link href="/legal/cookies" className="text-primary hover:underline">
+                Cookie Policy
+              </Link>{" "}
+              for what it stores and how long it lasts.
             </p>
           </section>
 
