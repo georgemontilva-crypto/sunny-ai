@@ -8,23 +8,23 @@ import { MessageCircle, FileText, Zap, Target } from "lucide-react";
 const features = [
   {
     icon: MessageCircle,
-    title: "Natural conversations",
-    description: "Chat naturally about your health goals",
+    title: "Plain-language questions",
+    description: "Ask about compounds and topics in your own words",
   },
   {
     icon: FileText,
-    title: "Lab report analysis",
-    description: "Upload and analyze your biomarkers",
+    title: "Citations included",
+    description: "Every summary points back to published work",
   },
   {
     icon: Zap,
-    title: "Smart research mapping",
-    description: "AI-powered literature search",
+    title: "Literature review",
+    description: "Published research organized around your question",
   },
   {
     icon: Target,
-    title: "Research by goal",
-    description: "Literature mapped to what you're exploring",
+    title: "Research context",
+    description: "What the evidence shows, and where it stops",
   },
 ];
 
@@ -73,7 +73,7 @@ export default function MeetSunny() {
               transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="text-lg text-muted-foreground mb-8 max-w-lg"
             >
-              He's not a chatbot. He's a structured AI research assistant who conducts a professional intake — understanding your goals, biology, and experience before mapping the perfect peptide pathway.
+              Sunny is an AI-powered research assistant designed to make peptide literature easier to understand. Ask questions in plain language, explore published findings, and review citations, limitations, and research context — all in one place.
             </motion.p>
 
             {/* FEATURES GRID */}
@@ -109,7 +109,7 @@ export default function MeetSunny() {
               className="flex flex-col sm:flex-row items-start gap-4"
             >
               <Button size="lg" className="text-base font-semibold px-8 h-12">
-                Start Conversation
+                Ask a Research Question
               </Button>
               <Button
                 size="lg"

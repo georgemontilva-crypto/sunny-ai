@@ -77,10 +77,10 @@ export default function Hero() {
               transition={{ duration: 0.7, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
               className="text-5xl sm:text-6xl font-bold tracking-tight mb-6 leading-[1.05]"
             >
-              Clarity on{" "}
               <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
-                peptide research
+                Peptide Research
               </span>
+              , Made Clear
             </motion.h1>
 
             <motion.p
@@ -89,7 +89,7 @@ export default function Hero() {
               transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="text-lg text-muted-foreground mb-10 max-w-lg"
             >
-              Sunny organizes scientific literature on peptides and explains it in clear language. Research-backed, judgment-free, and always educational.
+              Sunny organizes peptide research and explains the science in clear, accessible language.
             </motion.p>
 
             <motion.div

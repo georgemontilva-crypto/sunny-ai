@@ -167,7 +167,7 @@ export default function Questions() {
             Real questions people ask
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Science-first answers tailored to your goals. Judgment-free, research-backed guidance.
+            Science-first explanations based on what you are exploring.
           </p>
         </motion.div>
 
