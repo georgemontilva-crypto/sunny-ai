@@ -3,6 +3,7 @@ import { type FormEvent, useState } from "react";
 import { Link, Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useMemberAuth } from "@/hooks/useMemberAuth";
 import { getSlotUrl } from "@/lib/media";
 import { SITE } from "@shared/site.ts";
@@ -63,8 +64,7 @@ export default function SignInPage() {
                 Forgot password?
               </a>
             </div>
-            <Input
-              type="password"
+            <PasswordInput
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

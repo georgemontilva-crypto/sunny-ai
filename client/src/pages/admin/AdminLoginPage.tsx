@@ -4,6 +4,7 @@ import { Redirect } from "wouter";
 import { getSlotUrl } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { useMemberAuth } from "@/hooks/useMemberAuth";
 
@@ -64,8 +65,7 @@ export default function AdminLoginPage() {
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
-            <Input
-              type="password"
+            <PasswordInput
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

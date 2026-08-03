@@ -4,6 +4,7 @@ import { Link, Redirect } from "wouter";
 import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { useMemberAuth } from "@/hooks/useMemberAuth";
 import { getSlotUrl } from "@/lib/media";
 
@@ -95,8 +96,7 @@ export default function SignUpPage() {
 
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
-            <Input
-              type="password"
+            <PasswordInput
               autoComplete="new-password"
               minLength={8}
               value={password}
