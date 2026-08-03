@@ -7,6 +7,7 @@ import { Redirect, Route, Switch } from "wouter";
 import { useSeoMeta } from "./hooks/useSeoMeta";
 import ConsentGate from "./components/ConsentGate";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ScrollToTop from "./components/ScrollToTop";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import BlogPage from "@/pages/BlogPage";
@@ -33,66 +34,69 @@ import AccountPage from "@/pages/AccountPage";
 function Router() {
   useSeoMeta();
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/blog"} component={BlogPage} />
-      <Route path={"/blog/:slug"} component={BlogPostPage} />
-      <Route path={"/contact"} component={ContactPage} />
-      <Route path={"/partner"} component={PartnerPage} />
-      <Route path={"/legal/terms"} component={Terms} />
-      <Route path={"/legal/privacy"} component={Privacy} />
-      <Route path={"/legal/cookies"} component={Cookies} />
-      <Route path={"/legal/disclaimer"} component={Disclaimer} />
-      {/* /signin, /signup, /chat, /account are never in scripts/prerender.mjs's
+    <>
+      <ScrollToTop />
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/blog"} component={BlogPage} />
+        <Route path={"/blog/:slug"} component={BlogPostPage} />
+        <Route path={"/contact"} component={ContactPage} />
+        <Route path={"/partner"} component={PartnerPage} />
+        <Route path={"/legal/terms"} component={Terms} />
+        <Route path={"/legal/privacy"} component={Privacy} />
+        <Route path={"/legal/cookies"} component={Cookies} />
+        <Route path={"/legal/disclaimer"} component={Disclaimer} />
+        {/* /signin, /signup, /chat, /account are never in scripts/prerender.mjs's
           routes list or the sitemap — server/index.ts serves dist/app-shell.html
           (a generic noindex empty shell, same idea as /admin's) for a direct hit. */}
-      <Route path={"/signin"} component={SignInPage} />
-      <Route path={"/signup"} component={SignUpPage} />
-      <Route path={"/chat"}>
-        <MemberGuarded>
-          <ChatPage />
-        </MemberGuarded>
-      </Route>
-      <Route path={"/account"}>
-        <MemberGuarded>
-          <AccountPage />
-        </MemberGuarded>
-      </Route>
-      {/* /admin/* is never in scripts/prerender.mjs's routes list or the
+        <Route path={"/signin"} component={SignInPage} />
+        <Route path={"/signup"} component={SignUpPage} />
+        <Route path={"/chat"}>
+          <MemberGuarded>
+            <ChatPage />
+          </MemberGuarded>
+        </Route>
+        <Route path={"/account"}>
+          <MemberGuarded>
+            <AccountPage />
+          </MemberGuarded>
+        </Route>
+        {/* /admin/* is never in scripts/prerender.mjs's routes list or the
           sitemap — see that script's dedicated dist/admin/index.html shell. */}
-      <Route path={"/admin/login"} component={AdminLoginPage} />
-      <Route path={"/admin/requests"}>
-        <AdminGuarded>
-          <AdminRequestsPage />
-        </AdminGuarded>
-      </Route>
-      <Route path={"/admin/media"}>
-        <AdminGuarded>
-          <AdminMediaPage />
-        </AdminGuarded>
-      </Route>
-      <Route path={"/admin/settings"}>
-        <AdminGuarded>
-          <AdminSettingsPage />
-        </AdminGuarded>
-      </Route>
-      <Route path={"/admin/users"}>
-        <AdminGuarded>
-          <AdminUsersPage />
-        </AdminGuarded>
-      </Route>
-      <Route path={"/admin/audit"}>
-        <AdminGuarded>
-          <AdminAuditPage />
-        </AdminGuarded>
-      </Route>
-      <Route path={"/admin"}>
-        <Redirect to="/admin/requests" />
-      </Route>
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+        <Route path={"/admin/login"} component={AdminLoginPage} />
+        <Route path={"/admin/requests"}>
+          <AdminGuarded>
+            <AdminRequestsPage />
+          </AdminGuarded>
+        </Route>
+        <Route path={"/admin/media"}>
+          <AdminGuarded>
+            <AdminMediaPage />
+          </AdminGuarded>
+        </Route>
+        <Route path={"/admin/settings"}>
+          <AdminGuarded>
+            <AdminSettingsPage />
+          </AdminGuarded>
+        </Route>
+        <Route path={"/admin/users"}>
+          <AdminGuarded>
+            <AdminUsersPage />
+          </AdminGuarded>
+        </Route>
+        <Route path={"/admin/audit"}>
+          <AdminGuarded>
+            <AdminAuditPage />
+          </AdminGuarded>
+        </Route>
+        <Route path={"/admin"}>
+          <Redirect to="/admin/requests" />
+        </Route>
+        <Route path={"/404"} component={NotFound} />
+        {/* Final fallback route */}
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 

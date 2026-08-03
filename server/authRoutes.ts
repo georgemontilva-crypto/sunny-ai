@@ -50,10 +50,26 @@ authRoutes.post("/login", loginLimiter, async (req, res) => {
     .verify(user?.passwordHash ?? DUMMY_HASH, parsed.data.password)
     .catch(() => false);
 
+  // TEMP DEBUG — remove once the login-rejected-despite-good-seed report is
+  // resolved. No email/password/hash values, just which check failed.
+  console.log(
+    `[auth.login] userFound=${!!user} passwordValid=${valid} isActive=${JSON.stringify(user?.isActive)} role=${user?.role ?? "(none)"}`
+  );
+
   // A member's credentials are valid, just not for this realm — rejected
   // here rather than left to adminProcedure's role check so a member never
   // gets an (unusable but real) admin-cookie session in the first place.
   if (!user || !valid || !user.isActive || user.role === "member") {
+    console.log(
+      `[auth.login] rejected: ${[
+        !user && "no user with this email",
+        user && !valid && "password did not verify",
+        user && !user.isActive && "isActive is falsy",
+        user && user.role === "member" && "role is member",
+      ]
+        .filter(Boolean)
+        .join(", ")}`
+    );
     res.status(401).json({ error: "Invalid credentials" });
     return;
   }
