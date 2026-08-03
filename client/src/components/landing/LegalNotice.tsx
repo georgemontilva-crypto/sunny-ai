@@ -24,10 +24,17 @@ export default function LegalNotice() {
               <div>
                 <h2 className="font-semibold text-lg mb-3">Important notice</h2>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                  All content on Sunny —compound library, blog, and contact form responses— is
-                  provided for <strong className="text-foreground">educational and research purposes
-                  only</strong>. Sunny <strong className="text-foreground">does not provide medical
-                  advice</strong> and does not diagnose or prescribe any treatment, compound, or protocol.
+                  Sunny provides educational summaries of published research. It does not provide
+                  medical advice, diagnosis, treatment recommendations, dosing instructions, or
+                  protocols. Always consult a qualified healthcare professional before making
+                  health-related decisions.
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                  All content on Sunny — including the compound library, blog, and responses to
+                  contact-form inquiries — is provided for <strong className="text-foreground">educational
+                  and research purposes only</strong>. Sunny <strong className="text-foreground">does not
+                  provide medical advice</strong> and does not diagnose or prescribe any treatment,
+                  compound, or protocol.
                 </p>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   This site is intended for <strong className="text-foreground">adults 21 and

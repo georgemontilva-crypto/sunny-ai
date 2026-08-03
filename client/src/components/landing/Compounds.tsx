@@ -24,6 +24,9 @@ export default function Compounds() {
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Research summaries in conditional language. The information provided here is strictly educational. Sunny does not provide dosing instructions, protocols, medical claims, or recommendations for human use.
           </p>
+          <p className="text-xs text-muted-foreground mt-3">
+            Educational summaries of published research. Not medical advice.
+          </p>
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-6">

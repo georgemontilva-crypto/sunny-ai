@@ -106,7 +106,7 @@ export default function Goals() {
                 </div>
                 <h3 className="text-lg font-semibold mb-2">{goal.title}</h3>
                 <p className="text-sm text-muted-foreground mb-4 flex-grow">{goal.description}</p>
-                <div className="flex flex-wrap gap-1 mb-4">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {goal.compounds.map((c) => (
                     <span key={c} className="text-xs px-2 py-1 bg-accent/10 text-accent rounded">
                       {c}

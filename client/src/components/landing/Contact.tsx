@@ -83,7 +83,7 @@ export default function Contact() {
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Have a question?</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Tell us about your research interests. We'll provide educational guidance, no medical advice.
+            Tell us about your research interests. We'll provide educational information — not medical advice.
           </p>
         </motion.div>
 
@@ -222,6 +222,9 @@ export default function Contact() {
                   </>
                 )}
               </Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Educational summaries of published research. Not medical advice.
+              </p>
             </form>
           )}
         </div>

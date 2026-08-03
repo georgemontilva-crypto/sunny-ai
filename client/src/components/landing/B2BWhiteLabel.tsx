@@ -10,13 +10,13 @@ const embedCapabilities = [
 ];
 
 const whiteLabelCapabilities = [
-  "Your brand, your domain, your palette — Sunny's research engine underneath.",
-  "Same editorial standard: conditional language, no dosing or protocols, legal notice always visible.",
+  "Your brand, domain, and visual identity — powered by Sunny's research technology.",
+  "The same editorial standards apply: conditional language, no dosing or protocols, and a legal notice that remains visible.",
   "Built for clinics, supplement brands, and wellness platforms.",
 ];
 
 const partnerBenefits = [
-  { icon: Boxes, title: "Trained on your catalog", subtext: "Indexed from your own product data" },
+  { icon: Boxes, title: "Trained on your catalog", subtext: "Indexed using your product data" },
   { icon: Palette, title: "Your brand, your domain", subtext: "Fully white-labeled" },
   { icon: ShieldCheck, title: "Guardrails built in", subtext: "No dosing, no protocols, no diagnosis" },
 ];
@@ -39,6 +39,11 @@ export default function B2BWhiteLabel() {
             For clinics & brands: embed or white-label
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
+            Bring clear, research-focused education into your digital experience. Sunny can be adapted to
+            your brand while maintaining transparent citations, careful language, and visible educational
+            boundaries.
+          </p>
+          <p className="text-muted-foreground max-w-2xl mx-auto mt-4">
             If you already work with patients or clients interested in peptides, you can offer them the
             same educational content from within your own platform.
           </p>
