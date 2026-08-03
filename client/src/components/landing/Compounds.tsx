@@ -22,7 +22,7 @@ export default function Compounds() {
             Compound Library
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Research summaries in conditional language. No compounds here are evaluated for human use — no dosing, protocols, or medical claims.
+            Research summaries in conditional language. The information provided here is strictly educational. Sunny does not provide dosing instructions, protocols, medical claims, or recommendations for human use.
           </p>
         </motion.div>
 

@@ -6,18 +6,18 @@ import { ArrowRight } from "lucide-react";
 
 const goals = [
   {
-    title: "Recovery & Healing",
+    title: "Recovery & Tissue Research",
     metric: "Tissue repair",
     label: "area of interest",
-    description: "Tissue repair, injury support, faster bounce-back from training and surgery.",
+    description: "Explore published research related to tissue repair, recovery, and post-exercise adaptation.",
     compounds: ["BPC-157", "TB-500", "GHK-Cu"],
     image: "goal-recovery",
   },
   {
-    title: "Fat Loss & Metabolic",
+    title: "Metabolism & Body Composition",
     metric: "Body composition",
     label: "area of interest",
-    description: "Body recomposition, metabolic optimization, insulin sensitivity.",
+    description: "Explore research involving body composition, metabolic pathways, and insulin sensitivity.",
     compounds: ["MOTS-c", "AOD-9604"],
     image: "goal-fat-loss",
   },
@@ -25,15 +25,15 @@ const goals = [
     title: "Cognition & Focus",
     metric: "Cognitive focus",
     label: "area of interest",
-    description: "Compounds studied in the nootropic literature.",
+    description: "Explore research involving attention, memory, and neuroprotection.",
     compounds: ["Semax", "Selank", "Cerebrolysin"],
     image: "goal-cognition",
   },
   {
-    title: "Longevity & Anti-Aging",
+    title: "Longevity & Cellular Aging",
     metric: "Cellular aging",
     label: "area of interest",
-    description: "Cellular health, mitochondrial repair, research on cellular aging markers.",
+    description: "Explore research involving cellular aging markers, mitochondrial function, and longevity pathways.",
     compounds: ["Epitalon", "NAD+", "Thymalin"],
     image: "goal-longevity",
   },
@@ -41,15 +41,15 @@ const goals = [
     title: "Performance & Growth",
     metric: "Athletic performance",
     label: "area of interest",
-    description: "Compounds studied in growth hormone and performance research.",
+    description: "Explore research involving growth hormone pathways and physical performance.",
     compounds: ["CJC-1295", "Ipamorelin", "MK-677"],
     image: "goal-performance",
   },
   {
-    title: "Sleep & Hormones",
+    title: "Sleep & Hormonal Research",
     metric: "Sleep quality",
     label: "area of interest",
-    description: "Deep sleep architecture, cortisol balance, libido, mood — the foundation.",
+    description: "Explore research involving sleep architecture, hormonal signaling, mood, and related biological pathways.",
     compounds: ["DSIP", "PT-141", "Kisspeptin"],
     image: "goal-sleep",
   },
@@ -69,10 +69,10 @@ export default function Goals() {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Personalized to your goal
+            Explore Research by Topic
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Pick what's on your mind. We meet you exactly where you are.
+            Browse published research by area of interest.
           </p>
         </motion.div>
 
