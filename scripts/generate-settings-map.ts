@@ -24,9 +24,10 @@ const STRICT = process.argv.includes("--strict-on-error");
 // table (contact_email, newsletter_email, ...) is read live at request
 // time elsewhere and has no business in a static build artifact.
 const PARTNER_KEYS = [
-  "plan_embedded_price",
-  "plan_embedded_period",
-  "plan_embedded_setup",
+  "plan_standard_price",
+  "plan_standard_period",
+  "plan_standard_setup",
+  "plan_standard_note",
   "plan_whitelabel_price",
   "plan_whitelabel_note",
   "partner_contact_phone",

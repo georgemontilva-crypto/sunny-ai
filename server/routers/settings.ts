@@ -15,9 +15,10 @@ const REQUIRED_KEYS = ["contact_email", "newsletter_email"] as const;
 // (shows the page's dashed placeholder / hides the contact line), so these
 // allow saving "" to explicitly clear back to that state.
 const PARTNER_KEYS = [
-  "plan_embedded_price",
-  "plan_embedded_period",
-  "plan_embedded_setup",
+  "plan_standard_price",
+  "plan_standard_period",
+  "plan_standard_setup",
+  "plan_standard_note",
   "plan_whitelabel_price",
   "plan_whitelabel_note",
   "partner_contact_phone",

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc, type RouterOutputs } from "@/lib/trpc";
-import { SOURCE_LABELS, STATUS_LABELS } from "./requestLabels";
+import { SOURCE_LABELS, STATUS_LABELS, TOPIC_LABELS } from "./requestLabels";
 
 type RequestRow = RouterOutputs["requests"]["list"]["rows"][number];
 
@@ -67,6 +67,15 @@ export default function RequestDetailSheet({
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-4 space-y-6">
+          {request.topic && (
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                Contacting about
+              </p>
+              <p className="text-sm text-foreground">{TOPIC_LABELS[request.topic] ?? request.topic}</p>
+            </div>
+          )}
+
           {request.goal && (
             <div>
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">

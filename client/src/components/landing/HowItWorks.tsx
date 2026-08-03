@@ -39,7 +39,7 @@ export default function HowItWorks() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="how-it-works" className="py-24 px-4 bg-background" ref={ref}>
+    <section id="how-it-works" className="py-24 px-4 bg-background scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

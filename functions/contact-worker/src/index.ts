@@ -28,6 +28,7 @@ interface ContactPayload {
   name?: string;
   email?: string;
   goal?: string;
+  topic?: string; // 'general' | 'standard' | 'whitelabel' | 'partnership' — validated server-side
   message?: string;
   website?: string; // honeypot, passed through untouched
 }
@@ -35,6 +36,15 @@ interface ContactPayload {
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+// Mirrors shared/const.ts's CONTACT_TOPICS — duplicated rather than imported
+// since this Worker deploys standalone (Cloudflare, not the main build).
+const TOPIC_LABELS: Record<string, string> = {
+  general: "General question",
+  standard: "Sunny Standard",
+  whitelabel: "Sunny White-Label",
+  partnership: "Partnership",
+};
 
 function json(body: unknown, status: number, headers: HeadersInit): Response {
   return new Response(JSON.stringify(body), {
@@ -51,7 +61,7 @@ function json(body: unknown, status: number, headers: HeadersInit): Response {
 async function registerRequest(
   request: Request,
   env: Env,
-  payload: { name: string; email: string; goal: string; message: string; website?: string }
+  payload: { name: string; email: string; goal: string; topic: string; message: string; website?: string }
 ): Promise<string> {
   try {
     const res = await fetch(`${SITE_API_URL}/api/public/request`, {
@@ -104,6 +114,7 @@ export default {
     const name = (payload.name ?? "").trim();
     const email = (payload.email ?? "").trim();
     const goal = (payload.goal ?? "").trim();
+    const topic = (payload.topic ?? "").trim();
     const message = (payload.message ?? "").trim();
     const website = (payload.website ?? "").trim();
 
@@ -118,7 +129,7 @@ export default {
       return json({ ok: true }, 200, headers);
     }
 
-    const contactTo = await registerRequest(request, env, { name, email, goal, message, website });
+    const contactTo = await registerRequest(request, env, { name, email, goal, topic, message, website });
 
     const resendResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -131,7 +142,14 @@ export default {
         to: contactTo,
         reply_to: email,
         subject: `New contact form message from ${name}`,
-        text: [`Name: ${name}`, `Email: ${email}`, goal ? `Research goal: ${goal}` : null, "", message]
+        text: [
+          `Name: ${name}`,
+          `Email: ${email}`,
+          topic ? `About: ${TOPIC_LABELS[topic] ?? topic}` : null,
+          goal ? `Research goal: ${goal}` : null,
+          "",
+          message,
+        ]
           .filter(Boolean)
           .join("\n"),
       }),

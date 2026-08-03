@@ -7,9 +7,10 @@ import { trpc } from "@/lib/trpc";
 type SettingKey =
   | "contact_email"
   | "newsletter_email"
-  | "plan_embedded_price"
-  | "plan_embedded_period"
-  | "plan_embedded_setup"
+  | "plan_standard_price"
+  | "plan_standard_period"
+  | "plan_standard_setup"
+  | "plan_standard_note"
   | "plan_whitelabel_price"
   | "plan_whitelabel_note"
   | "partner_contact_phone"
@@ -95,39 +96,46 @@ export default function AdminSettingsPage() {
       </p>
 
       <SettingRow
-        label="Embedded plan — price"
-        description='Big figure on the pricing card, e.g. "$199". Empty shows the dashed placeholder.'
-        settingKey="plan_embedded_price"
-        placeholder="$199"
-        emptyHint="Shows a dashed placeholder on /partner until set."
+        label="Sunny Standard — price"
+        description='Big figure on the pricing card, e.g. "$799".'
+        settingKey="plan_standard_price"
+        placeholder="$799"
+        emptyHint='Falls back to "$799" until set.'
       />
       <SettingRow
-        label="Embedded plan — billing period"
-        description='Shown right after the price, e.g. "/month". Empty falls back to "/month".'
-        settingKey="plan_embedded_period"
+        label="Sunny Standard — billing period"
+        description='Shown right after the price, e.g. "/month".'
+        settingKey="plan_standard_period"
         placeholder="/month"
         emptyHint='Falls back to "/month" until set.'
       />
       <SettingRow
-        label="Embedded plan — setup fee"
-        description='Small line under the price, e.g. "$1,000 one-time setup".'
-        settingKey="plan_embedded_setup"
-        placeholder="$1,000 one-time setup"
-        emptyHint="Hidden from /partner until set."
+        label="Sunny Standard — setup fee"
+        description='Small line under the price, e.g. "+ $1,500 one-time setup fee".'
+        settingKey="plan_standard_setup"
+        placeholder="+ $1,500 one-time setup fee"
+        emptyHint='Falls back to "+ $1,500 one-time setup fee" until set.'
       />
       <SettingRow
-        label="White-label plan — price"
-        description='Big figure on the pricing card, e.g. "Custom". Empty shows the dashed placeholder.'
+        label="Sunny Standard — note"
+        description='Small line under the setup fee, e.g. "Cancel monthly · No long-term contract".'
+        settingKey="plan_standard_note"
+        placeholder="Cancel monthly · No long-term contract"
+        emptyHint='Falls back to "Cancel monthly · No long-term contract" until set.'
+      />
+      <SettingRow
+        label="Sunny White-Label — price"
+        description='Big figure on the pricing card, e.g. "Custom".'
         settingKey="plan_whitelabel_price"
         placeholder="Custom"
-        emptyHint="Shows a dashed placeholder on /partner until set."
+        emptyHint='Falls back to "Custom" until set.'
       />
       <SettingRow
-        label="White-label plan — note"
-        description='Small line under the price, e.g. "Starting at $2,500 setup + $399/mo".'
+        label="Sunny White-Label — note"
+        description='Small line under the price, e.g. "Starting at $2,500 setup + $999/mo".'
         settingKey="plan_whitelabel_note"
-        placeholder="Starting at $2,500 setup + $399/mo"
-        emptyHint="Hidden from /partner until set."
+        placeholder="Starting at $2,500 setup + $999/mo · Minimum 6 months · Pricing scales with traffic & customization"
+        emptyHint="Falls back to the default note until set."
       />
       <SettingRow
         label="Contact phone"

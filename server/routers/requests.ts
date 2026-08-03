@@ -1,16 +1,19 @@
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, like, or } from "drizzle-orm";
 import { z } from "zod";
+import { CONTACT_TOPIC_VALUES } from "../../shared/const.ts";
 import { writeAudit } from "../auditLog.ts";
 import { requests } from "../schema.ts";
 import { adminProcedure, router } from "../trpc.ts";
 
 const statusEnum = z.enum(["new", "contacted", "closed", "spam"]);
 const sourceEnum = z.enum(["contact", "partner", "newsletter"]);
+const topicEnum = z.enum(CONTACT_TOPIC_VALUES);
 
 const filterInput = z.object({
   status: statusEnum.optional(),
   source: sourceEnum.optional(),
+  topic: topicEnum.optional(),
   search: z.string().trim().max(200).optional(),
 });
 
@@ -18,6 +21,7 @@ function buildWhere(input: z.infer<typeof filterInput>) {
   const conditions = [];
   if (input.status) conditions.push(eq(requests.status, input.status));
   if (input.source) conditions.push(eq(requests.source, input.source));
+  if (input.topic) conditions.push(eq(requests.topic, input.topic));
   if (input.search) {
     const term = `%${input.search}%`;
     conditions.push(or(like(requests.name, term), like(requests.email, term)));

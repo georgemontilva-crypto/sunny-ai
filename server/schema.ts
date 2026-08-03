@@ -61,6 +61,9 @@ export const requests = mysqlTable(
     name: text("name").notNull(),
     email: varchar("email", { length: 255 }).notNull(),
     goal: text("goal"),
+    // From the /contact "What are you contacting us about?" select — nullable
+    // since rows from before this field existed have no value.
+    topic: varchar("topic", { length: 20 }), // 'general' | 'standard' | 'whitelabel' | 'partnership'
     message: text("message").notNull(),
     source: varchar("source", { length: 20 }).notNull().default("contact"), // 'contact' | 'partner' | 'newsletter'
     status: varchar("status", { length: 20 }).notNull().default("new"), // 'new' | 'contacted' | 'closed' | 'spam'

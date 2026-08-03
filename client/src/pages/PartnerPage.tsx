@@ -51,6 +51,29 @@ const launchSteps = [
 
 const compounds = ["BPC-157", "TB-500", "GHK-Cu", "MOTS-c", "Semax", "Tesamorelin", "Sermorelin"];
 
+const standardFeatures = [
+  "Sunny trained on your full product catalog",
+  "Custom intake flow for your brand",
+  "Embedded chat widget — one-line install",
+  "Lead capture into your CRM (email + goals)",
+  "Coupon & upsell logic built-in",
+  "Monthly performance report",
+  "Email + chat support",
+  '"Powered by Sunny" badge on widget',
+];
+
+const whitelabelFeatures = [
+  "Everything in Sunny Standard",
+  "Custom AI name, persona & avatar",
+  "Your brand colors, fonts, voice",
+  "Custom domain (chat.yourbrand.com)",
+  'No "Powered by Sunny" badge',
+  "Dedicated account manager",
+  "Priority training & weekly tuning",
+  "Custom integrations (Shopify, Klaviyo, GHL)",
+  "Quarterly strategy calls",
+];
+
 /** Reveal on scroll, matching the site's existing motion language. */
 function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null);
@@ -146,11 +169,14 @@ export default function PartnerPage() {
   const partnerHero2xUrl = getSlotUrl("partner-hero", "2x");
   const partnerHeroRecommended = getSlotDef("partner-hero")?.variants.base?.recommended;
 
-  const embeddedPrice = getSetting("plan_embedded_price");
-  const embeddedPeriod = getSetting("plan_embedded_period") || "/month";
-  const embeddedSetup = getSetting("plan_embedded_setup");
-  const whitelabelPrice = getSetting("plan_whitelabel_price");
-  const whitelabelNote = getSetting("plan_whitelabel_note");
+  const standardPrice = getSetting("plan_standard_price") || "$799";
+  const standardPeriod = getSetting("plan_standard_period") || "/month";
+  const standardSetup = getSetting("plan_standard_setup") || "+ $1,500 one-time setup fee";
+  const standardNote = getSetting("plan_standard_note") || "Cancel monthly · No long-term contract";
+  const whitelabelPrice = getSetting("plan_whitelabel_price") || "Custom";
+  const whitelabelNote =
+    getSetting("plan_whitelabel_note") ||
+    "Starting at $2,500 setup + $999/mo · Minimum 6 months · Pricing scales with traffic & customization";
   const contactPhone = getSetting("partner_contact_phone");
   const contactEmail = getSetting("partner_contact_email");
 
@@ -330,7 +356,7 @@ export default function PartnerPage() {
       </section>
 
       {/* ── GUARDRAILS ─────────────────────────────────────── */}
-      <section id="guardrails" className="py-24 px-4 bg-secondary/30">
+      <section id="guardrails" className="py-24 px-4 bg-secondary/30 scroll-mt-24">
         <div className="container mx-auto max-w-7xl">
           <Reveal className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
@@ -377,30 +403,27 @@ export default function PartnerPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <Reveal>
               <Card className="p-8 h-full flex flex-col">
-                <span className="text-xs font-medium uppercase tracking-widest text-accent">Embedded</span>
-                <h3 className="text-xl font-semibold mt-3">Sunny, as Sunny</h3>
+                <span className="text-xs font-medium uppercase tracking-widest text-accent">Sunny Standard</span>
+                <h3 className="text-xl font-semibold mt-3">Embed Sunny, keep his name</h3>
                 <p className="text-muted-foreground mt-2.5">
-                  The same assistant, embedded on your site and trained on your catalog, carrying a small
-                  "Powered by Sunny" mark.
+                  Get the same Sunny our brand uses — embedded on your site, trained on your catalog, branded
+                  with the "Powered by Sunny" badge.
                 </p>
                 <div className="mt-6 text-4xl font-bold tracking-tight">
-                  {embeddedPrice ? (
-                    <span>{embeddedPrice}</span>
-                  ) : (
-                    <span className="border border-dashed border-accent text-accent rounded px-2.5 py-0.5 text-base align-middle">price</span>
-                  )}
-                  <span className="text-base font-medium text-muted-foreground ml-2">{embeddedPeriod}</span>
+                  <span>{standardPrice}</span>
+                  <span className="text-base font-medium text-muted-foreground ml-2">{standardPeriod}</span>
                 </div>
-                {embeddedSetup && <p className="mt-1.5 text-xs text-muted-foreground">{embeddedSetup}</p>}
+                <p className="mt-1.5 text-xs text-muted-foreground">{standardSetup}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{standardNote}</p>
                 <ul className="mt-6 mb-8 space-y-0">
-                  {["Trained on your full catalog", "One-line install", "Custom intake flow", "Lead capture to your CRM", "Monthly conversation report"].map((f) => (
+                  {standardFeatures.map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
                       <Check className="w-4 h-4 text-accent flex-none mt-1" />{f}
                     </li>
                   ))}
                 </ul>
                 <Button variant="outline" className="mt-auto w-full" asChild>
-                  <a href="/contact">Book a call</a>
+                  <a href="/contact?plan=standard">Get Sunny Standard</a>
                 </Button>
               </Card>
             </Reveal>
@@ -408,31 +431,28 @@ export default function PartnerPage() {
             <Reveal delay={0.12}>
               <Card className="p-8 h-full flex flex-col relative border-accent/40 shadow-lg">
                 <span className="absolute -top-3 left-8 bg-accent text-accent-foreground text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded">
-                  Make it yours
+                  Most Popular · Make it yours
                 </span>
-                <span className="text-xs font-medium uppercase tracking-widest text-accent">White-label</span>
-                <h3 className="text-xl font-semibold mt-3">Your name on it</h3>
+                <span className="text-xs font-medium uppercase tracking-widest text-accent">Sunny White-Label</span>
+                <h3 className="text-xl font-semibold mt-3">Your brand. Your AI. Your closer.</h3>
                 <p className="text-muted-foreground mt-2.5">
-                  Rename it, restyle it, run it on your own subdomain. Customers see your brand and nothing else.
+                  Rename him "Nova", "Aria", "Max" — anything. Your colors, your voice, your domain. Customers
+                  will think you built him in-house.
                 </p>
                 <div className="mt-6 text-4xl font-bold tracking-tight">
-                  {whitelabelPrice ? (
-                    <span>{whitelabelPrice}</span>
-                  ) : (
-                    <span className="border border-dashed border-accent text-accent rounded px-2.5 py-0.5 text-base align-middle">custom</span>
-                  )}
+                  <span>{whitelabelPrice}</span>
                 </div>
-                {whitelabelNote && <p className="mt-1.5 text-xs text-muted-foreground">{whitelabelNote}</p>}
+                <p className="mt-1.5 text-xs text-muted-foreground">{whitelabelNote}</p>
                 <ul className="mt-6 mb-8 space-y-0">
-                  {["Everything in Embedded", "Custom name, persona, avatar", "Your colors, fonts, and voice", "Your subdomain", "No Sunny badge", "Dedicated account manager"].map((f) => (
+                  {whitelabelFeatures.map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
                       <Check className="w-4 h-4 text-accent flex-none mt-1" />{f}
                     </li>
                   ))}
                 </ul>
                 <Button className="mt-auto w-full group" asChild>
-                  <a href="/contact">
-                    Talk to us
+                  <a href="/contact?plan=whitelabel">
+                    Talk to Sales
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </a>
                 </Button>

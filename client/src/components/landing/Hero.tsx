@@ -14,7 +14,7 @@ export default function Hero() {
 
   return (
     <section
-      className="pt-32 pb-16 md:pb-32 px-4 min-h-screen flex items-end md:items-center justify-center relative overflow-hidden"
+      className="pt-32 pb-16 md:pb-32 px-4 min-h-screen flex items-end md:items-center justify-center relative overflow-hidden scroll-mt-24"
       id="hero"
     >
       {/* 1. Background photo */}

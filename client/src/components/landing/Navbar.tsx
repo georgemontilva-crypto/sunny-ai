@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { getSlotUrl } from "@/lib/media";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -15,6 +15,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [location] = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -22,8 +23,17 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // These sections (how-it-works, compounds, goals, contact) only exist on
+  // Home — from any other route (e.g. /partner) there's nothing local to
+  // scroll to, so navigate there instead and let the browser's native
+  // anchor scroll (same mechanism as the "Get Started" /partner#pricing
+  // link) land on the section once Home renders.
   const scrollToSection = (href: string) => {
     setMobileOpen(false);
+    if (location !== "/") {
+      window.location.href = `/${href}`;
+      return;
+    }
     const id = href.slice(1);
     const element = document.getElementById(id);
     if (element) {

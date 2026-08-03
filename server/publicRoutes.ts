@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { Router } from "express";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import { z } from "zod";
+import { CONTACT_TOPIC_VALUES } from "../shared/const.ts";
 import { SITE } from "../shared/site.ts";
 import { getDb, type Db } from "./db.ts";
 import { requests, settings } from "./schema.ts";
@@ -44,6 +45,7 @@ const requestSchema = z.object({
   name: z.string().trim().min(1).max(200),
   email: z.string().trim().email(),
   goal: z.string().trim().max(500).optional(),
+  topic: z.enum(CONTACT_TOPIC_VALUES).optional(),
   message: z.string().trim().min(1).max(5000),
   source: z.enum(["contact", "partner", "newsletter"]).default("contact"),
   // Honeypot — real visitors never see or fill this field.
@@ -111,6 +113,7 @@ publicRoutes.post("/request", publicLimiter, async (req, res) => {
     name: parsed.data.name,
     email: parsed.data.email,
     goal: parsed.data.goal,
+    topic: parsed.data.topic,
     message: parsed.data.message,
     source: parsed.data.source,
     ip: req.get("x-forwarded-client-ip") || req.ip,

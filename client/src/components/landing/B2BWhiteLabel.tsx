@@ -27,7 +27,7 @@ export default function B2BWhiteLabel() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section id="white-label" className="py-24 px-4 bg-secondary/30" ref={ref}>
+    <section id="white-label" className="py-24 px-4 bg-secondary/30 scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

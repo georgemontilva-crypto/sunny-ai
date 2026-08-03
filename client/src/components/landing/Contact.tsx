@@ -1,19 +1,30 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
+import { useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CONTACT_TOPICS, CONTACT_TOPIC_VALUES, type ContactTopic } from "@shared/const.ts";
 import { Mail, Send, CheckCircle, AlertCircle } from "lucide-react";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined;
 
+// /partner's CTAs link here as /contact?plan=standard|whitelabel — anything
+// else (missing, or an unrecognized value) preselects "General question".
+function topicFromPlanParam(search: string): ContactTopic {
+  const plan = new URLSearchParams(search).get("plan");
+  return (CONTACT_TOPIC_VALUES as readonly string[]).includes(plan ?? "") ? (plan as ContactTopic) : "general";
+}
+
 export default function Contact() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const search = useSearch();
 
-  const [form, setForm] = useState({ name: "", email: "", goal: "", message: "", website: "" });
+  const [form, setForm] = useState({ name: "", email: "", goal: "", message: "", website: "", topic: topicFromPlanParam(search) });
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -43,6 +54,7 @@ export default function Contact() {
           name: form.name,
           email: form.email,
           goal: form.goal || undefined,
+          topic: form.topic,
           message: form.message,
           website: form.website || undefined,
         }),
@@ -57,7 +69,7 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 px-4 bg-secondary/30" ref={ref}>
+    <section id="contact" className="py-24 px-4 bg-secondary/30 scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -95,7 +107,7 @@ export default function Contact() {
                 size="sm"
                 onClick={() => {
                   setStatus("idle");
-                  setForm({ name: "", email: "", goal: "", message: "", website: "" });
+                  setForm({ name: "", email: "", goal: "", message: "", website: "", topic: "general" });
                 }}
               >
                 Send another message
@@ -142,6 +154,27 @@ export default function Contact() {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  What are you contacting us about?
+                </label>
+                <Select
+                  value={form.topic}
+                  onValueChange={(value) => setForm({ ...form, topic: value as ContactTopic })}
+                >
+                  <SelectTrigger className="rounded-lg border-border/60 focus:border-accent/50 w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CONTACT_TOPICS.map((t) => (
+                      <SelectItem key={t.value} value={t.value}>
+                        {t.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-1.5">

@@ -1,7 +1,14 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import RequestDetailSheet from "@/components/admin/RequestDetailSheet";
-import { SOURCE_LABELS, SOURCE_ORDER, STATUS_LABELS, STATUS_ORDER } from "@/components/admin/requestLabels";
+import {
+  SOURCE_LABELS,
+  SOURCE_ORDER,
+  STATUS_LABELS,
+  STATUS_ORDER,
+  TOPIC_LABELS,
+  TOPIC_ORDER,
+} from "@/components/admin/requestLabels";
 import RequestStatusSelect from "@/components/admin/RequestStatusSelect";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,7 +35,7 @@ function csvEscape(value: string): string {
 }
 
 function toCsv(rows: RequestRow[]): string {
-  const headers = ["Date", "Name", "Email", "Source", "Status", "Goal", "Message", "Notes"];
+  const headers = ["Date", "Name", "Email", "Source", "Topic", "Status", "Goal", "Message", "Notes"];
   const lines = [headers.map(csvEscape).join(",")];
   for (const row of rows) {
     lines.push(
@@ -37,6 +44,7 @@ function toCsv(rows: RequestRow[]): string {
         row.name,
         row.email,
         SOURCE_LABELS[row.source] ?? row.source,
+        row.topic ? (TOPIC_LABELS[row.topic] ?? row.topic) : "",
         STATUS_LABELS[row.status] ?? row.status,
         row.goal ?? "",
         row.message,
@@ -66,6 +74,7 @@ export default function AdminRequestsPage() {
 
   const [statusFilter, setStatusFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
+  const [topicFilter, setTopicFilter] = useState("all");
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -79,11 +88,12 @@ export default function AdminRequestsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [statusFilter, sourceFilter, debouncedSearch]);
+  }, [statusFilter, sourceFilter, topicFilter, debouncedSearch]);
 
   const filters = {
     status: statusFilter === "all" ? undefined : (statusFilter as (typeof STATUS_ORDER)[number]),
     source: sourceFilter === "all" ? undefined : (sourceFilter as (typeof SOURCE_ORDER)[number]),
+    topic: topicFilter === "all" ? undefined : (topicFilter as (typeof TOPIC_ORDER)[number]),
     search: debouncedSearch || undefined,
   };
 
@@ -93,7 +103,8 @@ export default function AdminRequestsPage() {
     pageSize: PAGE_SIZE,
   });
 
-  const hasActiveFilters = statusFilter !== "all" || sourceFilter !== "all" || debouncedSearch !== "";
+  const hasActiveFilters =
+    statusFilter !== "all" || sourceFilter !== "all" || topicFilter !== "all" || debouncedSearch !== "";
   const selectedRow = data?.rows.find((r) => r.id === selectedId) ?? null;
   const totalPages = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1;
 
@@ -147,6 +158,20 @@ export default function AdminRequestsPage() {
           </SelectContent>
         </Select>
 
+        <Select value={topicFilter} onValueChange={setTopicFilter}>
+          <SelectTrigger className="w-[170px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All topics</SelectItem>
+            {TOPIC_ORDER.map((t) => (
+              <SelectItem key={t} value={t}>
+                {TOPIC_LABELS[t]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <div className="relative flex-1 min-w-[220px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -188,6 +213,7 @@ export default function AdminRequestsPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Source</TableHead>
+                <TableHead>Topic</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Message</TableHead>
               </TableRow>
@@ -205,6 +231,9 @@ export default function AdminRequestsPage() {
                   <TableCell className="font-medium text-foreground">{row.name}</TableCell>
                   <TableCell className="text-muted-foreground">{row.email}</TableCell>
                   <TableCell className="text-muted-foreground">{SOURCE_LABELS[row.source] ?? row.source}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {row.topic ? (TOPIC_LABELS[row.topic] ?? row.topic) : "—"}
+                  </TableCell>
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <RequestStatusSelect id={row.id} status={row.status} />
                   </TableCell>
