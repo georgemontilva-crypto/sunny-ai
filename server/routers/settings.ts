@@ -24,8 +24,15 @@ const PARTNER_KEYS = [
   "partner_contact_phone",
   "partner_contact_email",
 ] as const;
-const settingsKey = z.enum([...REQUIRED_KEYS, ...PARTNER_KEYS]);
-const partnerKeySet: ReadonlySet<string> = new Set(PARTNER_KEYS);
+// Section card order, JSON-encoded arrays of stable ids (e.g.
+// '["sleep-quality","body-composition",...]'). Also baked into the static
+// build by scripts/generate-settings-map.ts. An empty value is legitimate
+// (the section falls back to its default order), same reasoning as
+// PARTNER_KEYS.
+const LAYOUT_KEYS = ["section_order_questions"] as const;
+const settingsKey = z.enum([...REQUIRED_KEYS, ...PARTNER_KEYS, ...LAYOUT_KEYS]);
+const emptyAllowedKeySet: ReadonlySet<string> = new Set([...PARTNER_KEYS, ...LAYOUT_KEYS]);
+const republishKeySet: ReadonlySet<string> = new Set([...PARTNER_KEYS, ...LAYOUT_KEYS]);
 
 export const settingsRouter = router({
   getAll: adminProcedure.query(({ ctx }) => ctx.db.select().from(settings)),
@@ -33,7 +40,7 @@ export const settingsRouter = router({
   update: adminProcedure
     .input(z.object({ key: settingsKey, value: z.string().max(500) }))
     .mutation(async ({ ctx, input }) => {
-      if (!partnerKeySet.has(input.key) && input.value.trim() === "") {
+      if (!emptyAllowedKeySet.has(input.key) && input.value.trim() === "") {
         throw new TRPCError({ code: "BAD_REQUEST", message: "This setting can't be cleared to empty" });
       }
 
@@ -51,10 +58,10 @@ export const settingsRouter = router({
         detail: { value: input.value },
       });
 
-      // Partner-page settings are resolved into the static build at
-      // build/republish time (client/src/lib/settings.ts), not fetched at
+      // Partner-page and layout settings are resolved into the static build
+      // at build/republish time (client/src/lib/settings.ts), not fetched at
       // runtime — same reason media slots need a republish after a change.
-      if (partnerKeySet.has(input.key)) scheduleRepublish();
+      if (republishKeySet.has(input.key)) scheduleRepublish();
 
       const [row] = await ctx.db.select().from(settings).where(eq(settings.key, input.key));
       return row;

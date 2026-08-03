@@ -20,9 +20,9 @@ import { settings } from "../server/schema.ts";
 const OUT_FILE = path.resolve(import.meta.dirname, "..", "client", "src", "generated", "settings-map.json");
 const STRICT = process.argv.includes("--strict-on-error");
 
-// The only keys PartnerPage ever reads — anything else in the settings
-// table (contact_email, newsletter_email, ...) is read live at request
-// time elsewhere and has no business in a static build artifact.
+// The only keys PartnerPage/Questions ever read — anything else in the
+// settings table (contact_email, newsletter_email, ...) is read live at
+// request time elsewhere and has no business in a static build artifact.
 const PARTNER_KEYS = [
   "plan_standard_price",
   "plan_standard_period",
@@ -33,7 +33,8 @@ const PARTNER_KEYS = [
   "partner_contact_phone",
   "partner_contact_email",
 ] as const;
-const partnerKeySet: ReadonlySet<string> = new Set(PARTNER_KEYS);
+const LAYOUT_KEYS = ["section_order_questions"] as const;
+const bakedKeySet: ReadonlySet<string> = new Set([...PARTNER_KEYS, ...LAYOUT_KEYS]);
 
 function write(data: Record<string, string>) {
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
@@ -52,9 +53,9 @@ async function resolveFromDatabase(databaseUrl: string): Promise<Record<string, 
 
   const map: Record<string, string> = {};
   for (const row of rows) {
-    if (partnerKeySet.has(row.key) && row.value) map[row.key] = row.value;
+    if (bakedKeySet.has(row.key) && row.value) map[row.key] = row.value;
   }
-  console.log(`[settings-map] resolved ${Object.keys(map).length} of ${PARTNER_KEYS.length} known key(s)`);
+  console.log(`[settings-map] resolved ${Object.keys(map).length} of ${bakedKeySet.size} known key(s)`);
   return map;
 }
 
