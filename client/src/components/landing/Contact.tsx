@@ -1,16 +1,20 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
-import { useSearch } from "wouter";
+import { Link, useSearch } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CONTACT_TOPICS, CONTACT_TOPIC_VALUES, type ContactTopic } from "@shared/const.ts";
-import { Mail, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { SITE } from "@shared/site.ts";
+import { ArrowRight, Mail, Send, CheckCircle, AlertCircle } from "lucide-react";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_ENDPOINT as string | undefined;
+
+const FIELD_LABEL = "font-mono text-[10.5px] uppercase tracking-wide text-muted-foreground";
+const FIELD_INPUT = "rounded-lg border-border/60 focus:border-accent focus-visible:ring-accent/18";
 
 // /partner's CTAs link here as /contact?plan=standard|whitelabel — anything
 // else (missing, or an unrecognized value) preselects "General question".
@@ -69,164 +73,195 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 px-4 bg-secondary/30 scroll-mt-24" ref={ref}>
+    <section id="contact" className="py-24 px-4 bg-background scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-4">
-            <Mail className="w-3.5 h-3.5" />
-            Get in touch
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Have a question?</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Tell us about your research interests. We'll provide educational information — not medical advice.
-          </p>
-        </motion.div>
-
-        <div className="max-w-2xl mx-auto">
-          {status === "sent" ? (
-            <div className="text-center py-16 px-8">
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6"
-              >
-                <CheckCircle className="w-8 h-8 text-accent" />
-              </motion.div>
-              <h3 className="text-2xl font-bold mb-3">Message sent</h3>
-              <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-6">
-                Thanks for reaching out. We'll get back to you soon at <strong>{form.email}</strong>.
-              </p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setStatus("idle");
-                  setForm({ name: "", email: "", goal: "", message: "", website: "", topic: "general" });
-                }}
-              >
-                Send another message
-              </Button>
+        <div className="grid grid-cols-[.85fr_1.15fr] max-[860px]:grid-cols-1 gap-12 items-start">
+          {/* LEFT — eyebrow, headline, context, contact data */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-5">
+              <Mail className="w-3.5 h-3.5" />
+              Get in touch
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-2xl p-8 space-y-5 shadow-sm">
-              {/* Honeypot — hidden from real visitors, bots tend to fill every field */}
-              <input
-                type="text"
-                name="website"
-                value={form.website}
-                onChange={(e) => setForm({ ...form, website: e.target.value })}
-                className="hidden"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-              />
+            <h2 className="text-[clamp(32px,4.2vw,52px)] font-semibold leading-[1.03] mb-4">
+              Have a <span className="text-accent">question?</span>
+            </h2>
+            <p className="text-muted-foreground max-w-[36ch] mb-8">
+              Tell us about your research interests. We'll provide educational information — not medical
+              advice.
+            </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    placeholder="Your name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="rounded-lg border-border/60 focus:border-accent/50"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="rounded-lg border-border/60 focus:border-accent/50"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  What are you contacting us about?
-                </label>
-                <Select
-                  value={form.topic}
-                  onValueChange={(value) => setForm({ ...form, topic: value as ContactTopic })}
-                >
-                  <SelectTrigger className="rounded-lg border-border/60 focus:border-accent/50 w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CONTACT_TOPICS.map((t) => (
-                      <SelectItem key={t.value} value={t.value}>
-                        {t.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Research goal
-                </label>
-                <Input
-                  placeholder="E.g. recovery, longevity, body composition..."
-                  value={form.goal}
-                  onChange={(e) => setForm({ ...form, goal: e.target.value })}
-                  className="rounded-lg border-border/60 focus:border-accent/50"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Message <span className="text-red-500">*</span>
-                </label>
-                <Textarea
-                  placeholder="Tell us about your research interests..."
-                  value={form.message}
-                  onChange={(e) => setForm({ ...form, message: e.target.value })}
-                  className="rounded-lg border-border/60 focus:border-accent/50 min-h-[140px] resize-none"
-                  required
-                />
-              </div>
-
-              {status === "error" && (
-                <div className="flex items-start gap-2 text-sm text-red-600">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                  <p>{errorMsg}</p>
-                </div>
-              )}
-
-              <Button type="submit" disabled={status === "sending"} className="w-full font-semibold rounded-lg px-6 gap-2">
-                {status === "sending" ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Send Message
-                  </>
-                )}
-              </Button>
-              <p className="text-xs text-muted-foreground text-center">
-                Educational summaries of published research. Not medical advice.
+            <div className="pt-6 border-t border-border space-y-3">
+              <a
+                href={`mailto:${SITE.contactEmail}`}
+                className="flex items-center gap-2 text-sm text-foreground hover:text-accent transition-colors w-fit"
+              >
+                <Mail className="w-4 h-4 text-accent" />
+                {SITE.contactEmail}
+              </a>
+              <p className="text-sm text-muted-foreground">
+                Educational research content. Not medical advice. For adults 21+.
               </p>
-            </form>
-          )}
+            </div>
+
+            <p className="mt-8 text-sm text-muted-foreground">
+              Run a clinic or brand?{" "}
+              <Link href="/partner" className="text-accent hover:underline inline-flex items-center gap-1">
+                See how Sunny works for you
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </p>
+          </motion.div>
+
+          {/* RIGHT — form */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {status === "sent" ? (
+              <div className="bg-card border border-border/50 rounded-[20px] p-8 text-center py-16 shadow-sm">
+                <motion.div
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                  className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6"
+                >
+                  <CheckCircle className="w-8 h-8 text-accent" />
+                </motion.div>
+                <h3 className="text-2xl font-bold mb-3">Message sent</h3>
+                <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-6">
+                  Thanks for reaching out. We'll get back to you soon at <strong>{form.email}</strong>.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setStatus("idle");
+                    setForm({ name: "", email: "", goal: "", message: "", website: "", topic: "general" });
+                  }}
+                >
+                  Send another message
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-[20px] p-8 space-y-5 shadow-sm">
+                {/* Honeypot — hidden from real visitors, bots tend to fill every field */}
+                <input
+                  type="text"
+                  name="website"
+                  value={form.website}
+                  onChange={(e) => setForm({ ...form, website: e.target.value })}
+                  className="hidden"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className={FIELD_LABEL}>
+                      Name <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      placeholder="Your name"
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      className={FIELD_INPUT}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className={FIELD_LABEL}>
+                      Email <span className="text-red-500">*</span>
+                    </label>
+                    <Input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      className={FIELD_INPUT}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className={FIELD_LABEL}>What are you contacting us about?</label>
+                  <Select
+                    value={form.topic}
+                    onValueChange={(value) => setForm({ ...form, topic: value as ContactTopic })}
+                  >
+                    <SelectTrigger className={`${FIELD_INPUT} w-full`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CONTACT_TOPICS.map((t) => (
+                        <SelectItem key={t.value} value={t.value}>
+                          {t.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className={FIELD_LABEL}>Research goal</label>
+                  <Input
+                    placeholder="E.g. recovery, longevity, body composition..."
+                    value={form.goal}
+                    onChange={(e) => setForm({ ...form, goal: e.target.value })}
+                    className={FIELD_INPUT}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className={FIELD_LABEL}>
+                    Message <span className="text-red-500">*</span>
+                  </label>
+                  <Textarea
+                    placeholder="Tell us about your research interests..."
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    className={`${FIELD_INPUT} min-h-[140px] resize-none`}
+                    required
+                  />
+                </div>
+
+                {status === "error" && (
+                  <div className="flex items-start gap-2 text-sm text-red-600">
+                    <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                    <p>{errorMsg}</p>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="w-full font-semibold rounded-full px-6 gap-2"
+                >
+                  {status === "sending" ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Send Message
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  Educational summaries of published research. Not medical advice.
+                </p>
+              </form>
+            )}
+          </motion.div>
         </div>
       </div>
     </section>

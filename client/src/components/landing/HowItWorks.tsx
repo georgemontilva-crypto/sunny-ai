@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Card } from "@/components/ui/card";
+import SectionHead from "@/components/landing/SectionHead";
 import { getSlotUrl } from "@/lib/media";
 
 const steps = [
@@ -41,30 +41,42 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" className="py-24 px-4 bg-background scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Four steps to clarity
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            From your first question to research-backed guidance, we make peptide science accessible.
-          </p>
-        </motion.div>
+        <SectionHead
+          eyebrow="How it works"
+          title="Four steps to"
+          accentTitle="clarity"
+          note="From your first question to research-backed guidance, we make peptide science accessible."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {steps.map((step, i) => (
-            <motion.div
-              key={step.number}
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-            >
-              <Card className="p-8 h-full">
-                <div className="w-full h-48 rounded-lg mb-6 overflow-hidden">
+        <div className="relative">
+          {/* The connecting line sits behind the steps; each dot's halo
+              (boxShadow matching the section background) visually cuts a gap
+              in it where the dot sits. */}
+          <div
+            className="absolute h-px bg-border max-[860px]:hidden"
+            style={{ top: 38, left: "6%", right: "6%" }}
+            aria-hidden="true"
+          />
+
+          <div className="grid grid-cols-4 gap-0 max-[860px]:grid-cols-2 max-[860px]:gap-x-8 max-[860px]:gap-y-12 max-[520px]:grid-cols-1 relative">
+            {steps.map((step, i) => (
+              <motion.div
+                key={step.number}
+                initial={{ opacity: 0, y: 24 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+                className="group px-4 first:pl-0 last:pr-0"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span
+                    className="block rounded-full bg-accent shrink-0"
+                    style={{ width: 13, height: 13, boxShadow: "0 0 0 6px var(--background)" }}
+                  />
+                  <span className="font-mono text-sm text-muted-foreground">{step.number}</span>
+                </div>
+                <h3 className="text-[17.5px] font-semibold mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground mb-5">{step.description}</p>
+                <div className="rounded-xl overflow-hidden">
                   {step.hiRes ? (
                     <img
                       src={getSlotUrl(step.image)}
@@ -74,7 +86,7 @@ export default function HowItWorks() {
                       loading="lazy"
                       decoding="async"
                       alt={step.title}
-                      className="w-full h-full object-cover object-top rounded-xl"
+                      className="block w-full h-auto rounded-xl grayscale-[.4] group-hover:grayscale-0 transition-[filter] duration-500"
                     />
                   ) : (
                     <img
@@ -84,20 +96,13 @@ export default function HowItWorks() {
                       loading="lazy"
                       decoding="async"
                       alt={step.title}
-                      className="w-full h-full object-cover object-top rounded-xl"
+                      className="block w-full h-auto rounded-xl grayscale-[.4] group-hover:grayscale-0 transition-[filter] duration-500"
                     />
                   )}
                 </div>
-                <div className="flex items-start gap-4">
-                  <div className="text-4xl font-bold text-accent/30">{step.number}</div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                    <p className="text-muted-foreground">{step.description}</p>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

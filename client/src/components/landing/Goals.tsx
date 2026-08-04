@@ -1,8 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Card } from "@/components/ui/card";
+import SectionHead from "@/components/landing/SectionHead";
 import { getSlotUrl } from "@/lib/media";
-import { ArrowRight } from "lucide-react";
 
 const goals = [
   {
@@ -62,61 +61,59 @@ export default function Goals() {
   return (
     <section id="goals" className="py-24 px-4 bg-background scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Explore Research by Topic
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Browse published research by area of interest.
-          </p>
-        </motion.div>
+        <SectionHead
+          eyebrow="Areas of interest"
+          title="Explore Research"
+          accentTitle="by Topic"
+          note="Browse published research by area of interest."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Every tile is the same size (no column spans) — aspect-ratio
+            2.5/1 exactly matches the images' native 400x160, so
+            object-fit: cover here never crops or upscales anything, unlike
+            the rest of this redesign's images. */}
+        <div className="grid grid-cols-3 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1 gap-4">
           {goals.map((goal, i) => (
             <motion.div
               key={goal.title}
               initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
+              className="group relative rounded-2xl overflow-hidden"
+              style={{ aspectRatio: "2.5 / 1" }}
             >
-              <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow group cursor-pointer overflow-hidden">
-                <motion.div
-                  className="w-full h-40 rounded-lg mb-4 overflow-hidden mx-auto"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <img
-                    src={getSlotUrl(goal.image)}
-                    width={400}
-                    height={160}
-                    loading="lazy"
-                    decoding="async"
-                    alt={`Illustration for the ${goal.title} category`}
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                </motion.div>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-2xl font-bold text-accent">{goal.metric}</span>
-                  <span className="text-xs text-muted-foreground">{goal.label}</span>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{goal.title}</h3>
-                <p className="text-sm text-muted-foreground mb-4 flex-grow">{goal.description}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {goal.compounds.map((c) => (
-                    <span key={c} className="text-xs px-2 py-1 bg-accent/10 text-accent rounded">
-                      {c}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex items-center gap-2 text-xs font-medium text-accent group-hover:gap-3 transition-all">
-                  Learn more <ArrowRight className="w-3 h-3" />
-                </div>
-              </Card>
+              <img
+                src={getSlotUrl(goal.image)}
+                width={400}
+                height={160}
+                loading="lazy"
+                decoding="async"
+                alt={`Illustration for the ${goal.title} category`}
+                className="goals-card-image absolute inset-0 w-full h-full object-cover -z-20 transition-transform duration-700 group-hover:scale-105"
+              />
+              <div
+                className="absolute inset-0 -z-10"
+                style={{
+                  background:
+                    "linear-gradient(to top, oklch(from var(--noche) l c h / 90%) 0%, oklch(from var(--noche) l c h / 18%) 100%)",
+                }}
+                aria-hidden="true"
+              />
+
+              <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-1.5">
+                {goal.compounds.map((c) => (
+                  <span
+                    key={c}
+                    className="font-mono text-[10px] px-2 py-1 rounded-full bg-background/14 backdrop-blur-md text-white"
+                  >
+                    {c}
+                  </span>
+                ))}
+              </div>
+
+              <h3 className="absolute bottom-3 left-4 right-4 text-[17px] font-semibold text-white">
+                {goal.title}
+              </h3>
             </motion.div>
           ))}
         </div>

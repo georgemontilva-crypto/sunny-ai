@@ -15,6 +15,10 @@ export interface CompoundEntry {
   description: string;
   image: string;
   evidenceLevel: EvidenceLevel;
+  // Short evidence-status pills shown on the featured compound card
+  // (Compounds.tsx). Left empty where this hasn't been reviewed yet —
+  // never inferred from evidenceLevel, which is a broader classification.
+  evidenceTags?: string[];
 }
 
 export const compoundLibrary: CompoundEntry[] = [
@@ -24,6 +28,7 @@ export const compoundLibrary: CompoundEntry[] = [
     description: "A synthetic fragment derived from a gastric protective protein. Preclinical research explores its role in tendon, ligament, and gastrointestinal tissue repair.",
     image: "compound-bpc-157",
     evidenceLevel: "preclinical",
+    evidenceTags: ["Preclinical", "Animal models", "No RCTs published"],
   },
   {
     name: "TB-500",

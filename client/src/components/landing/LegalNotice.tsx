@@ -9,7 +9,7 @@ export default function LegalNotice() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-24 px-4 bg-background" ref={ref}>
+    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
       <div className="container mx-auto max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

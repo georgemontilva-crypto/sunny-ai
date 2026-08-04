@@ -55,6 +55,7 @@
   --chart-5: oklch(0.8802 0.0352 82.9); /* Arena Media */
   --radius: 0.65rem;
   --font-display: "Clash Display", "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --noche: oklch(0.16 0.03 75); /* Noche - warm near-black, dark hero/navbar surfaces */
   /* Desert Palette - Sunny AI */
   --background: oklch(0.9598 0.016 82.79); /* Arena - Light sand */
@@ -388,6 +389,26 @@
   .hero-cta-glow:hover {
     box-shadow: 0 14px 44px -6px oklch(from var(--accent) l c h / 65%);
   }
+
+  /* Reusable radial gold glow for other dark sections (MeetSunny, Footer) —
+     geometry (size/position) is set per-instance via inline style since it
+     differs each time; this just carries the gradient + drift animation. */
+  .warm-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform, opacity;
+    background: radial-gradient(
+      circle,
+      oklch(from var(--accent) l c h / 28%) 0%,
+      oklch(from var(--accent) l c h / 8%) 45%,
+      transparent 70%
+    );
+  }
+
+  .warm-glow-drift {
+    animation: hero-drift-1 28s ease-in-out infinite;
+  }
 }
 
 @keyframes hero-drift-1 {
@@ -429,7 +450,10 @@
   .hero-light-3,
   .hero-portrait-wrap,
   .hero-portrait-wrap::before,
-  .pulse-dot::after {
+  .pulse-dot::after,
+  .warm-glow-drift,
+  .goals-card-image {
     animation: none !important;
+    transition: none !important;
   }
 }

@@ -3,26 +3,21 @@ import { useRef } from "react";
 import { getSlotDef } from "@server/mediaCatalog.ts";
 import { Button } from "@/components/ui/button";
 import { getSlotUrl } from "@/lib/media";
-import { MessageCircle, FileText, Zap, Target } from "lucide-react";
 
 const features = [
   {
-    icon: MessageCircle,
     title: "Plain-language questions",
     description: "Ask about compounds and topics in your own words",
   },
   {
-    icon: FileText,
     title: "Citations included",
     description: "Every summary points back to published work",
   },
   {
-    icon: Zap,
     title: "Literature review",
     description: "Published research organized around your question",
   },
   {
-    icon: Target,
     title: "Research context",
     description: "What the evidence shows, and where it stops",
   },
@@ -36,9 +31,18 @@ export default function MeetSunny() {
   const meetSunnyRecommended = getSlotDef("meet-sunny")?.variants.base?.recommended;
 
   return (
-    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
-      <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section className="py-24 px-4 bg-noche relative overflow-hidden" ref={ref}>
+      <div
+        className="warm-glow warm-glow-drift"
+        style={{ width: 720, height: 720, top: -200, right: -180 }}
+        aria-hidden="true"
+      />
+
+      <div className="container mx-auto max-w-7xl relative z-10">
+        <div
+          className="grid grid-cols-1 [grid-template-columns:1.05fr_0.95fr] max-[900px]:grid-cols-1 items-center"
+          style={{ gap: "clamp(28px, 5vw, 68px)" }}
+        >
           {/* LEFT SIDE - TEXT CONTENT */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
@@ -49,7 +53,7 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-medium text-accent mb-6"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-background/15 bg-background/8 backdrop-blur-md text-xs font-medium text-accent mb-6"
             >
               <span className="w-2 h-2 bg-accent rounded-full"></span>
               YOUR AI CONSULTANT
@@ -59,7 +63,7 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
-              className="text-4xl sm:text-5xl font-bold tracking-tight mb-6"
+              className="text-[clamp(34px,4.6vw,56px)] font-bold mb-6 text-background"
             >
               Meet{" "}
               <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
@@ -71,17 +75,19 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className="text-lg text-muted-foreground mb-8 max-w-lg"
+              className="text-[16.5px] text-background/68 mb-8 max-w-lg"
             >
-              Sunny is an AI-powered research assistant designed to make peptide literature easier to understand. Ask questions in plain language, explore published findings, and review citations, limitations, and research context — all in one place.
+              Sunny is an AI-powered research assistant designed to make peptide literature easier to
+              understand. Ask questions in plain language, explore published findings, and review citations,
+              limitations, and research context — all in one place.
             </motion.p>
 
-            {/* FEATURES GRID */}
+            {/* CAPABILITIES — a list of filete rows instead of icon cards */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-              className="grid grid-cols-2 gap-4 mb-10"
+              className="mb-10"
             >
               {features.map((feature, i) => (
                 <motion.div
@@ -89,14 +95,12 @@ export default function MeetSunny() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
-                  className="flex items-start gap-3"
+                  className="grid grid-cols-[26px_1fr] gap-3 py-4 border-b border-background/14"
                 >
-                  <div className="flex-shrink-0 mt-1">
-                    <feature.icon className="w-5 h-5 text-accent" />
-                  </div>
+                  <span className="font-mono text-sm text-accent">{String(i + 1).padStart(2, "0")}</span>
                   <div>
-                    <h4 className="font-semibold text-sm mb-1">{feature.title}</h4>
-                    <p className="text-xs text-muted-foreground">{feature.description}</p>
+                    <h4 className="text-[15.5px] font-semibold text-background mb-1">{feature.title}</h4>
+                    <p className="text-sm text-background/55">{feature.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -108,50 +112,47 @@ export default function MeetSunny() {
               transition={{ duration: 0.6, delay: 0.5, ease: [0.23, 1, 0.32, 1] }}
               className="flex flex-col sm:flex-row items-start gap-4"
             >
-              <Button size="lg" className="text-base font-semibold px-8 h-12">
+              <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full">
                 Ask a Research Question
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="text-base font-medium px-8 h-12"
+                variant="ghost"
+                className="text-base font-medium px-8 h-12 rounded-full border border-background/20 bg-background/8 backdrop-blur-md text-background hover:bg-background/14 hover:text-background"
               >
                 Learn More
               </Button>
             </motion.div>
           </motion.div>
 
-          {/* RIGHT SIDE - IMAGE PLACEHOLDER */}
+          {/* RIGHT SIDE - PORTRAIT */}
           <motion.div
             initial={{ opacity: 0, x: 40, scale: 0.95 }}
             animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
-            className="relative h-96 lg:h-full min-h-96"
+            className="relative"
           >
-            <motion.div
-              className="w-full h-full rounded-3xl shadow-2xl overflow-hidden border-2 border-accent/20"
-              whileHover={{ scale: 1.02 }}
-              transition={{ duration: 0.5 }}
-            >
+            <div className="relative rounded-3xl overflow-hidden border border-background/12">
               {meetSunnyUrl ? (
-                <img
-                  src={meetSunnyUrl}
-                  srcSet={meetSunny2xUrl ? `${meetSunnyUrl} 800w, ${meetSunny2xUrl} 1600w` : undefined}
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  width={800}
-                  height={1000}
-                  loading="lazy"
-                  decoding="async"
-                  alt="Sunny, the AI peptide research assistant"
-                  className="w-full h-full object-cover"
-                />
+                <>
+                  <img
+                    src={meetSunnyUrl}
+                    srcSet={meetSunny2xUrl ? `${meetSunnyUrl} 800w, ${meetSunny2xUrl} 1600w` : undefined}
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    width={800}
+                    height={1000}
+                    loading="lazy"
+                    decoding="async"
+                    alt="Sunny, the AI peptide research assistant"
+                    className="block w-full h-auto"
+                  />
+                  {/* Subtle fade into the dark section background, rather than
+                      a hard edge against it. */}
+                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-noche to-transparent pointer-events-none" />
+                </>
               ) : (
-                <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-gray-300 w-full h-full flex items-center justify-center text-gray-600">
-                  <motion.div
-                    animate={{ y: [0, -15, 0] }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                    className="text-center"
-                  >
+                <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-background/10 w-full aspect-[4/5] flex items-center justify-center text-background/70">
+                  <div className="text-center">
                     <div className="w-24 h-24 bg-accent/30 rounded-full mx-auto mb-4 flex items-center justify-center">
                       <span className="text-5xl">✨</span>
                     </div>
@@ -161,10 +162,10 @@ export default function MeetSunny() {
                       </div>
                     )}
                     <div className="text-sm mt-2">Sunny Profile Image</div>
-                  </motion.div>
+                  </div>
                 </div>
               )}
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>

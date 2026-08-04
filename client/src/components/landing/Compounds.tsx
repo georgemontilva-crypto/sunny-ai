@@ -1,63 +1,93 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { compoundLibrary as compounds } from "@/lib/compoundLibrary";
+import SectionHead from "@/components/landing/SectionHead";
+import { compoundLibrary } from "@/lib/compoundLibrary";
 import { getSlotUrl } from "@/lib/media";
 
 export default function Compounds() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const [featured, ...rest] = compoundLibrary;
 
   return (
     <section id="compounds" className="py-24 px-4 bg-secondary/30 scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
+        <SectionHead eyebrow="Research summaries" title="Compound" accentTitle="Library" note="Not medical advice." />
+
+        <p className="text-sm text-muted-foreground max-w-2xl -mt-6 mb-10">
+          Research summaries in conditional language. The information provided here is strictly educational.
+          Sunny does not provide dosing instructions, protocols, medical claims, or recommendations for human
+          use.
+        </p>
+
+        {/* Featured compound */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="grid grid-cols-[minmax(280px,38%)_1fr] max-[800px]:grid-cols-1 bg-card border border-border rounded-2xl overflow-hidden mb-6"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Compound Library
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Research summaries in conditional language. The information provided here is strictly educational. Sunny does not provide dosing instructions, protocols, medical claims, or recommendations for human use.
-          </p>
-          <p className="text-xs text-muted-foreground mt-3">
-            Educational summaries of published research. Not medical advice.
-          </p>
+          <div className="p-6 flex items-center bg-secondary/20">
+            <img
+              src={getSlotUrl(featured.image)}
+              width={350}
+              height={140}
+              loading="lazy"
+              decoding="async"
+              alt={`${featured.name} research-grade vial`}
+              className="w-full h-auto rounded-xl"
+            />
+          </div>
+          <div className="py-[30px] px-8 flex flex-col justify-center">
+            <p className="font-mono text-[11px] tracking-[.1em] uppercase text-muted-foreground mb-2">
+              {featured.category}
+            </p>
+            <h3 className="text-[30px] font-semibold mb-3">{featured.name}</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-[56ch] mb-5">
+              {featured.description}
+            </p>
+            {featured.evidenceTags && featured.evidenceTags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {featured.evidenceTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="font-mono text-[10.5px] tracking-wide uppercase px-2.5 py-1 rounded-full border border-border text-muted-foreground"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </motion.div>
 
-        <div className="flex flex-wrap justify-center gap-6">
-          {compounds.map((c, i) => (
+        {/* Remaining compounds — items-start so a longer description on one
+            card never stretches the others to match its height. */}
+        <div className="grid grid-cols-4 max-[900px]:grid-cols-2 max-[520px]:grid-cols-1 gap-6 items-start">
+          {rest.map((c, i) => (
             <motion.div
               key={c.name}
-              className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
               initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
+              transition={{ delay: i * 0.08, duration: 0.5 }}
+              className="bg-card border border-border rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-18px_rgba(200,150,80,0.4)]"
             >
-              <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow overflow-hidden">
-                <div className="w-full h-32 rounded-lg mb-4 overflow-hidden">
-                  <img
-                    src={getSlotUrl(c.image)}
-                    width={350}
-                    height={140}
-                    loading="lazy"
-                    decoding="async"
-                    alt={`${c.name} research-grade vial`}
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                </div>
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <h3 className="font-semibold text-lg">{c.name}</h3>
-                  <Badge variant="secondary" className="text-xs shrink-0">
-                    {c.category}
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">{c.description}</p>
-              </Card>
+              <img
+                src={getSlotUrl(c.image)}
+                width={350}
+                height={140}
+                loading="lazy"
+                decoding="async"
+                alt={`${c.name} research-grade vial`}
+                className="w-full h-auto"
+              />
+              <div className="pt-4 px-[18px] pb-5">
+                <p className="font-mono text-[10.5px] tracking-[.1em] uppercase text-muted-foreground mb-1.5">
+                  {c.category}
+                </p>
+                <h3 className="text-lg font-semibold mb-1.5">{c.name}</h3>
+                <p className="text-[13.5px] text-muted-foreground leading-relaxed">{c.description}</p>
+              </div>
             </motion.div>
           ))}
         </div>

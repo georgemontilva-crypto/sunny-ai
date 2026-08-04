@@ -1,6 +1,8 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "wouter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import SectionHead from "@/components/landing/SectionHead";
 
 const faqs = [
   {
@@ -21,7 +23,15 @@ const faqs = [
   },
   {
     q: "Do you offer integrations for clinics or brands?",
-    a: "Yes, through embed or white-label. Check the section for clinics and brands above, or reach out through the contact form.",
+    a: (
+      <>
+        Yes, through embed or white-label. Check out{" "}
+        <Link href="/partner" className="text-accent hover:underline">
+          our page for clinics and brands
+        </Link>
+        , or reach out through the contact form.
+      </>
+    ),
   },
 ];
 
@@ -30,21 +40,14 @@ export default function FAQ() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-24 px-4 bg-background" ref={ref}>
+    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
       <div className="container mx-auto max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Frequently asked questions
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Straight answers about what Sunny is — and isn't.
-          </p>
-        </motion.div>
+        <SectionHead
+          eyebrow="FAQ"
+          title="Frequently asked"
+          accentTitle="questions"
+          note="Straight answers about what Sunny is — and isn't."
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import SectionHead from "@/components/landing/SectionHead";
 import { getSlotUrl } from "@/lib/media";
 
 const chatMessages = [
@@ -105,27 +106,20 @@ export default function ChatDemo() {
   }, [visibleCount, isTyping]);
 
   return (
-    <section className="py-24 px-4 bg-background" ref={ref}>
+    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
       <div className="container mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Chat with Sunny
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Ask questions in plain language. Sunny organizes published research around your topic — no diagnosis, no protocols.
-          </p>
-        </motion.div>
+        <SectionHead
+          eyebrow="AI research assistant"
+          title="Chat with"
+          accentTitle="Sunny"
+          note="Ask questions in plain language. Sunny organizes published research around your topic — no diagnosis, no protocols."
+        />
 
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="max-w-2xl mx-auto bg-card border border-border rounded-2xl overflow-hidden shadow-lg"
+          className="max-w-2xl mx-auto bg-card border border-border rounded-[20px] overflow-hidden shadow-2xl"
         >
           <div className="bg-gradient-to-r from-accent/10 to-accent/5 p-4 border-b border-border flex items-center gap-2">
             <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" loading="lazy" />
