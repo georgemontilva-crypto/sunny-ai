@@ -55,10 +55,26 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
   },
   {
     slot: "hero-sunny",
-    label: "Hero — Sunny portrait",
+    label: "Hero image 1",
     variants: {
-      base: { width: 1200, recommended: { width: 1200, height: 600 } },
-      "2x": { width: 2400, recommended: { width: 2400, height: 1200 } },
+      base: { width: 1400, recommended: { width: 1400, height: 700 } },
+      "2x": { width: 2800, recommended: { width: 2800, height: 1400 } },
+    },
+  },
+  {
+    slot: "hero-sunny-2",
+    label: "Hero image 2",
+    variants: {
+      base: { width: 1400, recommended: { width: 1400, height: 700 } },
+      "2x": { width: 2800, recommended: { width: 2800, height: 1400 } },
+    },
+  },
+  {
+    slot: "hero-sunny-3",
+    label: "Hero image 3",
+    variants: {
+      base: { width: 1400, recommended: { width: 1400, height: 700 } },
+      "2x": { width: 2800, recommended: { width: 2800, height: 1400 } },
     },
   },
   {

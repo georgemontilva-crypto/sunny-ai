@@ -95,9 +95,9 @@ export default function MediaSlotCard({ def, row }: { def: MediaSlotDef; row: Me
         {/* Always visible, loaded or not — so there's something to prepare
             before picking a file, not an error to react to afterward. */}
         <p className="text-xs text-muted-foreground/80 mt-1">
-          {declaredVariantEntries.length > 1
-            ? declaredVariantEntries.map(([name, spec]) => `${name} ${formatDims(spec.recommended)}`).join(" · ")
-            : `Recommended: ${baseRecommended ? formatDims(baseRecommended) : "—"}`}
+          {baseRecommended
+            ? `Recommended: ${formatDims(baseRecommended)} (${formatAspectRatio(baseRecommended.width, baseRecommended.height)})`
+            : "—"}
         </p>
       </div>
 
