@@ -105,7 +105,7 @@ export default function Navbar() {
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
-              className="w-9 h-9 rounded-full flex items-center justify-center text-background/85 hover:text-background hover:bg-background/9 transition-colors"
+              className="w-11 h-11 rounded-full flex items-center justify-center text-background/85 hover:text-background hover:bg-background/9 transition-colors"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

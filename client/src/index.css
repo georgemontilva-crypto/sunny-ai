@@ -333,6 +333,29 @@
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
+  /* Three large, continuously-animating blurred blobs cost real paint/layout
+     time on a mid-range phone — drop to two and shrink them under 768px
+     rather than rendering the full desktop set at a scaled-down viewport. */
+  @media (max-width: 768px) {
+    .hero-light-3 {
+      display: none;
+    }
+
+    .hero-light-1 {
+      width: 650px;
+      height: 650px;
+      top: -220px;
+      right: -160px;
+    }
+
+    .hero-light-2 {
+      width: 480px;
+      height: 480px;
+      bottom: -200px;
+      left: -140px;
+    }
+  }
+
   /* Hero portrait carousel wrapper: bleeds to the right edge, reserves the
      stacked cards' height via aspect-ratio, floats as one unit, and carries
      the breathing aura behind the cards (Hero.tsx / HeroCarousel.tsx). */
@@ -443,6 +466,7 @@
   }
 
   .hero-carousel-dot {
+    position: relative;
     width: 6px;
     height: 6px;
     border-radius: 99px;
@@ -451,6 +475,16 @@
     cursor: pointer;
     border: 0;
     padding: 0;
+  }
+
+  /* Invisible 44x44 hit area — generated content extends the clickable
+     region without growing the visible dot itself (WCAG touch-target
+     minimum). Symmetric inset, so it re-centers automatically on the
+     wider active-dot state too. */
+  .hero-carousel-dot::before {
+    content: "";
+    position: absolute;
+    inset: -19px;
   }
 
   .hero-carousel-dot--active {

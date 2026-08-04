@@ -174,7 +174,7 @@ function ChatBubble({ role, text, citation, product, typing }: Bubble) {
       </span>
       <div
         className={cn(
-          "max-w-[78%] rounded-[15px] text-[14.5px] leading-[1.55]",
+          "max-w-[78%] max-[600px]:max-w-[88%] rounded-[15px] text-[14.5px] leading-[1.55]",
           isUser
             ? "bg-accent text-noche font-medium rounded-br-[5px]"
             : "bg-background/7 text-background/88 border border-background/10 rounded-bl-[5px]"
@@ -332,8 +332,7 @@ export default function ChatDemo() {
               <div>
                 <div
                   ref={convRef}
-                  className="px-7 pt-[26px] pb-5 flex flex-col gap-[18px] overflow-y-auto"
-                  style={{ maxHeight: 420, minHeight: 400, scrollBehavior: "smooth" }}
+                  className="px-7 max-[600px]:px-4 pt-[26px] pb-5 flex flex-col gap-[18px] overflow-y-auto scroll-smooth max-h-[420px] max-[600px]:max-h-[320px] min-h-[400px] max-[600px]:min-h-[280px]"
                 >
                   {messages.map((m) => (
                     <ChatBubble key={m.id} {...m} />
@@ -348,7 +347,7 @@ export default function ChatDemo() {
                       disabled={usedIndices.has(i)}
                       onClick={() => respond(i)}
                       className={cn(
-                        "text-[12.5px] px-[13px] py-[7px] rounded-full border border-background/16 text-background/55 transition-all duration-300 shrink-0",
+                        "text-[12.5px] px-[13px] py-[14px] rounded-full border border-background/16 text-background/55 transition-all duration-300 shrink-0",
                         usedIndices.has(i)
                           ? "opacity-30 pointer-events-none"
                           : "cursor-pointer hover:border-accent/50 hover:text-accent"

@@ -99,6 +99,7 @@ export default function Compounds() {
             ref={trackRef}
             onScroll={updateEdges}
             className="flex gap-5 overflow-x-auto pb-[18px] px-1 -mx-1 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{ WebkitOverflowScrolling: "touch" }}
           >
             {compoundLibrary.map((c, i) => (
               <motion.article
@@ -163,7 +164,7 @@ export default function Compounds() {
             aria-label="Previous"
             disabled={atStart}
             onClick={() => scrollByCard(-1)}
-            className="w-[42px] h-[42px] rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
           >
             <ChevronLeft className="w-[17px] h-[17px]" />
           </button>
@@ -172,7 +173,7 @@ export default function Compounds() {
             aria-label="Next"
             disabled={atEnd}
             onClick={() => scrollByCard(1)}
-            className="w-[42px] h-[42px] rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
           >
             <ChevronRight className="w-[17px] h-[17px]" />
           </button>

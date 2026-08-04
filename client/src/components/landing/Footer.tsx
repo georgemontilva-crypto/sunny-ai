@@ -11,7 +11,7 @@ function isValidEmail(email: string): boolean {
 }
 
 const COLUMN_TITLE = "font-mono text-[10.5px] uppercase tracking-wide text-background/42 mb-4";
-const FOOTER_LINK = "text-[14.5px] text-background/66 hover:text-accent transition-colors";
+const FOOTER_LINK = "block py-3 text-[14.5px] text-background/66 hover:text-accent transition-colors";
 
 function NewsletterSignup() {
   const [email, setEmail] = useState("");
@@ -131,7 +131,7 @@ export default function Footer() {
           </div>
           <div>
             <h4 className={COLUMN_TITLE}>Product</h4>
-            <ul className="space-y-2.5">
+            <ul>
               <li><a href="/#how-it-works" className={FOOTER_LINK}>How it works</a></li>
               <li><a href="/#compounds" className={FOOTER_LINK}>Compounds</a></li>
               <li><a href="/#goals" className={FOOTER_LINK}>Topics</a></li>
@@ -140,7 +140,7 @@ export default function Footer() {
           </div>
           <div>
             <h4 className={COLUMN_TITLE}>Legal</h4>
-            <ul className="space-y-2.5">
+            <ul>
               <li><Link href="/legal/privacy" className={FOOTER_LINK}>Privacy</Link></li>
               <li><Link href="/legal/terms" className={FOOTER_LINK}>Terms</Link></li>
               <li><Link href="/legal/cookies" className={FOOTER_LINK}>Cookies</Link></li>
