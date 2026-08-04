@@ -82,7 +82,7 @@ export default function Compounds() {
         <div className="relative">
           <div
             className={cn(
-              "pointer-events-none absolute top-0 bottom-[18px] left-0 w-[70px] z-10 transition-opacity duration-300",
+              "pointer-events-none absolute top-0 bottom-[30px] left-0 w-[70px] z-10 transition-opacity duration-300",
               atStart ? "opacity-0" : "opacity-100"
             )}
             style={{ background: "linear-gradient(90deg, var(--noche), transparent)" }}
@@ -90,7 +90,7 @@ export default function Compounds() {
           />
           <div
             className={cn(
-              "pointer-events-none absolute top-0 bottom-[18px] right-0 w-[70px] z-10 transition-opacity duration-300",
+              "pointer-events-none absolute top-0 bottom-[30px] right-0 w-[70px] z-10 transition-opacity duration-300",
               atEnd ? "opacity-0" : "opacity-100"
             )}
             style={{ background: "linear-gradient(270deg, var(--noche), transparent)" }}
@@ -100,8 +100,8 @@ export default function Compounds() {
           <div
             ref={trackRef}
             onScroll={updateEdges}
-            className="flex gap-5 overflow-x-auto pb-[18px] px-1 -mx-1 scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className="flex gap-5 overflow-x-auto pt-5 -mt-5 pb-[30px] -mb-[30px] px-[30px] -mx-[30px] scroll-smooth snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            style={{ WebkitOverflowScrolling: "touch", scrollPaddingInline: "30px" }}
           >
             {compoundLibrary.map((c, i) => (
               <motion.article

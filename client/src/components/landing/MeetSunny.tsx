@@ -37,7 +37,7 @@ export default function MeetSunny() {
     <section className="py-24 px-4 bg-secondary/34" ref={ref}>
       <div className="container mx-auto max-w-7xl">
         <div
-          className="grid grid-cols-1 [grid-template-columns:1.05fr_0.95fr] max-[900px]:grid-cols-1 items-center"
+          className="grid [grid-template-columns:1.05fr_0.95fr] max-[900px]:grid-cols-1 items-center"
           style={{ gap: "clamp(28px, 5vw, 64px)" }}
         >
           {/* LEFT SIDE - TEXT CONTENT */}

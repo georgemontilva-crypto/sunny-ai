@@ -155,7 +155,7 @@ function ChatBubble({ role, text, citation, product, typing }: Bubble) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className={cn("flex gap-3 items-start", isUser && "flex-row-reverse")}
+      className={cn("flex gap-3 items-start shrink-0", isUser && "flex-row-reverse")}
     >
       <span
         className={cn(
