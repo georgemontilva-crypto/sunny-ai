@@ -31,17 +31,11 @@ export default function MeetSunny() {
   const meetSunnyRecommended = getSlotDef("meet-sunny")?.variants.base?.recommended;
 
   return (
-    <section className="py-24 px-4 bg-noche relative overflow-hidden" ref={ref}>
-      <div
-        className="warm-glow warm-glow-drift"
-        style={{ width: 720, height: 720, top: -200, right: -180 }}
-        aria-hidden="true"
-      />
-
-      <div className="container mx-auto max-w-7xl relative z-10">
+    <section className="py-24 px-4 bg-secondary/34" ref={ref}>
+      <div className="container mx-auto max-w-7xl">
         <div
           className="grid grid-cols-1 [grid-template-columns:1.05fr_0.95fr] max-[900px]:grid-cols-1 items-center"
-          style={{ gap: "clamp(28px, 5vw, 68px)" }}
+          style={{ gap: "clamp(28px, 5vw, 64px)" }}
         >
           {/* LEFT SIDE - TEXT CONTENT */}
           <motion.div
@@ -53,7 +47,7 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-background/15 bg-background/8 backdrop-blur-md text-xs font-medium text-accent mb-6"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card text-xs font-medium text-accent mb-6"
             >
               <span className="w-2 h-2 bg-accent rounded-full"></span>
               YOUR AI CONSULTANT
@@ -63,7 +57,7 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.1, ease: [0.23, 1, 0.32, 1] }}
-              className="text-[clamp(34px,4.6vw,56px)] font-bold mb-6 text-background"
+              className="text-[clamp(34px,4.6vw,56px)] font-semibold mb-[19px]"
             >
               Meet{" "}
               <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
@@ -75,7 +69,7 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
-              className="text-[16.5px] text-background/68 mb-8 max-w-lg"
+              className="text-[16.5px] text-muted-foreground max-w-[46ch]"
             >
               Sunny is an AI-powered research assistant designed to make peptide literature easier to
               understand. Ask questions in plain language, explore published findings, and review citations,
@@ -87,7 +81,7 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
-              className="mb-10"
+              className="mt-[30px] border-t border-border"
             >
               {features.map((feature, i) => (
                 <motion.div
@@ -95,12 +89,12 @@ export default function MeetSunny() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: 0.4 + i * 0.05, duration: 0.5 }}
-                  className="grid grid-cols-[26px_1fr] gap-3 py-4 border-b border-background/14"
+                  className="grid grid-cols-[26px_1fr] gap-3.5 items-baseline py-[15px] border-b border-border transition-[padding-left] duration-[350ms] ease-[cubic-bezier(0.23,1,0.32,1)] hover:pl-2"
                 >
-                  <span className="font-mono text-sm text-accent">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-mono text-[11px] text-accent">{String(i + 1).padStart(2, "0")}</span>
                   <div>
-                    <h4 className="text-[15.5px] font-semibold text-background mb-1">{feature.title}</h4>
-                    <p className="text-sm text-background/55">{feature.description}</p>
+                    <strong className="block text-[15.5px] font-semibold mb-0.5">{feature.title}</strong>
+                    <span className="block text-sm text-muted-foreground">{feature.description}</span>
                   </div>
                 </motion.div>
               ))}
@@ -110,17 +104,10 @@ export default function MeetSunny() {
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.5, ease: [0.23, 1, 0.32, 1] }}
-              className="flex flex-col sm:flex-row items-start gap-4"
+              className="mt-8"
             >
               <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full">
                 Ask a Research Question
-              </Button>
-              <Button
-                size="lg"
-                variant="ghost"
-                className="text-base font-medium px-8 h-12 rounded-full border border-background/20 bg-background/8 backdrop-blur-md text-background hover:bg-background/14 hover:text-background"
-              >
-                Learn More
               </Button>
             </motion.div>
           </motion.div>
@@ -132,26 +119,26 @@ export default function MeetSunny() {
             transition={{ duration: 0.8, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
             className="relative"
           >
-            <div className="relative rounded-3xl overflow-hidden border border-background/12">
+            <div className="relative rounded-[calc(var(--radius)+6px)] overflow-hidden border border-border shadow-[0_34px_70px_-40px_rgba(120,80,20,0.6)]">
+              <span
+                className="meetsunny-halo absolute -z-10 rounded-full"
+                style={{ inset: "-10%" }}
+                aria-hidden="true"
+              />
               {meetSunnyUrl ? (
-                <>
-                  <img
-                    src={meetSunnyUrl}
-                    srcSet={meetSunny2xUrl ? `${meetSunnyUrl} 800w, ${meetSunny2xUrl} 1600w` : undefined}
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    width={800}
-                    height={1000}
-                    loading="lazy"
-                    decoding="async"
-                    alt="Sunny, the AI peptide research assistant"
-                    className="block w-full h-auto"
-                  />
-                  {/* Subtle fade into the dark section background, rather than
-                      a hard edge against it. */}
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-noche to-transparent pointer-events-none" />
-                </>
+                <img
+                  src={meetSunnyUrl}
+                  srcSet={meetSunny2xUrl ? `${meetSunnyUrl} 800w, ${meetSunny2xUrl} 1600w` : undefined}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  width={800}
+                  height={1000}
+                  loading="lazy"
+                  decoding="async"
+                  alt="Sunny, the AI peptide research assistant"
+                  className="block w-full h-auto"
+                />
               ) : (
-                <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-background/10 w-full aspect-[4/5] flex items-center justify-center text-background/70">
+                <div className="bg-gradient-to-br from-accent/20 via-accent/10 to-secondary w-full aspect-[4/5] flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <div className="w-24 h-24 bg-accent/30 rounded-full mx-auto mb-4 flex items-center justify-center">
                       <span className="text-5xl">✨</span>

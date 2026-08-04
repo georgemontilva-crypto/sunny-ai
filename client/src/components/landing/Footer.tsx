@@ -111,12 +111,18 @@ export default function Footer() {
     <footer className="bg-noche relative overflow-hidden pt-[70px] pb-[34px] px-4">
       <div
         className="warm-glow"
-        style={{ width: 800, height: 800, bottom: -260, right: -220 }}
+        style={{
+          width: 800,
+          height: 800,
+          bottom: -470,
+          right: -180,
+          background: "radial-gradient(circle, oklch(from var(--accent) l c h / 15%), transparent 66%)",
+        }}
         aria-hidden="true"
       />
 
       <div className="container mx-auto max-w-7xl relative z-10">
-        <div className="grid grid-cols-[1.5fr_1fr_1fr_1.5fr] max-[900px]:grid-cols-2 max-[560px]:grid-cols-1 gap-8 mb-8">
+        <div className="grid grid-cols-[1.5fr_1fr_1fr_1.5fr] max-[900px]:grid-cols-2 max-[560px]:grid-cols-1 gap-8 mb-[42px]">
           <div>
             <img src={getSlotUrl("logo")} alt="Sunny" className="h-14 w-auto mb-4" loading="lazy" />
             <p className="text-[14.5px] text-background/66 max-w-[30ch]">
@@ -143,11 +149,11 @@ export default function Footer() {
           </div>
           <NewsletterSignup />
         </div>
-        <div className="border-t border-background/12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-background/55">
+        <div className="border-t border-background/12 pt-[22px] flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-background/38">
             © 2026 Sunny. Educational research content. Not medical advice. For adults 21+.
           </p>
-          <p className="text-xs text-background/55">
+          <p className="text-xs text-background/38">
             Sunny is operated by Brighter Days Labs. Compounds shown are BDL research products.
           </p>
         </div>

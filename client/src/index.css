@@ -507,6 +507,14 @@
   .warm-glow-drift {
     animation: hero-drift-1 28s ease-in-out infinite;
   }
+
+  /* MeetSunny's portrait halo — same breathing keyframe as the hero aura,
+     own duration/stops/blur (MeetSunny.tsx). */
+  .meetsunny-halo {
+    background: radial-gradient(circle, oklch(from var(--accent) l c h / 38%), transparent 68%);
+    filter: blur(50px);
+    animation: hero-breathe 6s ease-in-out infinite alternate;
+  }
 }
 
 @keyframes hero-drift-1 {
@@ -550,7 +558,7 @@
   .hero-portrait-wrap::before,
   .pulse-dot::after,
   .warm-glow-drift,
-  .goals-card-image {
+  .meetsunny-halo {
     animation: none !important;
     transition: none !important;
   }

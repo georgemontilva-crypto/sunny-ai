@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { CONTACT_TOPICS, CONTACT_TOPIC_VALUES, type ContactTopic } from "@shared/const.ts";
 import { SITE } from "@shared/site.ts";
-import { ArrowRight, Mail, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { ArrowRight, Send, CheckCircle, AlertCircle } from "lucide-react";
+import LegalNotice from "@/components/landing/LegalNotice";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -73,43 +74,44 @@ export default function Contact() {
   };
 
   return (
-    <section id="contact" className="py-24 px-4 bg-background scroll-mt-24" ref={ref}>
+    <section id="contact" className="py-24 px-4 bg-secondary/34 scroll-mt-24" ref={ref}>
       <div className="container mx-auto max-w-7xl">
-        <div className="grid grid-cols-[.85fr_1.15fr] max-[860px]:grid-cols-1 gap-12 items-start">
+        <div
+          className="grid grid-cols-[.85fr_1.15fr] max-[860px]:grid-cols-1 items-start"
+          style={{ gap: "clamp(30px, 5vw, 64px)" }}
+        >
           {/* LEFT — eyebrow, headline, context, contact data */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-5">
-              <Mail className="w-3.5 h-3.5" />
+            <span className="font-mono text-[11px] tracking-[.14em] uppercase text-muted-foreground mb-3.5 block">
               Get in touch
-            </div>
-            <h2 className="text-[clamp(32px,4.2vw,52px)] font-semibold leading-[1.03] mb-4">
+            </span>
+            <h2 className="text-[clamp(32px,4.2vw,50px)] font-semibold leading-[1.03] mb-[18px]">
               Have a <span className="text-accent">question?</span>
             </h2>
-            <p className="text-muted-foreground max-w-[36ch] mb-8">
+            <p className="text-muted-foreground max-w-[36ch]">
               Tell us about your research interests. We'll provide educational information — not medical
               advice.
             </p>
 
-            <div className="pt-6 border-t border-border space-y-3">
-              <a
-                href={`mailto:${SITE.contactEmail}`}
-                className="flex items-center gap-2 text-sm text-foreground hover:text-accent transition-colors w-fit"
-              >
-                <Mail className="w-4 h-4 text-accent" />
-                {SITE.contactEmail}
-              </a>
-              <p className="text-sm text-muted-foreground">
+            <div className="mt-7 pt-5 border-t border-border text-sm">
+              <div className="py-[7px] text-muted-foreground">
+                Email ·{" "}
+                <a href={`mailto:${SITE.contactEmail}`} className="text-foreground font-medium hover:text-accent">
+                  {SITE.contactEmail}
+                </a>
+              </div>
+              <div className="py-[7px] text-muted-foreground">
                 Educational research content. Not medical advice. For adults 21+.
-              </p>
+              </div>
             </div>
 
-            <p className="mt-8 text-sm text-muted-foreground">
+            <p className="mt-[22px] text-sm">
               Run a clinic or brand?{" "}
-              <Link href="/partner" className="text-accent hover:underline inline-flex items-center gap-1">
+              <Link href="/partner" className="text-accent font-medium hover:underline inline-flex items-center gap-1">
                 See how Sunny works for you
                 <ArrowRight className="w-3 h-3" />
               </Link>
@@ -123,7 +125,7 @@ export default function Contact() {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             {status === "sent" ? (
-              <div className="bg-card border border-border/50 rounded-[20px] p-8 text-center py-16 shadow-sm">
+              <div className="bg-card border border-border/50 rounded-[20px] p-8 text-center py-16 shadow-[0_24px_54px_-34px_rgba(120,80,20,0.4)]">
                 <motion.div
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -148,7 +150,10 @@ export default function Contact() {
                 </Button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-[20px] p-8 space-y-5 shadow-sm">
+              <form
+                onSubmit={handleSubmit}
+                className="bg-card border border-border/50 rounded-[20px] p-8 space-y-5 shadow-[0_24px_54px_-34px_rgba(120,80,20,0.4)]"
+              >
                 {/* Honeypot — hidden from real visitors, bots tend to fill every field */}
                 <input
                   type="text"
@@ -263,6 +268,10 @@ export default function Contact() {
             )}
           </motion.div>
         </div>
+      </div>
+
+      <div className="container mx-auto max-w-7xl" style={{ marginTop: "clamp(40px, 6vw, 64px)" }}>
+        <LegalNotice />
       </div>
     </section>
   );

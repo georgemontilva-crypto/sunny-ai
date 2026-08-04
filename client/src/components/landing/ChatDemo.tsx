@@ -106,9 +106,29 @@ export default function ChatDemo() {
   }, [visibleCount, isTyping]);
 
   return (
-    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
-      <div className="container mx-auto max-w-7xl">
+    <section id="chat" className="py-24 px-4 bg-noche relative overflow-hidden" ref={ref}>
+      <div
+        className="hero-light"
+        style={{
+          width: 1000,
+          height: 1000,
+          top: "-20%",
+          // Centered via a computed offset rather than left:50% +
+          // transform:translateX(-50%) — the drift keyframes animate
+          // `transform` too, and an animated transform fully replaces a
+          // static one rather than composing with it, which would silently
+          // drop the centering the moment the animation starts.
+          left: "calc(50% - 500px)",
+          background: "radial-gradient(circle, oklch(from var(--accent) l c h / 17%), transparent 62%)",
+          animation: "hero-drift-3 22s ease-in-out infinite",
+        }}
+        aria-hidden="true"
+      />
+      <div className="hero-grain" aria-hidden="true" />
+
+      <div className="container mx-auto max-w-7xl relative z-10">
         <SectionHead
+          dark
           eyebrow="AI research assistant"
           title="Chat with"
           accentTitle="Sunny"
@@ -167,7 +187,7 @@ export default function ChatDemo() {
           </div>
         </motion.div>
 
-        <p className="text-center text-xs text-muted-foreground mt-4">Illustrative example</p>
+        <p className="text-center text-xs text-background/40 mt-4">Illustrative example</p>
       </div>
     </section>
   );

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { GripVertical, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import SectionHead from "@/components/landing/SectionHead";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
 import { getSlotUrl } from "@/lib/media";
 import { getSetting } from "@/lib/settings";
@@ -157,21 +157,14 @@ export default function Questions() {
   return (
     <section className="py-24 px-4 bg-background" ref={ref}>
       <div className="container mx-auto max-w-7xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Real questions people ask
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Science-first explanations based on what you are exploring.
-          </p>
-        </motion.div>
+        <SectionHead
+          eyebrow="Real questions"
+          title="Real questions people"
+          accentTitle="ask"
+          note="Science-first explanations based on what you are exploring."
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 max-[900px]:grid-cols-2 max-[600px]:grid-cols-1 gap-5 items-start">
           {cards.map((q, i) => {
             const isDropTarget = editMode && overId === q.image && dragId !== q.image;
             return (
@@ -181,6 +174,9 @@ export default function Questions() {
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
               >
+                {/* IMPORTANT: this must stay a <div> (display:block) — a
+                    <span> here silently drops the .txt block's vertical
+                    padding and the copy ends up glued to the card edge. */}
                 <div
                   draggable={editMode}
                   onDragStart={editMode ? () => setDragId(q.image) : undefined}
@@ -211,29 +207,31 @@ export default function Questions() {
                       : undefined
                   }
                   className={cn(
-                    "h-full rounded-2xl",
-                    editMode && "cursor-grab active:cursor-grabbing",
-                    isDropTarget && "ring-2 ring-accent ring-offset-2 ring-offset-background"
+                    "group rounded-[calc(var(--radius)+5px)] overflow-hidden bg-card border transition-all duration-700",
+                    editMode ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
+                    isDropTarget
+                      ? "ring-2 ring-accent ring-offset-2 ring-offset-background"
+                      : "border-border hover:-translate-y-[5px] hover:border-accent/42 hover:shadow-[0_26px_52px_-26px_rgba(200,150,80,0.5)]"
                   )}
                 >
-                  <Card className="p-6 h-full flex flex-col hover:shadow-md transition-shadow cursor-pointer group overflow-hidden">
-                    {editMode && (
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3 -mt-1 select-none">
-                        <GripVertical className="w-3.5 h-3.5" />
-                        Drag to reorder
-                      </div>
-                    )}
+                  {editMode && (
+                    <div className="flex items-center gap-1.5 px-5 pt-3 text-xs text-muted-foreground select-none">
+                      <GripVertical className="w-3.5 h-3.5" />
+                      Drag to reorder
+                    </div>
+                  )}
+                  <div className="block relative overflow-hidden">
                     {q.hiRes ? (
                       <img
                         src={getSlotUrl(`card-${q.image}`)}
                         srcSet={`${getSlotUrl(`card-${q.image}`)} 800w${getSlotUrl(`card-${q.image}`, "2x") ? `, ${getSlotUrl(`card-${q.image}`, "2x")} 1600w` : ""}`}
-                        sizes="(max-width: 768px) 100vw, 400px"
+                        sizes="(max-width: 900px) 50vw, 33vw"
                         width={800}
                         height={320}
                         loading="lazy"
                         decoding="async"
                         alt={`Research-grade vial, ${q.image} category`}
-                        className="w-full h-40 object-cover object-center rounded-xl mb-4"
+                        className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
                       />
                     ) : (
                       <img
@@ -243,18 +241,24 @@ export default function Questions() {
                         loading="lazy"
                         decoding="async"
                         alt={`Research-grade vial, ${q.image} category`}
-                        className="w-full h-40 object-cover object-center rounded-xl mb-4"
+                        className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
                       />
                     )}
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span className="text-2xl font-bold text-accent">{q.metric}</span>
-                      <span className="text-xs text-muted-foreground">{q.label}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-4 flex-grow">"{q.question}"</p>
-                    <div className="flex items-center gap-2 text-xs font-medium text-accent group-hover:gap-3 transition-all">
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{ background: "linear-gradient(to top, oklch(1 0 0 / 55%) 1%, transparent 30%)" }}
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="block px-5 pt-[18px] pb-[22px]">
+                    <span className="block text-[19px] font-semibold text-accent mb-2 [font-family:var(--font-display)]">
+                      {q.metric}
+                    </span>
+                    <p className="text-[14.5px] text-muted-foreground leading-[1.55]">"{q.question}"</p>
+                    <span className="mt-3.5 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-muted-foreground transition-all duration-300 group-hover:text-accent group-hover:gap-[11px]">
                       Ask Sunny <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </Card>
+                    </span>
+                  </div>
                 </div>
               </motion.div>
             );

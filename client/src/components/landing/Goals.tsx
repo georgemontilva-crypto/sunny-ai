@@ -68,52 +68,48 @@ export default function Goals() {
           note="Browse published research by area of interest."
         />
 
-        {/* Every tile is the same size (no column spans) — aspect-ratio
-            2.5/1 exactly matches the images' native 400x160, so
-            object-fit: cover here never crops or upscales anything, unlike
-            the rest of this redesign's images. */}
-        <div className="grid grid-cols-3 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1 gap-4">
+        <div className="grid grid-cols-3 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1 gap-[18px]">
           {goals.map((goal, i) => (
             <motion.div
               key={goal.title}
               initial={{ opacity: 0, y: 24 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
-              className="group relative rounded-2xl overflow-hidden"
-              style={{ aspectRatio: "2.5 / 1" }}
+              className="group flex flex-col relative rounded-[calc(var(--radius)+5px)] overflow-hidden bg-card border border-border transition-all duration-400 hover:-translate-y-[5px] hover:border-accent/40 hover:shadow-[0_26px_52px_-26px_rgba(200,150,80,0.5)]"
             >
-              <img
-                src={getSlotUrl(goal.image)}
-                width={400}
-                height={160}
-                loading="lazy"
-                decoding="async"
-                alt={`Illustration for the ${goal.title} category`}
-                className="goals-card-image absolute inset-0 w-full h-full object-cover -z-20 transition-transform duration-700 group-hover:scale-105"
-              />
-              <div
-                className="absolute inset-0 -z-10"
-                style={{
-                  background:
-                    "linear-gradient(to top, oklch(from var(--noche) l c h / 90%) 0%, oklch(from var(--noche) l c h / 18%) 100%)",
-                }}
-                aria-hidden="true"
-              />
-
-              <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-1.5">
-                {goal.compounds.map((c) => (
-                  <span
-                    key={c}
-                    className="font-mono text-[10px] px-2 py-1 rounded-full bg-background/14 backdrop-blur-md text-white"
-                  >
-                    {c}
-                  </span>
-                ))}
+              <div className="block relative overflow-hidden">
+                <img
+                  src={getSlotUrl(goal.image)}
+                  width={400}
+                  height={160}
+                  loading="lazy"
+                  decoding="async"
+                  alt={`Illustration for the ${goal.title} category`}
+                  className="block w-full h-auto transition-transform duration-700 group-hover:scale-[1.06]"
+                />
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ background: "linear-gradient(to top, oklch(1 0 0 / 90%) 2%, transparent 45%)" }}
+                  aria-hidden="true"
+                />
               </div>
-
-              <h3 className="absolute bottom-3 left-4 right-4 text-[17px] font-semibold text-white">
-                {goal.title}
-              </h3>
+              <div className="flex-1 flex flex-col px-5 pt-4 pb-5">
+                <span className="block font-mono text-[10px] tracking-[.12em] uppercase text-accent mb-1.5">
+                  {goal.metric}
+                </span>
+                <h3 className="text-lg font-semibold mb-[7px]">{goal.title}</h3>
+                <p className="flex-1 text-[13.5px] text-muted-foreground leading-[1.55]">{goal.description}</p>
+                <div className="flex flex-wrap gap-[5px] mt-3.5">
+                  {goal.compounds.map((c) => (
+                    <span
+                      key={c}
+                      className="font-mono text-[9.5px] tracking-[.06em] px-2 py-1 rounded-[6px] bg-accent/12 text-muted-foreground"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           ))}
         </div>

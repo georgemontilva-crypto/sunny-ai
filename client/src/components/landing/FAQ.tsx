@@ -40,7 +40,7 @@ export default function FAQ() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-24 px-4 bg-secondary/30" ref={ref}>
+    <section className="py-24 px-4 bg-background" ref={ref}>
       <div className="container mx-auto max-w-3xl">
         <SectionHead
           eyebrow="FAQ"
@@ -54,11 +54,17 @@ export default function FAQ() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full space-y-2.5">
             {faqs.map((faq, i) => (
-              <AccordionItem key={i} value={`item-${i}`}>
-                <AccordionTrigger className="text-left font-medium">{faq.q}</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed">
+              <AccordionItem
+                key={i}
+                value={`item-${i}`}
+                className="border rounded-[var(--radius)] bg-card px-[22px] transition-colors duration-300 data-[state=open]:border-accent/40"
+              >
+                <AccordionTrigger className="text-left font-medium text-base py-[18px] hover:no-underline">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed text-[15px] max-w-[64ch] pb-5">
                   {faq.a}
                 </AccordionContent>
               </AccordionItem>

@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import SectionHead from "@/components/landing/SectionHead";
 import { getSlotUrl } from "@/lib/media";
+import { cn } from "@/lib/utils";
 
 const steps = [
   {
@@ -49,34 +50,45 @@ export default function HowItWorks() {
         />
 
         <div className="relative">
-          {/* The connecting line sits behind the steps; each dot's halo
-              (boxShadow matching the section background) visually cuts a gap
-              in it where the dot sits. */}
+          {/* Center line, behind the steps — moves to the left edge once the
+              layout stacks under 860px, where the dots move with it. */}
           <div
-            className="absolute h-px bg-border max-[860px]:hidden"
-            style={{ top: 38, left: "6%", right: "6%" }}
+            className="absolute top-0 bottom-0 w-px bg-border left-1/2 max-[860px]:left-[19px]"
             aria-hidden="true"
           />
 
-          <div className="grid grid-cols-4 gap-0 max-[860px]:grid-cols-2 max-[860px]:gap-x-8 max-[860px]:gap-y-12 max-[520px]:grid-cols-1 relative">
-            {steps.map((step, i) => (
+          {steps.map((step, i) => {
+            const left = i % 2 === 0;
+            return (
               <motion.div
                 key={step.number}
                 initial={{ opacity: 0, y: 24 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="group px-4 first:pl-0 last:pr-0"
+                className="grid grid-cols-[1fr_78px_1fr] max-[860px]:grid-cols-[40px_1fr] items-center mb-[26px]"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <span
-                    className="block rounded-full bg-accent shrink-0"
-                    style={{ width: 13, height: 13, boxShadow: "0 0 0 6px var(--background)" }}
-                  />
-                  <span className="font-mono text-sm text-muted-foreground">{step.number}</span>
-                </div>
-                <h3 className="text-[17.5px] font-semibold mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground mb-5">{step.description}</p>
-                <div className="rounded-xl overflow-hidden">
+                <span
+                  className="relative z-[2] block rounded-full bg-accent justify-self-center max-[860px]:justify-self-start [grid-column:2] max-[860px]:[grid-column:1]"
+                  style={{
+                    width: 15,
+                    height: 15,
+                    boxShadow: "0 0 0 6px var(--background), 0 0 22px -2px oklch(from var(--accent) l c h / 80%)",
+                  }}
+                />
+                <div
+                  className={cn(
+                    "grid grid-cols-[1fr_150px] max-[860px]:grid-cols-1 gap-5 items-center bg-card border border-border rounded-[calc(var(--radius)+4px)] p-6 transition-all duration-400 hover:border-accent/40 hover:shadow-[0_20px_44px_-26px_rgba(200,150,80,0.5)]",
+                    "max-[860px]:[grid-column:2]",
+                    left ? "[grid-column:1]" : "[grid-column:3]"
+                  )}
+                >
+                  <div>
+                    <span className="block font-mono text-[11px] tracking-[.14em] text-accent mb-[7px]">
+                      {step.number}
+                    </span>
+                    <h3 className="text-[19px] font-semibold mb-[7px]">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
+                  </div>
                   {step.hiRes ? (
                     <img
                       src={getSlotUrl(step.image)}
@@ -85,8 +97,8 @@ export default function HowItWorks() {
                       height={300}
                       loading="lazy"
                       decoding="async"
-                      alt={step.title}
-                      className="block w-full h-auto rounded-xl grayscale-[.4] group-hover:grayscale-0 transition-[filter] duration-500"
+                      alt=""
+                      className="block w-full h-auto rounded-[10px]"
                     />
                   ) : (
                     <img
@@ -95,14 +107,14 @@ export default function HowItWorks() {
                       height={300}
                       loading="lazy"
                       decoding="async"
-                      alt={step.title}
-                      className="block w-full h-auto rounded-xl grayscale-[.4] group-hover:grayscale-0 transition-[filter] duration-500"
+                      alt=""
+                      className="block w-full h-auto rounded-[10px]"
                     />
                   )}
                 </div>
               </motion.div>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>
