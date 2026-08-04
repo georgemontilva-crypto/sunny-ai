@@ -40,6 +40,7 @@ export default defineConfig(({ isSsrBuild }) => ({
           : {
               "react-vendor": ["react", "react-dom"],
               motion: ["framer-motion"],
+              icons: ["lucide-react"],
             },
       },
     },

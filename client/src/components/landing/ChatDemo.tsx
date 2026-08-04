@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Book, FileText, FlaskConical, Info, Send, ShieldCheck } from "lucide-react";
 import SectionHead from "@/components/landing/SectionHead";
+import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
 import { cn } from "@/lib/utils";
 
 interface QAItem {
@@ -197,6 +198,7 @@ function ChatBubble({ role, text, citation, product, typing }: Bubble) {
 export default function ChatDemo() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const bgAnimating = useAnimateWhileVisible(sectionRef);
   const convRef = useRef<HTMLDivElement>(null);
   const reducedMotion = usePrefersReducedMotion();
 
@@ -243,7 +245,7 @@ export default function ChatDemo() {
   return (
     <section id="chat" className="py-24 px-4 bg-noche relative overflow-hidden" ref={sectionRef}>
       <div
-        className="hero-light"
+        className={cn("hero-light", !bgAnimating && "anim-paused")}
         style={{
           width: 1000,
           height: 1000,

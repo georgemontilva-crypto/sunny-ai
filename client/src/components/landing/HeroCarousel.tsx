@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSlotUrl } from "@/lib/media";
+import { cn } from "@/lib/utils";
 
 const SLOTS = ["hero-sunny", "hero-sunny-2", "hero-sunny-3"];
 const ROTATE_MS = 4200;
@@ -8,6 +9,19 @@ interface CarouselImage {
   slot: string;
   base: string;
   base2x?: string;
+  mobile?: string;
+}
+
+// Smallest-first so a browser that only reads the first matching candidate
+// (some older ones) still gets the mobile-sized file rather than the 1400px
+// base — the 700w mobile variant is what keeps small phones from
+// downloading the desktop asset.
+function buildSrcSet(img: CarouselImage): string | undefined {
+  const parts: string[] = [];
+  if (img.mobile) parts.push(`${img.mobile} 700w`);
+  parts.push(`${img.base} 1400w`);
+  if (img.base2x) parts.push(`${img.base2x} 2800w`);
+  return parts.length > 1 ? parts.join(", ") : undefined;
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -25,10 +39,10 @@ function usePrefersReducedMotion(): boolean {
 // Reads all three hero image slots and only shows whatever actually has an
 // image — 1, 2, or 3. Never a gap, never a broken <img>: a slot with nothing
 // uploaded just isn't in `images` at all (see client/src/lib/media.ts).
-export default function HeroCarousel() {
+export default function HeroCarousel({ bgAnimating = true }: { bgAnimating?: boolean }) {
   const images: CarouselImage[] = SLOTS.map((slot): CarouselImage | null => {
     const base = getSlotUrl(slot);
-    return base ? { slot, base, base2x: getSlotUrl(slot, "2x") } : null;
+    return base ? { slot, base, base2x: getSlotUrl(slot, "2x"), mobile: getSlotUrl(slot, "mobile") } : null;
   }).filter((img): img is CarouselImage => img !== null);
 
   const count = images.length;
@@ -52,14 +66,14 @@ export default function HeroCarousel() {
   const visibleCount = visible.length;
 
   return (
-    <div className="hero-portrait-wrap">
+    <div className={cn("hero-portrait-wrap", !bgAnimating && "anim-paused")}>
       {visible.map((img, i) => {
         const pos = visibleCount > 1 ? (i - front + visibleCount) % visibleCount : 0;
         return (
           <div key={img.slot} className={`hero-carousel-card hero-carousel-card--p${pos}`}>
             <img
               src={img.base}
-              srcSet={img.base2x ? `${img.base} 1400w, ${img.base2x} 2800w` : undefined}
+              srcSet={buildSrcSet(img)}
               sizes="(max-width: 940px) 100vw, 57vw"
               width={1400}
               height={700}

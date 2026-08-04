@@ -124,10 +124,25 @@ async function main() {
     ? template.replace('href="/favicon.png"', `href="${pngHref}"`)
     : dropLink(template, '<link rel="icon" type="image/png" href="/favicon.png" />');
 
-  const heroPreloadHref = mediaMap["hero-sunny"]?.base;
-  template = heroPreloadHref
-    ? template.replace('href="/hero-sunny.webp"', `href="${heroPreloadHref}"`)
-    : dropLink(template, '<link rel="preload" as="image" href="/hero-sunny.webp" />');
+  // Responsive preload: imagesrcset/imagesizes mirror HeroCarousel.tsx's own
+  // <img> srcset/sizes exactly, so the browser preloads the same variant it
+  // ends up actually requesting (a mismatch here just wastes the preload,
+  // it doesn't break anything) — the "mobile" 700w variant is what keeps a
+  // phone from preloading the 1400px desktop asset.
+  const heroPreloadTag = '<link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 940px) 100vw, 57vw" />';
+  const heroSlot = mediaMap["hero-sunny"];
+  if (heroSlot?.base) {
+    const srcsetParts = [];
+    if (heroSlot.mobile) srcsetParts.push(`${heroSlot.mobile} 700w`);
+    srcsetParts.push(`${heroSlot.base} 1400w`);
+    if (heroSlot["2x"]) srcsetParts.push(`${heroSlot["2x"]} 2800w`);
+    template = template.replace(
+      heroPreloadTag,
+      `<link rel="preload" as="image" href="${heroSlot.base}" imagesrcset="${srcsetParts.join(", ")}" imagesizes="(max-width: 940px) 100vw, 57vw" />`
+    );
+  } else {
+    template = dropLink(template, heroPreloadTag);
+  }
 
   // Already an absolute R2 URL when set (client/public is no longer a
   // fallback source, so there's no relative path to prepend SITE.domain

@@ -124,7 +124,14 @@ export default function Footer() {
       <div className="container mx-auto max-w-7xl relative z-10">
         <div className="grid grid-cols-[1.5fr_1fr_1fr_1.5fr] max-[900px]:grid-cols-2 max-[560px]:grid-cols-1 gap-8 mb-[42px]">
           <div>
-            <img src={getSlotUrl("logo")} alt="Sunny" className="h-14 w-auto mb-4" loading="lazy" />
+            <img
+              src={getSlotUrl("logo")}
+              alt="Sunny"
+              width={886}
+              height={300}
+              className="h-14 w-auto mb-4"
+              loading="lazy"
+            />
             <p className="text-[14.5px] text-background/66 max-w-[30ch]">
               AI-powered peptide research. Educational content, research-backed guidance.
             </p>

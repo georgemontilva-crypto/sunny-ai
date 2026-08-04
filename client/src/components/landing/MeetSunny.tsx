@@ -2,7 +2,9 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { getSlotDef } from "@server/mediaCatalog.ts";
 import { Button } from "@/components/ui/button";
+import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
 import { getSlotUrl } from "@/lib/media";
+import { cn } from "@/lib/utils";
 
 const features = [
   {
@@ -26,6 +28,7 @@ const features = [
 export default function MeetSunny() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const bgAnimating = useAnimateWhileVisible(ref);
   const meetSunnyUrl = getSlotUrl("meet-sunny");
   const meetSunny2xUrl = getSlotUrl("meet-sunny", "2x");
   const meetSunnyRecommended = getSlotDef("meet-sunny")?.variants.base?.recommended;
@@ -126,7 +129,7 @@ export default function MeetSunny() {
           >
             <div className="relative rounded-[calc(var(--radius)+6px)] overflow-hidden border border-border shadow-[0_34px_70px_-40px_rgba(120,80,20,0.6)]">
               <span
-                className="meetsunny-halo absolute -z-10 rounded-full"
+                className={cn("meetsunny-halo absolute -z-10 rounded-full", !bgAnimating && "anim-paused")}
                 style={{ inset: "-10%" }}
                 aria-hidden="true"
               />

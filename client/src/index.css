@@ -256,6 +256,23 @@
     background: oklch(from var(--noche) l c h / 82%);
   }
 
+  /* backdrop-filter is the single most expensive thing in this design on a
+     mid-range phone (it forces the compositor to blur everything behind
+     the pill on every frame it's visible, i.e. always — this bar is
+     fixed). Below 768px, trade the frosted-glass look for a solid fill at
+     roughly the same perceived opacity instead. Desktop keeps the blur. */
+  @media (max-width: 768px) {
+    .navbar-pill {
+      background: oklch(from var(--noche) l c h / 95%);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .navbar-pill.is-scrolled {
+      background: oklch(from var(--noche) l c h / 97%);
+    }
+  }
+
   .pill-link {
     transition: background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1), color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
   }
@@ -269,6 +286,17 @@
     background: oklch(from var(--noche) l c h / 92%);
     -webkit-backdrop-filter: blur(26px) saturate(160%);
     backdrop-filter: blur(26px) saturate(160%);
+  }
+
+  /* Same backdrop-filter trade-off as .navbar-pill above — this panel is
+     already 92% opaque, so dropping the blur under 768px barely changes
+     how it looks and removes a full-screen blur from the compositor. */
+  @media (max-width: 768px) {
+    .mobile-menu-panel {
+      background: oklch(from var(--noche) l c h / 97%);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
   }
 
   .mobile-menu-link {
@@ -285,6 +313,18 @@
     border-radius: 50%;
     pointer-events: none;
     will-change: transform, opacity;
+    contain: paint;
+  }
+
+  /* Applied alongside .anim-paused below to actually stop an animated
+     light/glow from costing paint time while its section is off-screen
+     (see useAnimateWhileVisible + Hero/Compounds/MeetSunny/ChatDemo/
+     Footer). animation-play-state, not unmounting the element — resuming
+     just un-pauses mid-cycle instead of restarting/popping. */
+  .anim-paused,
+  .anim-paused::before,
+  .anim-paused::after {
+    animation-play-state: paused !important;
   }
 
   .hero-light-1 {
@@ -530,6 +570,7 @@
     border-radius: 50%;
     pointer-events: none;
     will-change: transform, opacity;
+    contain: paint;
     background: radial-gradient(
       circle,
       oklch(from var(--accent) l c h / 28%) 0%,

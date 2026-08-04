@@ -2,6 +2,7 @@ import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import SectionHead from "@/components/landing/SectionHead";
+import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
 import { compoundLibrary } from "@/lib/compoundLibrary";
 import { getSlotUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ function EvidenceBar({ label, value, active }: { label: string; value: number; a
 export default function Compounds() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
+  const bgAnimating = useAnimateWhileVisible(sectionRef);
   const trackRef = useRef<HTMLDivElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(false);
@@ -55,7 +57,7 @@ export default function Compounds() {
   return (
     <section id="compounds" className="py-24 px-4 bg-noche relative overflow-hidden" ref={sectionRef}>
       <div
-        className="hero-light"
+        className={cn("hero-light", !bgAnimating && "anim-paused")}
         style={{
           width: 900,
           height: 900,
@@ -108,7 +110,7 @@ export default function Compounds() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.06, duration: 0.5 }}
-                className="shrink-0 basis-[354px] max-[520px]:basis-[84%] snap-start rounded-[calc(var(--radius)+5px)] overflow-hidden border border-background/13 bg-background/[.045] backdrop-blur-[14px] transition-all duration-400 hover:border-accent/40 hover:shadow-[0_26px_54px_-28px_rgba(0,0,0,0.8)]"
+                className="shrink-0 basis-[354px] max-[520px]:basis-[84%] snap-start rounded-[calc(var(--radius)+5px)] overflow-hidden border border-background/13 bg-background/[.045] backdrop-blur-[14px] max-[768px]:backdrop-blur-none max-[768px]:bg-background/9 max-[768px]:border-background/18 transition-all duration-400 hover:border-accent/40 hover:shadow-[0_26px_54px_-28px_rgba(0,0,0,0.8)]"
               >
                 <div className="relative leading-[0]">
                   <img

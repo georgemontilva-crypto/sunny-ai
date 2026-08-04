@@ -1,11 +1,17 @@
 import { motion } from "framer-motion";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import HeroCarousel from "@/components/landing/HeroCarousel";
+import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
+import { cn } from "@/lib/utils";
 
 const EASE = [0.23, 1, 0.32, 1] as const;
 
 export default function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const bgAnimating = useAnimateWhileVisible(sectionRef);
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -15,16 +21,19 @@ export default function Hero() {
 
   return (
     <section
+      ref={sectionRef}
       className="pt-40 pb-16 md:pb-32 px-4 min-h-screen flex items-center justify-center relative overflow-hidden scroll-mt-24 bg-noche"
       id="hero"
     >
       {/* Background: three drifting radial gold light layers + a grain layer
           to keep the gradients from banding — replaces the old hero-bg photo
-          entirely (the media slot itself is untouched, just unused here). */}
+          entirely (the media slot itself is untouched, just unused here).
+          Paused (not unmounted) while the section is scrolled out of view —
+          see useAnimateWhileVisible. */}
       <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <div className="hero-light hero-light-1" />
-        <div className="hero-light hero-light-2" />
-        <div className="hero-light hero-light-3" />
+        <div className={cn("hero-light hero-light-1", !bgAnimating && "anim-paused")} />
+        <div className={cn("hero-light hero-light-2", !bgAnimating && "anim-paused")} />
+        <div className={cn("hero-light hero-light-3", !bgAnimating && "anim-paused")} />
         <div className="hero-grain" />
       </div>
 
@@ -109,7 +118,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
             className="relative"
           >
-            <HeroCarousel />
+            <HeroCarousel bgAnimating={bgAnimating} />
           </motion.div>
         </div>
       </div>

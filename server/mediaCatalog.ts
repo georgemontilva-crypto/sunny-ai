@@ -59,6 +59,12 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     variants: {
       base: { width: 1400, recommended: { width: 1400, height: 700 } },
       "2x": { width: 2800, recommended: { width: 2800, height: 1400 } },
+      // Same 2:1 ratio as base, just smaller — width+height both set so
+      // this scales down cleanly instead of cropping (mediaVariants.ts
+      // only crops when the target ratio differs from the source's).
+      // Mobile viewports pick this via srcset instead of downloading the
+      // 1400px base.
+      mobile: { width: 700, height: 350, recommended: { width: 700, height: 350 } },
     },
   },
   {
@@ -67,6 +73,7 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     variants: {
       base: { width: 1400, recommended: { width: 1400, height: 700 } },
       "2x": { width: 2800, recommended: { width: 2800, height: 1400 } },
+      mobile: { width: 700, height: 350, recommended: { width: 700, height: 350 } },
     },
   },
   {
@@ -75,6 +82,7 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     variants: {
       base: { width: 1400, recommended: { width: 1400, height: 700 } },
       "2x": { width: 2800, recommended: { width: 2800, height: 1400 } },
+      mobile: { width: 700, height: 350, recommended: { width: 700, height: 350 } },
     },
   },
   {
