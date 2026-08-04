@@ -515,6 +515,42 @@
     filter: blur(50px);
     animation: hero-breathe 6s ease-in-out infinite alternate;
   }
+
+  /* Floating glass badges around the chat demo window (ChatDemo.tsx) — each
+     has its own position + float duration/delay, hidden under 1100px. */
+  .chat-badge {
+    position: absolute;
+    z-index: 3;
+  }
+
+  .chat-badge-1 {
+    top: 14%;
+    left: -2%;
+    animation: hero-float 7s ease-in-out infinite;
+  }
+
+  .chat-badge-2 {
+    bottom: 24%;
+    right: -3%;
+    animation: hero-float 8.5s ease-in-out 0.8s infinite;
+  }
+
+  .chat-badge-3 {
+    bottom: 6%;
+    left: 6%;
+    animation: hero-float 9s ease-in-out 1.4s infinite;
+  }
+
+  @media (max-width: 1100px) {
+    .chat-badge {
+      display: none;
+    }
+  }
+}
+
+@keyframes chat-typing-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
 }
 
 @keyframes hero-drift-1 {
@@ -558,8 +594,15 @@
   .hero-portrait-wrap::before,
   .pulse-dot::after,
   .warm-glow-drift,
-  .meetsunny-halo {
+  .meetsunny-halo,
+  .chat-badge-1,
+  .chat-badge-2,
+  .chat-badge-3 {
     animation: none !important;
     transition: none !important;
   }
+
+  /* The typing-indicator dots never mount under reduced motion at all — see
+     ChatDemo.tsx, which checks prefers-reduced-motion itself and skips
+     straight to the response — so no selector is needed here for them. */
 }
