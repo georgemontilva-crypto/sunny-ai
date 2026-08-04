@@ -106,9 +106,14 @@ export default function MeetSunny() {
               transition={{ duration: 0.6, delay: 0.5, ease: [0.23, 1, 0.32, 1] }}
               className="mt-8"
             >
-              <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full">
-                Ask a Research Question
-              </Button>
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full">
+                  Ask a Research Question
+                </Button>
+                <Button size="lg" variant="outline" className="text-base font-medium px-8 h-12 rounded-full">
+                  Learn More
+                </Button>
+              </div>
             </motion.div>
           </motion.div>
 
