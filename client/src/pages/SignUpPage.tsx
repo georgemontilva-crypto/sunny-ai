@@ -1,12 +1,17 @@
 import { AlertCircle } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Link, Redirect } from "wouter";
+import AuthBackdrop from "@/components/AuthBackdrop";
 import PasswordStrengthMeter from "@/components/PasswordStrengthMeter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useMemberAuth } from "@/hooks/useMemberAuth";
 import { getSlotUrl } from "@/lib/media";
+
+const FIELD_LABEL = "text-xs font-medium text-background/50 uppercase tracking-wide font-mono";
+const FIELD_INPUT =
+  "bg-background/5 border-background/14 text-background placeholder:text-background/50 rounded-lg focus-visible:ring-ring/18";
 
 export default function SignUpPage() {
   const { user, isLoading, signup } = useMemberAuth();
@@ -43,17 +48,21 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-noche px-4 py-12 relative overflow-hidden">
+      <AuthBackdrop />
+      <div className="w-full max-w-sm relative z-10">
         <div className="flex justify-center mb-6">
           <Link href="/">
             <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" />
           </Link>
         </div>
-        <form onSubmit={handleSubmit} className="bg-card border border-border/50 rounded-2xl p-8 space-y-5 shadow-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-background/5 backdrop-blur-[16px] backdrop-saturate-150 border border-background/13 rounded-[22px] p-8 space-y-5 shadow-[0_34px_74px_-44px_rgba(0,0,0,0.7)]"
+        >
           <div className="text-center mb-2">
-            <h1 className="text-xl font-bold text-foreground">Create your account</h1>
-            <p className="text-sm text-muted-foreground mt-1">Free to join. Talk to Sunny about your research goals.</p>
+            <h1 className="text-xl font-bold text-background">Create your account</h1>
+            <p className="text-sm text-background/60 mt-1">Free to join. Talk to Sunny about your research goals.</p>
           </div>
 
           {/* Honeypot: off-screen, not display:none — some bots skip fields hidden that way */}
@@ -71,45 +80,45 @@ export default function SignUpPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</label>
+            <label className={FIELD_LABEL}>Name</label>
             <Input
               type="text"
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="rounded-lg border-border/60 focus:border-accent/50"
+              className={FIELD_INPUT}
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Email</label>
+            <label className={FIELD_LABEL}>Email</label>
             <Input
               type="email"
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border-border/60 focus:border-accent/50"
+              className={FIELD_INPUT}
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
+            <label className={FIELD_LABEL}>Password</label>
             <PasswordInput
               autoComplete="new-password"
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border-border/60 focus:border-accent/50"
+              className={FIELD_INPUT}
               required
             />
-            <PasswordStrengthMeter password={password} />
-            <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+            <PasswordStrengthMeter password={password} dark />
+            <p className="text-xs text-background/50">At least 8 characters.</p>
           </div>
 
           <div className="space-y-3 pt-1">
-            <label className="flex items-start gap-2.5 text-sm text-foreground cursor-pointer">
+            <label className="flex items-start gap-2.5 text-sm text-background cursor-pointer">
               <input
                 type="checkbox"
                 checked={ageConfirmed}
@@ -118,7 +127,7 @@ export default function SignUpPage() {
               />
               I confirm that I am at least 21 years old.
             </label>
-            <label className="flex items-start gap-2.5 text-sm text-foreground cursor-pointer">
+            <label className="flex items-start gap-2.5 text-sm text-background cursor-pointer">
               <input
                 type="checkbox"
                 checked={termsConfirmed}
@@ -140,19 +149,23 @@ export default function SignUpPage() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-2 text-sm text-red-600">
+            <div className="flex items-start gap-2 text-sm text-red-400">
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
               <p>{error}</p>
             </div>
           )}
 
-          <Button type="submit" disabled={!canSubmit || submitting} className="w-full font-semibold rounded-lg px-6">
+          <Button
+            type="submit"
+            disabled={!canSubmit || submitting}
+            className="w-full font-semibold rounded-lg px-6 hero-cta-glow"
+          >
             {submitting ? "Creating your account…" : "Create account"}
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-background/60">
             Already have an account?{" "}
-            <Link href="/signin" className="text-accent hover:underline font-medium">
+            <Link href="/signin" className="text-background/60 hover:text-accent underline font-medium transition-colors">
               Sign in
             </Link>
           </p>

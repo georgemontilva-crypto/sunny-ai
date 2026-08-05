@@ -583,6 +583,12 @@
     animation: hero-drift-1 28s ease-in-out infinite;
   }
 
+  /* Second drift variant — used alongside .warm-glow-drift when a section
+     needs two independently-moving lights (auth pages) instead of one. */
+  .warm-glow-drift-2 {
+    animation: hero-drift-2 32s ease-in-out infinite;
+  }
+
   /* MeetSunny's portrait halo — same breathing keyframe as the hero aura,
      own duration/stops/blur (MeetSunny.tsx). */
   .meetsunny-halo {
@@ -669,6 +675,7 @@
   .hero-portrait-wrap::before,
   .pulse-dot::after,
   .warm-glow-drift,
+  .warm-glow-drift-2,
   .meetsunny-halo,
   .chat-badge-1,
   .chat-badge-2,

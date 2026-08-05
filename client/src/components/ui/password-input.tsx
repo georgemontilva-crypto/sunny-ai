@@ -17,7 +17,7 @@ export function PasswordInput({ className, ...props }: React.ComponentProps<"inp
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? "Hide password" : "Show password"}
         aria-pressed={visible}
-        className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground transition-colors"
+        className="absolute inset-y-0 right-0 flex items-center px-3 text-background/50 hover:text-accent transition-colors"
       >
         {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
       </button>

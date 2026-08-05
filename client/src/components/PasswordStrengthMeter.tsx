@@ -14,7 +14,9 @@ function scorePassword(password: string): number {
 const LABELS = ["Too short", "Weak", "Fair", "Good", "Strong"];
 const BAR_COLORS = ["bg-red-500", "bg-red-500", "bg-amber-500", "bg-lime-500", "bg-emerald-500"];
 
-export default function PasswordStrengthMeter({ password }: { password: string }) {
+// `dark` swaps the track/label colors for use on a --noche glass card (the
+// auth pages) — AccountPage stays on the default light-theme colors.
+export default function PasswordStrengthMeter({ password, dark = false }: { password: string; dark?: boolean }) {
   if (!password) return null;
   const score = scorePassword(password);
 
@@ -22,10 +24,13 @@ export default function PasswordStrengthMeter({ password }: { password: string }
     <div className="mt-2" aria-live="polite">
       <div className="flex gap-1 h-1.5">
         {[0, 1, 2, 3].map((i) => (
-          <div key={i} className={`flex-1 rounded-full transition-colors ${i < score ? BAR_COLORS[score] : "bg-secondary"}`} />
+          <div
+            key={i}
+            className={`flex-1 rounded-full transition-colors ${i < score ? BAR_COLORS[score] : dark ? "bg-background/14" : "bg-secondary"}`}
+          />
         ))}
       </div>
-      <p className="text-xs text-muted-foreground mt-1">{LABELS[score]}</p>
+      <p className={`text-xs mt-1 ${dark ? "text-background/50" : "text-muted-foreground"}`}>{LABELS[score]}</p>
     </div>
   );
 }
