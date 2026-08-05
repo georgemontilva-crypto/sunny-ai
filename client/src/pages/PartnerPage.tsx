@@ -404,7 +404,7 @@ export default function PartnerPage() {
             <Reveal>
               <Card className="p-8 h-full flex flex-col">
                 <span className="text-xs font-medium uppercase tracking-widest text-accent">Sunny Standard</span>
-                <h3 className="text-xl font-semibold mt-3">Embed Sunny, keep his name</h3>
+                <h3 className="text-xl font-semibold mt-3">Embed Sunny, keep her name</h3>
                 <p className="text-muted-foreground mt-2.5">
                   Get the same Sunny our brand uses — embedded on your site, trained on your catalog, branded
                   with the "Powered by Sunny" badge.
@@ -436,8 +436,8 @@ export default function PartnerPage() {
                 <span className="text-xs font-medium uppercase tracking-widest text-accent">Sunny White-Label</span>
                 <h3 className="text-xl font-semibold mt-3">Your brand. Your AI. Your closer.</h3>
                 <p className="text-muted-foreground mt-2.5">
-                  Rename him "Nova", "Aria", "Max" — anything. Your colors, your voice, your domain. Customers
-                  will think you built him in-house.
+                  Rename her "Nova", "Aria", "Max" — anything. Your colors, your voice, your domain. Customers
+                  will think you built her in-house.
                 </p>
                 <div className="mt-6 text-4xl font-bold tracking-tight">
                   <span>{whitelabelPrice}</span>
