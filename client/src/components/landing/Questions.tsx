@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Link } from "wouter";
 import { GripVertical, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionHead from "@/components/landing/SectionHead";
@@ -167,16 +168,10 @@ export default function Questions() {
         <div className="grid grid-cols-3 max-[900px]:grid-cols-2 max-[600px]:grid-cols-1 gap-5 items-start">
           {cards.map((q, i) => {
             const isDropTarget = editMode && overId === q.image && dragId !== q.image;
-            return (
-              <motion.div
-                key={q.image}
-                initial={{ opacity: 0, y: 24 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
-              >
-                {/* IMPORTANT: this must stay a <div> (display:block) — a
-                    <span> here silently drops the .txt block's vertical
-                    padding and the copy ends up glued to the card edge. */}
+            // IMPORTANT: this must stay a <div> (display:block) — a <span>
+            // here silently drops the .txt block's vertical padding and the
+            // copy ends up glued to the card edge.
+            const card = (
                 <div
                   draggable={editMode}
                   onDragStart={editMode ? () => setDragId(q.image) : undefined}
@@ -260,6 +255,27 @@ export default function Questions() {
                     </span>
                   </div>
                 </div>
+            );
+            return (
+              <motion.div
+                key={q.image}
+                initial={{ opacity: 0, y: 24 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: (i % 3) * 0.08, duration: 0.5 }}
+              >
+                {/* The whole card is the link to /chat — the "Ask Sunny"
+                    row at the bottom is its label, not a separate control
+                    (it always looked clickable; now it is). Never wrapped
+                    while reordering: an <a> around a draggable element
+                    makes the browser start its own native link-drag
+                    instead, and every drop would navigate away mid-edit. */}
+                {editMode ? (
+                  card
+                ) : (
+                  <Link href="/chat" className="block" aria-label={`Ask Sunny: ${q.question}`}>
+                    {card}
+                  </Link>
+                )}
               </motion.div>
             );
           })}

@@ -88,6 +88,32 @@ async function main() {
   let template = fs.readFileSync(TEMPLATE_CACHE, "utf-8");
   fs.mkdirSync(DIST_DIR, { recursive: true });
 
+  // Lynx chat widget config -> the `null` placeholder in the index.html
+  // loader (see the long comment there). Substituted here rather than at
+  // `vite build` time for the same reason the favicons are: a live
+  // republish re-runs only this script, so anything resolved in the vite
+  // plugin would go stale in dist/ the moment the cached template is
+  // re-spliced. Throws instead of silently shipping a dead loader — the
+  // placeholder is the loader's own bail-out condition, so a typo here
+  // would show up as "the chat just isn't there", with nothing in the
+  // console to explain why.
+  const CHAT_WIDGET_PLACEHOLDER = "/* __CHAT_WIDGET_CONFIG__ */ null";
+  if (!template.includes(CHAT_WIDGET_PLACEHOLDER)) {
+    throw new Error(
+      `Expected ${CHAT_WIDGET_PLACEHOLDER} in the cached template — client/index.html's chat widget loader changed shape.`
+    );
+  }
+  const chatWidgetConfig = {
+    src: SITE.chatWidgetSrc,
+    apiKey: SITE.chatWidgetKey,
+    hiddenRoutes: SITE.chatWidgetHiddenRoutes,
+    consent: SITE.consent,
+  };
+  template = template.replace(
+    CHAT_WIDGET_PLACEHOLDER,
+    JSON.stringify(chatWidgetConfig).replace(/</g, "\\u003c")
+  );
+
   // Loaded once, used below for: the favicon/preload <link>s, resolving
   // og:image, window.__MEDIA_MAP__ (so hydration doesn't clobber this
   // render with the client bundle's frozen import — see
@@ -224,7 +250,20 @@ async function main() {
     `<title>Panel — ${SITE.name}</title>`,
     `<meta name="robots" content="noindex, nofollow" />`,
   ].join("\n    ");
-  const adminShell = template.replace("<!--app-html-->", "").replace("<!--app-head-->", adminHeadHtml);
+  // Neither shell gets the chat widget loader at all. The loader already
+  // checks SITE.chatWidgetHiddenRoutes at runtime and would bail on every
+  // path these two files serve, but stripping the block outright means the
+  // bytes are never shipped to /admin or the member pages in the first
+  // place — and it can't be re-armed there by a stray consent event.
+  const shellTemplate = template.replace(
+    /[ \t]*<!--chat-widget-start-->[\s\S]*?<!--chat-widget-end-->\r?\n/,
+    ""
+  );
+  if (shellTemplate === template) {
+    throw new Error("Expected the <!--chat-widget-start--> block in the cached template to strip for the shells.");
+  }
+
+  const adminShell = shellTemplate.replace("<!--app-html-->", "").replace("<!--app-head-->", adminHeadHtml);
   fs.mkdirSync(path.join(DIST_DIR, "admin"), { recursive: true });
   fs.writeFileSync(path.join(DIST_DIR, "admin", "index.html"), adminShell, "utf-8");
   console.log("[prerender] wrote /admin/index.html (empty shell)");
@@ -237,7 +276,7 @@ async function main() {
   const appShellHeadHtml = [`<title>${SITE.name}</title>`, `<meta name="robots" content="noindex, nofollow" />`].join(
     "\n    "
   );
-  const appShell = template.replace("<!--app-html-->", "").replace("<!--app-head-->", appShellHeadHtml);
+  const appShell = shellTemplate.replace("<!--app-html-->", "").replace("<!--app-head-->", appShellHeadHtml);
   fs.writeFileSync(path.join(DIST_DIR, "app-shell.html"), appShell, "utf-8");
   console.log("[prerender] wrote /app-shell.html (empty shell for /signin, /signup, /chat, /account)");
 

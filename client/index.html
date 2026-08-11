@@ -23,6 +23,88 @@
   <body>
     <div id="root"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!--chat-widget-start-->
+    <!--
+      Lynx chat bubble. Deliberately NOT a plain <script src ... defer> tag.
+
+      `defer` still makes the browser fetch the third party during initial
+      page load, on a page already sitting at ~50/100 on mobile Lighthouse —
+      it competes with the LCP image for bandwidth on a phone. This loader
+      injects it only once the visitor shows intent (first scroll) or after
+      3s of idle, whichever comes first, so it can never be in flight while
+      the hero is still painting.
+
+      It also refuses to inject at all until the 21+ ConsentGate has been
+      accepted. That is the *only* reliable way to keep the chat behind the
+      gate: Lynx pins its bubble at z-index 2147483647 — the 32-bit maximum
+      — as an inline !important style, which outranks anything an author
+      stylesheet can say, so no modal can ever be layered above it. The
+      bubble simply must not exist yet. (ChatWidgetRouteGate.tsx clamps it
+      back down to 30 once it does.)
+
+      The `null` below is replaced with the real config by
+      scripts/prerender.mjs, from SITE in shared/site.ts — one place to edit
+      the key. The dev server does the same substitution via the
+      chat-widget-config plugin in vite.config.ts. If it is ever left
+      unsubstituted, cfg stays null and this whole block quietly does
+      nothing rather than injecting a broken script tag.
+    -->
+    <script>
+      (function () {
+        var cfg = /* __CHAT_WIDGET_CONFIG__ */ null;
+        if (!cfg || !cfg.src || !cfg.apiKey) return;
+
+        var path = location.pathname.replace(/\/+$/, "") || "/";
+        for (var i = 0; i < cfg.hiddenRoutes.length; i++) {
+          var route = cfg.hiddenRoutes[i];
+          if (path === route || path.indexOf(route + "/") === 0) return;
+        }
+
+        var timer = null;
+        var injected = false;
+
+        function inject() {
+          if (injected) return;
+          injected = true;
+          window.removeEventListener("scroll", inject);
+          if (timer) clearTimeout(timer);
+          var script = document.createElement("script");
+          script.src = cfg.src;
+          script.async = true;
+          script.setAttribute("data-api-key", cfg.apiKey);
+          document.body.appendChild(script);
+        }
+
+        function arm() {
+          window.addEventListener("scroll", inject, { once: true, passive: true });
+          timer = setTimeout(inject, 3000);
+        }
+
+        function hasConsent() {
+          try {
+            var raw = localStorage.getItem(cfg.consent.storageKey);
+            if (!raw) return false;
+            var parsed = JSON.parse(raw);
+            return parsed.accepted === true && parsed.version === cfg.consent.version;
+          } catch (err) {
+            // localStorage unavailable (private browsing): treat as no
+            // consent. The gate will ask again, and this waits for it.
+            return false;
+          }
+        }
+
+        if (hasConsent()) {
+          arm();
+        } else {
+          // Dispatched by ConsentGate.tsx the moment "I agree and enter" is
+          // accepted, so a first-time visitor still gets the bubble in the
+          // same session without a reload.
+          window.addEventListener("sunny:consent-accepted", arm, { once: true });
+        }
+      })();
+    </script>
+    <!--chat-widget-end-->
   </body>
 
 </html>

@@ -6,10 +6,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 
+// `href` starting with "#" scrolls to a section on Home; anything else is a
+// real route. Chat sits between Compounds and Contact as asked — placed
+// after Goals specifically, so the four section anchors stay in the same
+// order as the sections themselves and the one real route doesn't split
+// them down the middle.
 const navLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Compounds", href: "#compounds" },
   { label: "Goals", href: "#goals" },
+  { label: "Chat", href: "/chat" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -78,15 +84,25 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden min-[900px]:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <button
-                key={link.href}
-                onClick={() => scrollToSection(link.href)}
-                className="pill-link px-4 py-2 text-sm text-background/85 hover:text-background rounded-full"
-              >
-                {link.label}
-              </button>
-            ))}
+            {navLinks.map((link) =>
+              link.href.startsWith("#") ? (
+                <button
+                  key={link.href}
+                  onClick={() => scrollToSection(link.href)}
+                  className="pill-link px-4 py-2 text-sm text-background/85 hover:text-background rounded-full"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="pill-link px-4 py-2 text-sm text-background/85 hover:text-background rounded-full"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
             <Link
               href="/partner"
               className="pill-link px-4 py-2 text-sm text-background/85 hover:text-background rounded-full"
@@ -131,18 +147,33 @@ export default function Navbar() {
           >
             <div className="h-14 shrink-0" aria-hidden="true" />
             <div className="flex-1 flex flex-col justify-center px-8 gap-2">
-              {navLinks.map((link, i) => (
-                <motion.button
-                  key={link.href}
-                  onClick={() => scrollToSection(link.href)}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06, duration: 0.4, ease: EASE }}
-                  className="mobile-menu-link text-left text-background py-2"
-                >
-                  {link.label}
-                </motion.button>
-              ))}
+              {navLinks.map((link, i) => {
+                const motionProps = {
+                  initial: { opacity: 0, y: 16 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { delay: i * 0.06, duration: 0.4, ease: EASE },
+                } as const;
+                return link.href.startsWith("#") ? (
+                  <motion.button
+                    key={link.href}
+                    onClick={() => scrollToSection(link.href)}
+                    {...motionProps}
+                    className="mobile-menu-link text-left text-background py-2"
+                  >
+                    {link.label}
+                  </motion.button>
+                ) : (
+                  <motion.div key={link.href} {...motionProps}>
+                    <Link
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="mobile-menu-link block text-background py-2"
+                    >
+                      {link.label}
+                    </Link>
+                  </motion.div>
+                );
+              })}
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}

@@ -1,5 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "wouter";
 import { getSlotDef } from "@server/mediaCatalog.ts";
 import { Button } from "@/components/ui/button";
 import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
@@ -110,8 +111,8 @@ export default function MeetSunny() {
               className="mt-8"
             >
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full">
-                  Ask a Research Question
+                <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full" asChild>
+                  <Link href="/chat">Ask a Research Question</Link>
                 </Button>
                 <Button size="lg" variant="outline" className="text-base font-medium px-8 h-12 rounded-full">
                   Learn More

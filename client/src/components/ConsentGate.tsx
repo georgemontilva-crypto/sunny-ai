@@ -3,11 +3,14 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { ShieldCheck } from "lucide-react";
+import { SITE } from "@shared/site";
 
-const STORAGE_KEY = "sunny-consent";
-// Bump this if the terms change — anyone who accepted an older version gets
-// asked again.
-const CONSENT_VERSION = 1;
+// Both live in shared/site.ts because the chat widget loader in
+// client/index.html reads the same localStorage record — it must not inject
+// Lynx's bubble until this gate has been accepted. Bump `version` there if
+// the terms change: anyone who accepted an older version gets asked again.
+const STORAGE_KEY = SITE.consent.storageKey;
+const CONSENT_VERSION = SITE.consent.version;
 const TERMS_ID = "consent-terms";
 
 interface StoredConsent {
@@ -95,6 +98,10 @@ export default function ConsentGate() {
     if (!canAccept) return;
     saveConsent();
     setVisible(false);
+    // Releases the chat widget loader in client/index.html, which has been
+    // parked waiting for exactly this event since page load. Without it a
+    // first-time visitor would have to reload before the bubble appeared.
+    window.dispatchEvent(new Event("sunny:consent-accepted"));
   };
 
   const handleDecline = () => {

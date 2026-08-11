@@ -6,6 +6,7 @@ import { queryClient, trpc, trpcClient } from "@/lib/trpc";
 import NotFound from "@/pages/NotFound";
 import { Redirect, Route, Switch } from "wouter";
 import { useSeoMeta } from "./hooks/useSeoMeta";
+import ChatWidgetRouteGate from "./components/ChatWidgetRouteGate";
 import ConsentGate from "./components/ConsentGate";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
@@ -54,6 +55,7 @@ function Router() {
   return (
     <>
       <ScrollToTop />
+      <ChatWidgetRouteGate />
       <Suspense fallback={<RouteFallback />}>
         <Switch>
           <Route path={"/"} component={Home} />
@@ -70,11 +72,13 @@ function Router() {
           (a generic noindex empty shell, same idea as /admin's) for a direct hit. */}
           <Route path={"/signin"} component={SignInPage} />
           <Route path={"/signup"} component={SignUpPage} />
-          <Route path={"/chat"}>
-            <MemberGuarded>
-              <ChatPage />
-            </MemberGuarded>
-          </Route>
+          {/* Public on purpose, unlike /account below. The chat itself is
+          served by Lynx, not by us, and the same assistant is already one
+          click away from every public page via the floating bubble — a
+          guard here would only add friction to the full-screen version of
+          something that is already open. Still noindex (see lib/seo.ts):
+          not secret, just not ours to have indexed. */}
+          <Route path={"/chat"} component={ChatPage} />
           <Route path={"/account"}>
             <MemberGuarded>
               <AccountPage />

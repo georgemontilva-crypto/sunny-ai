@@ -562,6 +562,12 @@
     transform: translateY(-2px);
   }
 
+  /* There is deliberately no rule here for the Lynx chat widget. It builds
+     its elements with `z-index:...!important` in the style *attribute*, and
+     an important inline declaration outranks an important declaration in an
+     author stylesheet — a rule here would lose no matter what it said.
+     ChatWidgetRouteGate.tsx writes those inline styles from JS instead. */
+
   /* Reusable radial gold glow for other dark sections (MeetSunny, Footer) —
      geometry (size/position) is set per-instance via inline style since it
      differs each time; this just carries the gradient + drift animation. */

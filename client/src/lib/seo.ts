@@ -46,11 +46,28 @@ export function getMetaForPath(path: string): HeadMeta {
     };
   }
 
+  // /chat is publicly reachable (no MemberGuarded — see App.tsx), but it's
+  // still never indexed: the page is a full-screen iframe of Lynx's chat,
+  // so there is no content of ours on it for a crawler to rank, and it's
+  // deliberately absent from both the sitemap and scripts/prerender.mjs's
+  // route list. Unlike the member pages below it gets a real description —
+  // it's a page we link to from the navbar and from three CTAs, so it can
+  // legitimately end up in a share preview.
+  if (clean === "/chat") {
+    return {
+      title: `Chat — ${NAME}`,
+      description:
+        "Ask Sunny about peptide research and get educational summaries of what the literature says. Not medical advice. Adults 21+.",
+      canonicalPath: "/chat",
+      noindex: true,
+    };
+  }
+
   // Member account pages, same reasoning as /admin above: never indexed,
   // regardless of SITE.indexable, and not part of withNoindex()'s per-route
   // defaults that flip once the site goes public.
-  if (clean === "/signin" || clean === "/signup" || clean === "/chat" || clean === "/account") {
-    const labels: Record<string, string> = { "/signin": "Sign in", "/signup": "Create account", "/chat": "Chat", "/account": "Account" };
+  if (clean === "/signin" || clean === "/signup" || clean === "/account") {
+    const labels: Record<string, string> = { "/signin": "Sign in", "/signup": "Create account", "/account": "Account" };
     return {
       title: `${labels[clean]} — ${NAME}`,
       description: `${NAME} account.`,

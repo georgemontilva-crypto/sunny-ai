@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { Link } from "wouter";
 import HeroCarousel from "@/components/landing/HeroCarousel";
 import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
 import { cn } from "@/lib/utils";
@@ -87,9 +88,11 @@ export default function Hero() {
               transition={{ duration: 0.6, delay: 0.3, ease: EASE }}
               className="flex flex-col sm:flex-row items-start gap-3"
             >
-              <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full">
-                Start Exploring
-                <ArrowRight className="w-4 h-4 ml-2" />
+              <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full" asChild>
+                <Link href="/chat">
+                  Start Exploring
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
               </Button>
               <Button
                 size="lg"
