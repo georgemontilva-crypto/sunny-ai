@@ -5,7 +5,7 @@
 // every public page and inside the /chat iframe URL, so anyone can read it
 // from view-source. It identifies which assistant to serve, it doesn't
 // authorize anything — the private keys stay on Lynx's side.
-const CHAT_WIDGET_KEY = "lx_eee26ff5455327788b1cfc5c83389aff09f06b47162d8003";
+const CHAT_WIDGET_KEY = "lx_65fe1ca24a3d807cb8565b931e91035093c4b3bd2d91378a";
 
 export const SITE = {
   name: "Sunny",

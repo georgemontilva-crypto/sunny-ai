@@ -26,12 +26,22 @@ const DIST_DIR = process.env.PRERENDER_OUT_DIR ? path.resolve(process.env.PREREN
 const SSR_TMP_DIR = path.join(ROOT, ".ssr-tmp");
 const TEMPLATE_CACHE = path.join(ROOT, "dist-server", ".prerender-template.html");
 
-// manifest.json's colors, kept in sync by hand with client/src/index.css's
-// light-theme :root block — --background ("Arena") and --accent ("Sol").
-// Not worth parsing CSS at build time for two values that change on a
-// redesign, not a routine edit.
+// manifest.json's colors. Not worth parsing CSS at build time for two values
+// that change on a redesign, not a routine edit.
+//
+// background_color still tracks client/src/index.css's light-theme :root
+// --background ("Arena"), kept in sync by hand.
+//
+// theme_color deliberately no longer tracks --accent ("Sol", #E9A020). It is
+// the Lynx assistant's own `primaryColor`, as returned by
+// GET /api/widget/config for SITE.chatWidgetKey — so the browser/PWA chrome
+// matches the chat the site is built around. Hex rather than oklch() to match
+// the value at its source, and because manifest colors are parsed by the OS
+// launcher, not the CSS engine. Kept identical to the <meta name="theme-color">
+// in client/index.html. If the assistant's primary color is changed in Lynx's
+// panel, both need updating by hand.
 const MANIFEST_BACKGROUND_COLOR = "oklch(0.9598 0.016 82.79)";
-const MANIFEST_THEME_COLOR = "oklch(0.7587 0.153 74.46)";
+const MANIFEST_THEME_COLOR = "#403911";
 
 function escapeHtml(s) {
   return s

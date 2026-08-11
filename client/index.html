@@ -10,6 +10,10 @@
     <!--app-head-->
 
     <link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 940px) 100vw, 57vw" />
+    <!-- Matches manifest.json's theme_color (scripts/prerender.mjs) — both are
+         the Lynx assistant's own primaryColor, so browser chrome, the PWA
+         launcher and the chat agree on one color. Update both together. -->
+    <meta name="theme-color" content="#403911" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
