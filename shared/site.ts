@@ -2,10 +2,10 @@
 // dominio final (canonical, sitemap, robots.txt, og tags, JSON-LD) importa de
 // aquí — para cambiar de dominio basta con editar la línea de `domain`.
 // Lynx's public embed key. Not a secret: it ships inside a <script> tag on
-// every public page and inside the /chat iframe URL, so anyone can read it
-// from view-source. It identifies which assistant to serve, it doesn't
-// authorize anything — the private keys stay on Lynx's side.
-const CHAT_WIDGET_KEY = "lx_65fe1ca24a3d807cb8565b931e91035093c4b3bd2d91378a";
+// every public page and in the data-api-key attribute of the /chat loader, so
+// anyone can read it from view-source. It identifies which assistant to serve,
+// it doesn't authorize anything — the private keys stay on Lynx's side.
+const CHAT_WIDGET_KEY = "lx_d9bc4b4dded89638fd1ade26797509c4936fa6dd257117de";
 
 export const SITE = {
   name: "Sunny",
@@ -26,11 +26,19 @@ export const SITE = {
   // --- Lynx chat integration -------------------------------------------
   // Single place to change the embed. `chatWidgetSrc`/`chatWidgetKey` feed
   // the floating bubble that client/index.html injects on every public page
-  // (scripts/prerender.mjs substitutes them into the template); `chatEmbedUrl`
-  // feeds the full-page iframe on /chat (client/src/pages/ChatPage.tsx).
+  // (scripts/prerender.mjs substitutes them into the template);
+  // `chatPageLoaderSrc` feeds the full-page chat on /chat
+  // (client/src/pages/ChatPage.tsx), which injects it as a <script> on mount
+  // rather than hard-coding an iframe URL.
   chatWidgetKey: CHAT_WIDGET_KEY,
   chatWidgetSrc: "https://www.lynxaiassistant.com/api/widget.js",
-  chatEmbedUrl: `https://www.lynxaiassistant.com/chat/${CHAT_WIDGET_KEY}`,
+  chatPageLoaderSrc: "https://www.lynxaiassistant.com/api/widget/page.js",
+  // Spinner colour for the /chat loader, kept identical to
+  // MANIFEST_THEME_COLOR in scripts/prerender.mjs so the page and the PWA
+  // chrome agree. Note this is no longer the assistant's `primaryColor` —
+  // GET /api/widget/config now returns #000000 for it, so prerender.mjs's
+  // comment claiming the two track each other is out of date.
+  chatAccent: "#403911",
 
   // Paths (and their subtrees) where the floating bubble must never appear.
   // /admin is staff-only and /signin, /signup, /account are transactional —
