@@ -169,14 +169,9 @@ export default function PartnerPage() {
   const partnerHero2xUrl = getSlotUrl("partner-hero", "2x");
   const partnerHeroRecommended = getSlotDef("partner-hero")?.variants.base?.recommended;
 
-  const standardPrice = getSetting("plan_standard_price") || "$799";
-  const standardPeriod = getSetting("plan_standard_period") || "/month";
-  const standardSetup = getSetting("plan_standard_setup") || "+ $1,500 one-time setup fee";
-  const standardNote = getSetting("plan_standard_note") || "Cancel monthly · No long-term contract";
-  const whitelabelPrice = getSetting("plan_whitelabel_price") || "Custom";
-  const whitelabelNote =
-    getSetting("plan_whitelabel_note") ||
-    "Starting at $2,500 setup + $999/mo · Minimum 6 months · Pricing scales with traffic & customization";
+  // The plan_* pricing settings still live in the DB and in /admin/settings, but the
+  // page no longer reads them — the cards quote on request instead. To show prices
+  // again, read those keys back into the plan cards below.
   const contactPhone = getSetting("partner_contact_phone");
   const contactEmail = getSetting("partner_contact_email");
 
@@ -397,7 +392,9 @@ export default function PartnerPage() {
         <div className="container mx-auto max-w-7xl">
           <Reveal className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Two ways to run it.</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">Both go live in under a week.</p>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Both go live in under a week. Tell us which one fits and we'll scope it on the call.
+            </p>
           </Reveal>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -409,12 +406,7 @@ export default function PartnerPage() {
                   Get the same Sunny our brand uses — embedded on your site, trained on your catalog, branded
                   with the "Powered by Sunny" badge.
                 </p>
-                <div className="mt-6 text-4xl font-bold tracking-tight">
-                  <span>{standardPrice}</span>
-                  <span className="text-base font-medium text-muted-foreground ml-2">{standardPeriod}</span>
-                </div>
-                <p className="mt-1.5 text-xs text-muted-foreground">{standardSetup}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{standardNote}</p>
+                <div className="mt-6 text-lg font-semibold tracking-tight">Pricing on request</div>
                 <ul className="mt-6 mb-8 space-y-0">
                   {standardFeatures.map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
@@ -439,10 +431,7 @@ export default function PartnerPage() {
                   Rename her "Nova", "Aria", "Max" — anything. Your colors, your voice, your domain. Customers
                   will think you built her in-house.
                 </p>
-                <div className="mt-6 text-4xl font-bold tracking-tight">
-                  <span>{whitelabelPrice}</span>
-                </div>
-                <p className="mt-1.5 text-xs text-muted-foreground">{whitelabelNote}</p>
+                <div className="mt-6 text-lg font-semibold tracking-tight">Custom pricing</div>
                 <ul className="mt-6 mb-8 space-y-0">
                   {whitelabelFeatures.map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
