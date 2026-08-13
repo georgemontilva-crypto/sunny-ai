@@ -406,7 +406,7 @@ export default function PartnerPage() {
                   Get the same Sunny our brand uses — embedded on your site, trained on your catalog, branded
                   with the "Powered by Sunny" badge.
                 </p>
-                <div className="mt-6 text-lg font-semibold tracking-tight">Pricing on request</div>
+                <div className="mt-6 text-lg font-semibold tracking-tight">Contact us for pricing</div>
                 <ul className="mt-6 mb-8 space-y-0">
                   {standardFeatures.map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
@@ -415,7 +415,7 @@ export default function PartnerPage() {
                   ))}
                 </ul>
                 <Button variant="outline" className="mt-auto w-full" asChild>
-                  <a href="/contact?plan=standard">Get Sunny Standard</a>
+                  <a href="/contact?plan=standard">Contact us for pricing</a>
                 </Button>
               </Card>
             </Reveal>
@@ -431,7 +431,7 @@ export default function PartnerPage() {
                   Rename her "Nova", "Aria", "Max" — anything. Your colors, your voice, your domain. Customers
                   will think you built her in-house.
                 </p>
-                <div className="mt-6 text-lg font-semibold tracking-tight">Custom pricing</div>
+                <div className="mt-6 text-lg font-semibold tracking-tight">Contact us for pricing</div>
                 <ul className="mt-6 mb-8 space-y-0">
                   {whitelabelFeatures.map((f) => (
                     <li key={f} className="flex gap-3 py-3 border-b border-border text-[15px]">
@@ -441,7 +441,7 @@ export default function PartnerPage() {
                 </ul>
                 <Button className="mt-auto w-full group" asChild>
                   <a href="/contact?plan=whitelabel">
-                    Talk to Sales
+                    Contact us for pricing
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </a>
                 </Button>
