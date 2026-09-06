@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Calendar, ArrowLeft, BookOpen } from "lucide-react";
 import { getPostBySlug } from "@/lib/blog";
+import { getSlotUrl } from "@/lib/media";
+import { POST_PROSE_CLASSNAME, renderMarkdown } from "@/lib/markdown";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
@@ -34,7 +36,7 @@ export default function BlogPostPage() {
     );
   }
 
-  const { meta, Component } = post;
+  const coverUrl = post.coverSlot ? getSlotUrl(post.coverSlot) : undefined;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -49,37 +51,37 @@ export default function BlogPostPage() {
         </div>
 
         <header className="mb-10">
-          <div className="flex items-center gap-3 mb-5">
-            <Badge variant="secondary" className="text-xs">{meta.category}</Badge>
-          </div>
+          {coverUrl && (
+            <img
+              src={coverUrl}
+              alt=""
+              className="w-full aspect-[16/9] object-cover rounded-2xl border border-border/50 mb-8"
+            />
+          )}
 
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight mb-6">{meta.title}</h1>
+          {post.category && (
+            <div className="flex items-center gap-3 mb-5">
+              <Badge variant="secondary" className="text-xs">{post.category}</Badge>
+            </div>
+          )}
 
-          <p className="text-xl text-muted-foreground leading-relaxed mb-8">{meta.description}</p>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight leading-tight mb-6">{post.title}</h1>
+
+          <p className="text-xl text-muted-foreground leading-relaxed mb-8">{post.excerpt}</p>
 
           <div className="flex items-center gap-6 text-sm text-muted-foreground pb-8 border-b border-border/50">
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              {formatDate(meta.date)}
+              {formatDate(post.publishedAt)}
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
-              {meta.readingTimeMinutes} min de lectura
+              {post.readingTimeMinutes} min de lectura
             </span>
           </div>
         </header>
 
-        <div
-          className="prose prose-lg max-w-none
-            prose-headings:font-bold prose-headings:tracking-tight
-            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-            prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-            prose-p:text-muted-foreground prose-p:leading-relaxed prose-p:mb-5
-            prose-ul:text-muted-foreground prose-li:mb-2
-            prose-strong:text-foreground prose-strong:font-semibold"
-        >
-          <Component />
-        </div>
+        <div className={POST_PROSE_CLASSNAME}>{renderMarkdown(post.content)}</div>
 
         <div className="mt-16 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
           <h3 className="text-xl font-bold mb-3">¿Tienes preguntas sobre un compuesto?</h3>

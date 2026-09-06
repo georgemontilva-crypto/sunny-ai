@@ -8,6 +8,7 @@ import { useAdminAuth } from "@/hooks/useAdminAuth";
 const NAV_ITEMS = [
   { href: "/admin/requests", label: "Requests" },
   { href: "/admin/media", label: "Media" },
+  { href: "/admin/blog", label: "Blog" },
   { href: "/admin/settings", label: "Settings" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/audit", label: "Audit log" },

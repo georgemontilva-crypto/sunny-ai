@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar, ArrowRight, BookOpen, Rss } from "lucide-react";
-import { getAllPosts, type BlogPostMeta } from "@/lib/blog";
+import { getAllPosts, type BlogPost } from "@/lib/blog";
+import { getSlotUrl } from "@/lib/media";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
@@ -14,8 +15,11 @@ function formatDate(date: string) {
   });
 }
 
-function BlogCard({ post, index }: { post: BlogPostMeta; index: number }) {
+function BlogCard({ post, index }: { post: BlogPost; index: number }) {
   const isFirst = index === 0;
+  // Empty until an image is uploaded to that slot in /admin/media — the
+  // card falls back to its icon placeholder rather than a broken <img>.
+  const coverUrl = post.coverSlot ? getSlotUrl(post.coverSlot) : undefined;
 
   return (
     <motion.article
@@ -27,12 +31,23 @@ function BlogCard({ post, index }: { post: BlogPostMeta; index: number }) {
       <Link href={`/blog/${post.slug}`} className="block h-full">
         <div className="h-full rounded-2xl border border-border/50 bg-card overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
           <div className={`relative overflow-hidden ${isFirst ? "h-56" : "h-44"} bg-muted/40 flex items-center justify-center`}>
-            <BookOpen className="w-16 h-16 text-primary/20" />
-            <div className="absolute top-4 left-4">
-              <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-xs font-medium">
-                {post.category}
-              </Badge>
-            </div>
+            {coverUrl ? (
+              <img
+                src={coverUrl}
+                alt=""
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+              />
+            ) : (
+              <BookOpen className="w-16 h-16 text-primary/20" />
+            )}
+            {post.category && (
+              <div className="absolute top-4 left-4">
+                <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-xs font-medium">
+                  {post.category}
+                </Badge>
+              </div>
+            )}
           </div>
 
           <div className="p-6">
@@ -40,14 +55,14 @@ function BlogCard({ post, index }: { post: BlogPostMeta; index: number }) {
               {post.title}
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed mb-5 line-clamp-3">
-              {post.description}
+              {post.excerpt}
             </p>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5" />
-                  {formatDate(post.date)}
+                  {formatDate(post.publishedAt)}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" />

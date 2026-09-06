@@ -34,6 +34,8 @@ import MemberGuarded from "@/components/member/MemberGuarded";
 const AdminLoginPage = lazy(() => import("@/pages/admin/AdminLoginPage"));
 const AdminRequestsPage = lazy(() => import("@/pages/admin/AdminRequestsPage"));
 const AdminMediaPage = lazy(() => import("@/pages/admin/AdminMediaPage"));
+const AdminBlogPage = lazy(() => import("@/pages/admin/AdminBlogPage"));
+const AdminBlogEditorPage = lazy(() => import("@/pages/admin/AdminBlogEditorPage"));
 const AdminSettingsPage = lazy(() => import("@/pages/admin/AdminSettingsPage"));
 const AdminUsersPage = lazy(() => import("@/pages/admin/AdminUsersPage"));
 const AdminAuditPage = lazy(() => import("@/pages/admin/AdminAuditPage"));
@@ -95,6 +97,22 @@ function Router() {
           <Route path={"/admin/media"}>
             <AdminGuarded>
               <AdminMediaPage />
+            </AdminGuarded>
+          </Route>
+          <Route path={"/admin/blog"}>
+            <AdminGuarded>
+              <AdminBlogPage />
+            </AdminGuarded>
+          </Route>
+          {/* Before the :id route below — otherwise "new" is read as a post id. */}
+          <Route path={"/admin/blog/new"}>
+            <AdminGuarded>
+              <AdminBlogEditorPage />
+            </AdminGuarded>
+          </Route>
+          <Route path={"/admin/blog/:id"}>
+            <AdminGuarded>
+              <AdminBlogEditorPage />
             </AdminGuarded>
           </Route>
           <Route path={"/admin/settings"}>

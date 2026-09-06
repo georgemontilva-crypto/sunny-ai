@@ -17,6 +17,14 @@ build/
 # first run if it's missing.
 client/src/generated/media-map.json
 
+# Same reasoning, for the blog. Committing it would freeze whole article
+# bodies into the repo on every build, and re-freeze them into the client
+# bundle (see client/src/lib/blog.ts's window.__BLOG_MAP__ fallback path).
+# scripts/generate-blog-map.ts always writes it — including an empty list
+# when there's no DATABASE_URL — and runs before `vite build` in the build
+# script, so a fresh clone never hits a missing import.
+client/src/generated/blog-map.json
+
 # Environment variables
 .env
 .env.local

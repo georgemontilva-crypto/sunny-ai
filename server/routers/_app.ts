@@ -1,5 +1,6 @@
 import { auditRouter } from "./audit.ts";
 import { authRouter } from "./auth.ts";
+import { blogRouter } from "./blog.ts";
 import { mediaRouter } from "./media.ts";
 import { memberRouter } from "./member.ts";
 import { requestsRouter } from "./requests.ts";
@@ -11,6 +12,7 @@ export const appRouter = router({
   auth: authRouter,
   requests: requestsRouter,
   media: mediaRouter,
+  blog: blogRouter,
   settings: settingsRouter,
   users: usersRouter,
   audit: auditRouter,

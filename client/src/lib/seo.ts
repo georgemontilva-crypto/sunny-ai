@@ -25,6 +25,7 @@ const ADMIN_LABELS: Record<string, string> = {
   "/admin/login": "Sign in",
   "/admin/requests": "Requests",
   "/admin/media": "Media",
+  "/admin/blog": "Blog",
   "/admin/settings": "Settings",
   "/admin/users": "Users",
   "/admin/audit": "Audit log",
@@ -105,9 +106,13 @@ export function getMetaForPath(path: string): HeadMeta {
   if (blogMatch) {
     const post = getPostBySlug(blogMatch[1]);
     if (!post) return withNoindex({ title: NAME, description: SITE.description, canonicalPath: clean, notFound: true });
+    // metaTitle/metaDescription are the author's overrides from
+    // /admin/blog. When set they're used verbatim — no " · Sunny" suffix
+    // appended to a title someone deliberately wrote to fit in 60
+    // characters. Empty falls back to the post's own title/excerpt.
     return withNoindex({
-      title: `${post.meta.title} · ${NAME}`,
-      description: post.meta.description,
+      title: post.metaTitle || `${post.title} · ${NAME}`,
+      description: post.metaDescription || post.excerpt || SITE.description,
       canonicalPath: clean,
     });
   }

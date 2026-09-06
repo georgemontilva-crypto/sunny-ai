@@ -1,4 +1,4 @@
-import { boolean, index, json, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, index, json, longtext, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 // MySQL has no built-in random-uuid column default (unlike Postgres'
 // gen_random_uuid()) — every id is generated in application code via
@@ -117,6 +117,49 @@ export const messages = mysqlTable(
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
   (table) => [index("messages_conversation_id_idx").on(table.conversationId)]
+);
+
+// Blog articles, managed from /admin/blog. Replaced content/blog/*.mdx —
+// the database is the source of truth and the static build reads it; it is
+// never fetched at request time. scripts/generate-blog-map.ts bakes the
+// published rows into client/src/generated/blog-map.json and
+// scripts/prerender.mjs renders /blog + /blog/:slug from that map, the same
+// build-time resolution media slots and partner settings already use.
+//
+// `content` is markdown, not MDX — it ends up inside prerendered HTML, so
+// it's rendered through a token allowlist (client/src/lib/markdown.tsx)
+// that never emits raw HTML coming from the database.
+export const posts = mysqlTable(
+  "posts",
+  {
+    id: uuidPk(),
+    // 191, not 255: the unique index has to fit in InnoDB's 767-byte key
+    // prefix under utf8mb4 (4 bytes per character).
+    slug: varchar("slug", { length: 191 }).notNull().unique(),
+    title: text("title").notNull(),
+    excerpt: text("excerpt"),
+    content: longtext("content").notNull(),
+    category: varchar("category", { length: 80 }),
+    // A slot from server/mediaCatalog.ts (the blog-cover-* ones), not a
+    // URL — the image itself is uploaded through /admin/media like every
+    // other image and resolved at render time via getSlotUrl().
+    coverSlot: varchar("cover_slot", { length: 80 }),
+    status: varchar("status", { length: 20 }).notNull().default("draft"), // 'draft' | 'published'
+    lang: varchar("lang", { length: 5 }).notNull().default("en"),
+    publishedAt: timestamp("published_at"),
+    updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    authorId: varchar("author_id", { length: 36 }).references(() => users.id),
+    metaTitle: text("meta_title"),
+    metaDescription: text("meta_description"),
+  },
+  (table) => [
+    // Same mysql-core limitation noted on `requests` above: no per-column
+    // DESC modifier. InnoDB scans the index backwards anyway for the
+    // "published, newest first" query generate-blog-map.ts runs.
+    index("posts_status_published_at_idx").on(table.status, table.publishedAt),
+    index("posts_slug_idx").on(table.slug),
+  ]
 );
 
 export const auditLog = mysqlTable("audit_log", {

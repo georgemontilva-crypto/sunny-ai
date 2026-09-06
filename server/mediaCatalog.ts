@@ -162,6 +162,18 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     variants: { base: { recommended: { width: 400, height: 160 } } },
   },
   { slot: "goal-sleep", label: "Goal — Sleep & hormones", variants: { base: { recommended: { width: 400, height: 160 } } } },
+  // Blog covers. Unlike every other slot here these aren't tied to one
+  // fixed spot on one page — /admin/blog picks which post uses which, so
+  // they're a small numbered pool: upload an image here, then choose it as
+  // a post's cover. Adding more is just adding entries to this list.
+  { slot: "blog-cover-1", label: "Blog cover 1", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-2", label: "Blog cover 2", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-3", label: "Blog cover 3", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-4", label: "Blog cover 4", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-5", label: "Blog cover 5", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-6", label: "Blog cover 6", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-7", label: "Blog cover 7", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
+  { slot: "blog-cover-8", label: "Blog cover 8", variants: { base: { width: 1200, recommended: { width: 1200, height: 675 } } } },
   { slot: "logo", label: "Logo", variants: { base: { recommended: { width: 886, height: 300 } } } },
   { slot: "favicon-svg", label: "Favicon (SVG)", variants: { base: { recommended: { width: 100, height: 100 } } } },
   { slot: "favicon-png", label: "Favicon (PNG fallback)", variants: { base: { recommended: { width: 64, height: 64 } } } },
@@ -181,6 +193,14 @@ export const MEDIA_SLOTS: MediaSlotDef[] = [
     variants: { base: { width: 512, height: 512, recommended: { width: 512, height: 512 } } },
   },
 ];
+
+// The subset /admin/blog offers as post covers — a post can only point at
+// one of these, never at the logo, a favicon or a landing-page slot.
+export const BLOG_COVER_SLOTS: MediaSlotDef[] = MEDIA_SLOTS.filter((def) => def.slot.startsWith("blog-cover-"));
+
+export function isBlogCoverSlot(slot: string): boolean {
+  return BLOG_COVER_SLOTS.some((def) => def.slot === slot);
+}
 
 const SLOT_MAP = new Map(MEDIA_SLOTS.map((def) => [def.slot, def]));
 

@@ -87,6 +87,11 @@ async function main() {
     "/legal/cookies",
     "/legal/disclaimer",
   ];
+  // Published posts only — getAllPosts reads
+  // client/src/generated/blog-map.json, which scripts/generate-blog-map.ts
+  // fills from the rows with status = 'published'. A draft therefore gets
+  // no page written here and no sitemap entry below, and unpublishing one
+  // removes both on the next republish.
   const blogRoutes = getAllPosts().map((p) => `/blog/${p.slug}`);
   const routes = [...staticRoutes, ...blogRoutes];
 
@@ -218,6 +223,24 @@ async function main() {
       throw new Error('Expected a <script type="module"> tag in the cached template to inject window.__SETTINGS_MAP__ before.');
     }
     template = template.replace('<script type="module"', `${settingsMapScript}\n    <script type="module"`);
+  }
+
+  // And once more for the blog. client/src/lib/blog.ts statically imports
+  // blog-map.json, so the client bundle's copy is whatever was published at
+  // the last full `vite build` — hydrating with that would make a freshly
+  // published article render server-side and then disappear on hydration,
+  // and an unpublished one come back. scripts/generate-blog-map.ts runs
+  // immediately before this script (in `pnpm build` and in every
+  // republish), so what's injected here is exactly what the routes below
+  // were rendered from.
+  const blogMapPath = path.join(ROOT, "client", "src", "generated", "blog-map.json");
+  if (fs.existsSync(blogMapPath)) {
+    const blogMap = JSON.parse(fs.readFileSync(blogMapPath, "utf-8"));
+    const blogMapScript = `<script>window.__BLOG_MAP__ = ${JSON.stringify(blogMap).replace(/</g, "\\u003c")};</script>`;
+    if (!template.includes('<script type="module"')) {
+      throw new Error('Expected a <script type="module"> tag in the cached template to inject window.__BLOG_MAP__ before.');
+    }
+    template = template.replace('<script type="module"', `${blogMapScript}\n    <script type="module"`);
   }
 
   for (const route of routes) {

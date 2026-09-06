@@ -1,9 +1,6 @@
-import mdx from "@mdx-js/rollup";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
 import { SITE } from "./shared/site";
 
@@ -40,8 +37,7 @@ function chatWidgetConfigPlugin() {
 
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [
-    { enforce: "pre" as const, ...mdx({ remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter] }) },
-    react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
+    react({ include: /\.(jsx|js|tsx|ts)$/ }),
     tailwindcss(),
     chatWidgetConfigPlugin(),
   ],

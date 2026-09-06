@@ -184,6 +184,13 @@ export function republishIfGeneratedMapsAreEmpty(): void {
     return;
   }
 
+  // blog-map.json is deliberately NOT part of this test. An empty blog map
+  // is a legitimate steady state (nothing published yet), so testing it here
+  // would schedule a pointless republish on every single boot until the
+  // first article goes live. It doesn't need to be tested anyway: all three
+  // maps are generated from the same database, so a build that couldn't
+  // reach it leaves media-map and settings-map empty too — and the republish
+  // this schedules regenerates the blog map along with them.
   const mediaEmpty = isMediaMapEmpty(readGeneratedMap("media-map.json"));
   const settingsEmpty = isSettingsMapEmpty(readGeneratedMap("settings-map.json"));
 
@@ -214,14 +221,16 @@ async function republish(): Promise<void> {
 
     fs.rmSync(tempDir, { recursive: true, force: true });
 
-    // Refresh client/src/generated/media-map.json and settings-map.json
-    // from the DB first — prerender.mjs inlines both at build time, so
-    // stale copies would prerender old image URLs / old partner-page
-    // pricing. --strict-on-error: a DB hiccup here must surface as a real
-    // failure, not a silent fallback that wipes every value and still
-    // reports "published".
+    // Refresh client/src/generated/media-map.json, settings-map.json and
+    // blog-map.json from the DB first — prerender.mjs inlines all three at
+    // build time, so stale copies would prerender old image URLs, old
+    // partner-page pricing, or a just-unpublished article.
+    // --strict-on-error: a DB hiccup here must surface as a real failure,
+    // not a silent fallback that wipes every value (or every published
+    // post) and still reports "published".
     await runChild(process.execPath, [TSX_CLI, "scripts/generate-media-map.ts", "--strict-on-error"]);
     await runChild(process.execPath, [TSX_CLI, "scripts/generate-settings-map.ts", "--strict-on-error"]);
+    await runChild(process.execPath, [TSX_CLI, "scripts/generate-blog-map.ts", "--strict-on-error"]);
     await runChild(process.execPath, ["scripts/prerender.mjs"], { PRERENDER_OUT_DIR: tempDir });
 
     copyDirRecursive(tempDir, DIST_DIR);
