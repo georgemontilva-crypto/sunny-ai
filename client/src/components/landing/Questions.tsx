@@ -6,7 +6,7 @@ import { GripVertical, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionHead from "@/components/landing/SectionHead";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
-import { getSlotUrl } from "@/lib/media";
+import SlotImage from "@/components/SlotImage";
 import { getSetting } from "@/lib/settings";
 import { trpc } from "@/lib/trpc";
 import { cn } from "@/lib/utils";
@@ -216,29 +216,17 @@ export default function Questions() {
                     </div>
                   )}
                   <div className="block relative overflow-hidden">
-                    {q.hiRes ? (
-                      <img
-                        src={getSlotUrl(`card-${q.image}`)}
-                        srcSet={`${getSlotUrl(`card-${q.image}`)} 800w${getSlotUrl(`card-${q.image}`, "2x") ? `, ${getSlotUrl(`card-${q.image}`, "2x")} 1600w` : ""}`}
-                        sizes="(max-width: 900px) 50vw, 33vw"
-                        width={800}
-                        height={320}
-                        loading="lazy"
-                        decoding="async"
-                        alt={`Research-grade vial, ${q.image} category`}
-                        className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <img
-                        src={getSlotUrl(`card-${q.image}`)}
-                        width={400}
-                        height={160}
-                        loading="lazy"
-                        decoding="async"
-                        alt={`Research-grade vial, ${q.image} category`}
-                        className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                      />
-                    )}
+                    <SlotImage
+                      slot={`card-${q.image}`}
+                      srcSetWidths={q.hiRes ? { base: 800, "2x": 1600 } : undefined}
+                      sizes={q.hiRes ? "(max-width: 900px) 50vw, 33vw" : undefined}
+                      width={q.hiRes ? 800 : 400}
+                      height={q.hiRes ? 320 : 160}
+                      loading="lazy"
+                      decoding="async"
+                      alt={`Research-grade vial, ${q.image} category`}
+                      className="block w-full h-auto transition-transform duration-700 group-hover:scale-105"
+                    />
                     <div
                       className="absolute inset-0 pointer-events-none"
                       style={{ background: "linear-gradient(to top, oklch(1 0 0 / 55%) 1%, transparent 30%)" }}

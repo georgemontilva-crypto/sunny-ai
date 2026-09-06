@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "wouter";
-import { getSlotUrl } from "@/lib/media";
+import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
@@ -73,14 +73,7 @@ export default function Navbar() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <img
-                src={getSlotUrl("logo")}
-                alt="Sunny"
-                width={886}
-                height={300}
-                className="h-9 w-auto max-w-[9rem]"
-                loading="lazy"
-              />
+              <Logo className="h-9 w-auto max-w-[9rem]" wordmarkClassName="text-lg font-semibold text-background" loading="lazy" />
             </motion.div>
           </Link>
 

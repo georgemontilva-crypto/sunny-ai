@@ -2,7 +2,7 @@ import { AlertCircle } from "lucide-react";
 import { type FormEvent, useState } from "react";
 import { Redirect } from "wouter";
 import AuthBackdrop from "@/components/AuthBackdrop";
-import { getSlotUrl } from "@/lib/media";
+import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
       <AuthBackdrop />
       <div className="w-full max-w-sm relative z-10">
         <div className="flex justify-center mb-6">
-          <img src={getSlotUrl("logo")} alt="Sunny" width={886} height={300} className="h-10 w-auto" />
+          <Logo className="h-10 w-auto" wordmarkClassName="text-xl font-semibold text-background" />
         </div>
         <form
           onSubmit={handleSubmit}

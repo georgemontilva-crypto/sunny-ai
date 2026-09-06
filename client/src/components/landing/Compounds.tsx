@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import SectionHead from "@/components/landing/SectionHead";
 import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
 import { compoundLibrary } from "@/lib/compoundLibrary";
-import { getSlotUrl } from "@/lib/media";
+import SlotImage from "@/components/SlotImage";
 import { cn } from "@/lib/utils";
 
 function EvidenceBar({ label, value, active }: { label: string; value: number; active: boolean }) {
@@ -113,8 +113,8 @@ export default function Compounds() {
                 className="shrink-0 basis-[354px] max-[520px]:basis-[84%] snap-start rounded-[calc(var(--radius)+5px)] overflow-hidden border border-background/13 bg-background/[.045] backdrop-blur-[14px] max-[768px]:backdrop-blur-none max-[768px]:bg-background/9 max-[768px]:border-background/18 transition-all duration-400 hover:border-accent/40 hover:shadow-[0_26px_54px_-28px_rgba(0,0,0,0.8)]"
               >
                 <div className="relative leading-[0]">
-                  <img
-                    src={getSlotUrl(c.image)}
+                  <SlotImage
+                    slot={c.image}
                     width={350}
                     height={140}
                     loading="lazy"

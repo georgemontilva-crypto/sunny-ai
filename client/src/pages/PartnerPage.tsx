@@ -7,6 +7,7 @@ import Footer from "@/components/landing/Footer";
 import ParticleBackground from "@/components/landing/ParticleBackground";
 import CatalogInsights from "@/components/partner/CatalogInsights";
 import { getSlotDef } from "@server/mediaCatalog.ts";
+import SlotImage from "@/components/SlotImage";
 import { getSlotUrl } from "@/lib/media";
 import { getSetting } from "@/lib/settings";
 import {
@@ -142,8 +143,8 @@ function RoutingDemo() {
           transition={{ duration: 0.55, ease: EASE }}
           className="mt-4 flex items-center gap-3 rounded-lg border border-border p-3"
         >
-          <img src={getSlotUrl("compound-bpc-157")} alt="" width={56} height={40}
-               className="w-14 h-10 rounded object-cover flex-none" loading="lazy" />
+          <SlotImage slot="compound-bpc-157" alt="" width={56} height={40}
+                     className="w-14 h-10 rounded object-cover flex-none" loading="lazy" />
           <span>
             <span className="block font-semibold text-[15px]">BPC-157</span>
             <span className="block text-xs text-muted-foreground">yourbrand.com/store</span>

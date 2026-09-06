@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useMemberAuth } from "@/hooks/useMemberAuth";
-import { getSlotUrl } from "@/lib/media";
+import Logo from "@/components/Logo";
 import { SITE } from "@shared/site.ts";
 
 const FIELD_LABEL = "text-xs font-medium text-background/50 uppercase tracking-wide font-mono";
@@ -42,7 +42,7 @@ export default function SignInPage() {
       <div className="w-full max-w-sm relative z-10">
         <div className="flex justify-center mb-6">
           <Link href="/">
-            <img src={getSlotUrl("logo")} alt="Sunny" width={886} height={300} className="h-10 w-auto" />
+            <Logo className="h-10 w-auto" wordmarkClassName="text-xl font-semibold text-background" />
           </Link>
         </div>
         <form

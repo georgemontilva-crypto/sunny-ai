@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import SectionHead from "@/components/landing/SectionHead";
-import { getSlotUrl } from "@/lib/media";
+import SlotImage from "@/components/SlotImage";
 import { cn } from "@/lib/utils";
 
 const steps = [
@@ -89,28 +89,19 @@ export default function HowItWorks() {
                     <h3 className="text-[19px] font-semibold mb-[7px]">{step.title}</h3>
                     <p className="text-sm text-muted-foreground">{step.description}</p>
                   </div>
-                  {step.hiRes ? (
-                    <img
-                      src={getSlotUrl(step.image)}
-                      srcSet={`${getSlotUrl(step.image)} 500w${getSlotUrl(step.image, "2x") ? `, ${getSlotUrl(step.image, "2x")} 1000w` : ""}`}
-                      width={500}
-                      height={300}
-                      loading="lazy"
-                      decoding="async"
-                      alt=""
-                      className="block w-full h-auto rounded-[10px]"
-                    />
-                  ) : (
-                    <img
-                      src={getSlotUrl(step.image)}
-                      width={500}
-                      height={300}
-                      loading="lazy"
-                      decoding="async"
-                      alt=""
-                      className="block w-full h-auto rounded-[10px]"
-                    />
-                  )}
+                  {/* Una sola rama: SlotImage arma el srcset con las
+                  variantes que existan y omite las que no, así que `hiRes`
+                  solo decide si merece la pena pedirlo. */}
+                  <SlotImage
+                    slot={step.image}
+                    srcSetWidths={step.hiRes ? { base: 500, "2x": 1000 } : undefined}
+                    width={500}
+                    height={300}
+                    loading="lazy"
+                    decoding="async"
+                    alt=""
+                    className="block w-full h-auto rounded-[10px]"
+                  />
                 </div>
               </motion.div>
             );

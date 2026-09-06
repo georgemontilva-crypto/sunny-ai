@@ -3,7 +3,7 @@
 // through getSlotUrl below — never a literal /slot.webp path.
 import mediaMap from "../generated/media-map.json";
 
-type VariantName = "base" | "2x" | "mobile";
+export type VariantName = "base" | "2x" | "mobile";
 type SlotEntry = Partial<Record<VariantName, string>>;
 type MediaMap = Record<string, SlotEntry>;
 

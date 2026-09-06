@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import SectionHead from "@/components/landing/SectionHead";
-import { getSlotUrl } from "@/lib/media";
+import SlotImage from "@/components/SlotImage";
 
 const goals = [
   {
@@ -78,8 +78,8 @@ export default function Goals() {
               className="group flex flex-col relative rounded-[calc(var(--radius)+5px)] overflow-hidden bg-card border border-border transition-all duration-400 hover:-translate-y-[5px] hover:border-accent/40 hover:shadow-[0_26px_52px_-26px_rgba(200,150,80,0.5)]"
             >
               <div className="block relative overflow-hidden">
-                <img
-                  src={getSlotUrl(goal.image)}
+                <SlotImage
+                  slot={goal.image}
                   width={400}
                   height={160}
                   loading="lazy"
