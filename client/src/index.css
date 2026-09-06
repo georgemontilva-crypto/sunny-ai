@@ -323,7 +323,10 @@
      just un-pauses mid-cycle instead of restarting/popping. */
   .anim-paused,
   .anim-paused::before,
-  .anim-paused::after {
+  .anim-paused::after,
+  .anim-paused *,
+  .anim-paused *::before,
+  .anim-paused *::after {
     animation-play-state: paused !important;
   }
 
@@ -622,7 +625,10 @@
     animation: hero-float 8.5s ease-in-out 0.8s infinite;
   }
 
-  .chat-badge-3 {
+  .chat-badge-3,
+  .reveal-up,
+  .reveal-left,
+  .reveal-right {
     bottom: 6%;
     left: 6%;
     animation: hero-float 9s ease-in-out 1.4s infinite;
@@ -669,6 +675,99 @@
   0% { transform: scale(1); opacity: 0.7; }
   100% { transform: scale(2.6); opacity: 0; }
 }
+
+/* Above-the-fold entrance animations, in CSS rather than framer-motion
+   (Hero.tsx).
+
+   framer-motion serializes its `initial` prop into the server-rendered
+   markup as an inline style — so every prerendered hero element shipped as
+   style="opacity:0" and stayed invisible until the ~200 KiB client bundle
+   had downloaded, parsed and hydrated. That is exactly what Lighthouse
+   reports as LCP "element render delay": 656ms measured locally with the
+   <h1> as the LCP element, 1189ms on the deployed site with the hero image
+   as the LCP element. The pixels were ready; the fade-in was waiting on
+   JavaScript.
+
+   A CSS animation runs from the first frame the browser paints, with no JS
+   in the critical path. `both` keeps the from-state before the animation
+   starts, so the reveal looks the same as it did — it just no longer costs
+   a second of LCP.
+
+   The two LCP candidates (the h1 and the carousel) deliberately get no
+   delay: an element at opacity 0 is not an LCP candidate, so any delay here
+   is added to LCP one-for-one. The supporting copy below them can wait. */
+@layer components {
+  .reveal-up,
+  .reveal-left,
+  .reveal-right {
+    animation-duration: 0.7s;
+    animation-timing-function: var(--e);
+    animation-fill-mode: both;
+  }
+
+  .reveal-up {
+    animation-name: reveal-up;
+  }
+
+  .reveal-left {
+    animation-name: reveal-left;
+  }
+
+  .reveal-right {
+    animation-name: reveal-right;
+    animation-duration: 0.8s;
+  }
+
+  .reveal-d1 {
+    animation-delay: 0.1s;
+  }
+
+  .reveal-d2 {
+    animation-delay: 0.2s;
+  }
+
+  .reveal-d3 {
+    animation-delay: 0.3s;
+  }
+
+  .reveal-d5 {
+    animation-delay: 0.5s;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 
 /* prefers-reduced-motion: no drift, no breathing, no floating — every
    keyframe animation declared above is disabled outright rather than

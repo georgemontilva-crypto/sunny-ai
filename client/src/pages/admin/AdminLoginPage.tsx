@@ -49,7 +49,7 @@ export default function AdminLoginPage() {
       <AuthBackdrop />
       <div className="w-full max-w-sm relative z-10">
         <div className="flex justify-center mb-6">
-          <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" />
+          <img src={getSlotUrl("logo")} alt="Sunny" width={886} height={300} className="h-10 w-auto" />
         </div>
         <form
           onSubmit={handleSubmit}

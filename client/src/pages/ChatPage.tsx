@@ -91,7 +91,7 @@ export default function ChatPage() {
               scrolling and without waiting for a third party to load. */}
           <header className="shrink-0 flex flex-col gap-1.5 border-b border-background/13 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 sm:px-6">
             <Link href="/" className="shrink-0">
-              <img src={getSlotUrl("logo")} alt="Sunny" className="h-7 w-auto" />
+              <img src={getSlotUrl("logo")} alt="Sunny" width={886} height={300} className="h-7 w-auto" />
             </Link>
             <p className="text-[12.5px] leading-snug text-background/60">
               Educational research summaries. Not medical advice. For adults 21+.

@@ -42,7 +42,7 @@ export default function SignInPage() {
       <div className="w-full max-w-sm relative z-10">
         <div className="flex justify-center mb-6">
           <Link href="/">
-            <img src={getSlotUrl("logo")} alt="Sunny" className="h-10 w-auto" />
+            <img src={getSlotUrl("logo")} alt="Sunny" width={886} height={300} className="h-10 w-auto" />
           </Link>
         </div>
         <form

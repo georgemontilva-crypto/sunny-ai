@@ -74,7 +74,7 @@ export default function HeroCarousel({ bgAnimating = true }: { bgAnimating?: boo
             <img
               src={img.base}
               srcSet={buildSrcSet(img)}
-              sizes="(max-width: 940px) 100vw, 57vw"
+              sizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw"
               width={1400}
               height={700}
               fetchPriority={i === 0 ? "high" : undefined}
@@ -82,7 +82,7 @@ export default function HeroCarousel({ bgAnimating = true }: { bgAnimating?: boo
               decoding="async"
               alt={i === 0 ? "Sunny, the AI peptide research assistant" : ""}
             />
-            <span className="hero-carousel-chip absolute left-4 bottom-4 flex items-center gap-2 px-3 py-2 rounded-full bg-background/10 backdrop-blur-md border border-background/15 text-xs font-medium text-background">
+            <span className="hero-carousel-chip absolute left-4 bottom-4 flex items-center gap-2 px-3 py-2 rounded-full bg-background/10 backdrop-blur-md max-[768px]:backdrop-blur-none max-[768px]:bg-noche/70 max-[768px]:border-background/25 border border-background/15 text-xs font-medium text-background">
               <span className="pulse-dot" />
               Research assistant
             </span>

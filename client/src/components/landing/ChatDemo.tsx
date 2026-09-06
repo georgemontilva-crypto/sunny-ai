@@ -268,15 +268,24 @@ export default function ChatDemo() {
         />
 
         <div className="relative">
-          <span className="chat-badge chat-badge-1 flex items-center gap-2 px-[15px] py-[9px] rounded-full bg-noche/62 backdrop-blur-[16px] border border-background/15 text-[12.5px] text-background/80 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)]">
+          <span className={cn(
+            "chat-badge chat-badge-1 flex items-center gap-2 px-[15px] py-[9px] rounded-full bg-noche/62 backdrop-blur-[16px] border border-background/15 text-[12.5px] text-background/80 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)]",
+            !bgAnimating && "anim-paused"
+          )}>
             <ShieldCheck className="w-3.5 h-3.5 text-accent shrink-0" />
             No dosing, ever
           </span>
-          <span className="chat-badge chat-badge-2 flex items-center gap-2 px-[15px] py-[9px] rounded-full bg-noche/62 backdrop-blur-[16px] border border-background/15 text-[12.5px] text-background/80 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)]">
+          <span className={cn(
+            "chat-badge chat-badge-2 flex items-center gap-2 px-[15px] py-[9px] rounded-full bg-noche/62 backdrop-blur-[16px] border border-background/15 text-[12.5px] text-background/80 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)]",
+            !bgAnimating && "anim-paused"
+          )}>
             <Book className="w-3.5 h-3.5 text-accent shrink-0" />
             Every claim cited
           </span>
-          <span className="chat-badge chat-badge-3 flex items-center gap-2 px-[15px] py-[9px] rounded-full bg-noche/62 backdrop-blur-[16px] border border-background/15 text-[12.5px] text-background/80 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)]">
+          <span className={cn(
+            "chat-badge chat-badge-3 flex items-center gap-2 px-[15px] py-[9px] rounded-full bg-noche/62 backdrop-blur-[16px] border border-background/15 text-[12.5px] text-background/80 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.8)]",
+            !bgAnimating && "anim-paused"
+          )}>
             <Info className="w-3.5 h-3.5 text-accent shrink-0" />
             Redirects to clinicians
           </span>

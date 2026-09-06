@@ -14,7 +14,7 @@
 
     <!--app-head-->
 
-    <link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 940px) 100vw, 57vw" />
+    <link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw" />
     <!-- Matches manifest.json's theme_color (scripts/prerender.mjs) — both are
          the Lynx assistant's own primaryColor, so browser chrome, the PWA
          launcher and the chat agree on one color. Update both together. -->
@@ -24,9 +24,27 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- Both font stylesheets load without blocking the first paint.
+         They used to be plain <link rel=stylesheet>, which meant the
+         browser could not paint a single pixel until two third-party
+         CSS files had been fetched over two fresh connections —
+         Lighthouse costed that at ~300ms locally and ~1,050ms on the
+         deployed site, all of it in front of FCP and therefore in front
+         of LCP too.
+
+         rel=preload fetches the CSS at high priority without blocking
+         rendering; the onload handler promotes it to a real stylesheet
+         the moment it arrives. Both URLs already carry display=swap, so
+         text was always going to be painted in the fallback face first
+         and swapped — this changes when the swap happens, not whether.
+         The <noscript> copies keep the fonts working with JS disabled. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <link rel="preload" as="style" href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" />
+      <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" />
+    </noscript>
     <link rel="preconnect" href="https://api.fontshare.com" />
-    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&display=swap" rel="stylesheet" />
   </head>
 
   <body>

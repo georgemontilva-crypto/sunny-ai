@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -6,8 +5,6 @@ import { Link } from "wouter";
 import HeroCarousel from "@/components/landing/HeroCarousel";
 import { useAnimateWhileVisible } from "@/hooks/useAnimateWhileVisible";
 import { cn } from "@/lib/utils";
-
-const EASE = [0.23, 1, 0.32, 1] as const;
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -38,56 +35,49 @@ export default function Hero() {
         <div className="hero-grain" />
       </div>
 
-      {/* Content */}
+      {/* Content.
+
+          Every entrance animation in this section is CSS (the .reveal-*
+          classes in index.css), not framer-motion, and that is a
+          performance decision rather than a stylistic one: framer-motion
+          writes its `initial` prop into the server-rendered markup as
+          style="opacity:0", so the whole hero used to ship invisible and
+          stay that way until the client bundle had downloaded and hydrated.
+          Lighthouse measured that wait as ~656ms of LCP "element render
+          delay" locally and ~1189ms on the deployed site. CSS animations
+          start on the browser's first frame instead, with no JS involved.
+
+          Sections below the fold still use framer-motion — they animate on
+          scroll, by which time the bundle is long since parsed, and they
+          are not LCP candidates. */}
       <div className="container mx-auto max-w-7xl relative z-10">
         <div
           className="grid grid-cols-1 min-[940px]:grid-cols-[.86fr_1.14fr] items-center"
           style={{ gap: "clamp(26px, 4vw, 48px)" }}
         >
           {/* LEFT SIDE - TEXT CONTENT */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, ease: EASE }}
-            className="text-left"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: EASE }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-background/16 bg-background/9 backdrop-blur-md text-xs font-medium text-accent mb-6"
-            >
+          <div className="text-left reveal-left">
+            <div className="reveal-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-background/16 bg-background/9 backdrop-blur-md max-[768px]:backdrop-blur-none max-[768px]:bg-background/[0.16] max-[768px]:border-background/25 text-xs font-medium text-accent mb-6">
               <Sparkles className="w-3.5 h-3.5" />
               AI-powered peptide research
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
-              className="text-[clamp(42px,6.4vw,78px)] font-semibold mb-6 max-w-[13ch] text-background"
-            >
+            {/* No reveal delay: this is the LCP element on a narrow viewport
+                (measured), and an element at opacity 0 is not an LCP
+                candidate — every millisecond of delay here is a millisecond
+                added to LCP. */}
+            <h1 className="reveal-up text-[clamp(42px,6.4vw,78px)] font-semibold mb-6 max-w-[13ch] text-background">
               Peptide Research,{" "}
               <span className="bg-gradient-to-r from-accent via-accent/80 to-accent/60 bg-clip-text text-transparent">
                 Made Clear
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-              className="text-[clamp(16px,1.7vw,19px)] text-background/68 mb-10 max-w-[42ch]"
-            >
+            <p className="reveal-up reveal-d2 text-[clamp(16px,1.7vw,19px)] text-background/68 mb-10 max-w-[42ch]">
               Sunny organizes peptide research and explains the science in clear, accessible language.
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3, ease: EASE }}
-              className="flex flex-col sm:flex-row items-start gap-3"
-            >
+            <div className="reveal-up reveal-d3 flex flex-col sm:flex-row items-start gap-3">
               <Button size="lg" className="hero-cta-glow text-base font-semibold px-8 h-12 rounded-full" asChild>
                 <Link href="/chat">
                   Start Exploring
@@ -97,32 +87,24 @@ export default function Hero() {
               <Button
                 size="lg"
                 variant="ghost"
-                className="text-base font-medium px-8 h-12 rounded-full border border-background/18 bg-background/7 backdrop-blur-md text-background hover:bg-background/14 hover:text-background"
+                className="text-base font-medium px-8 h-12 rounded-full border border-background/18 bg-background/7 backdrop-blur-md max-[768px]:backdrop-blur-none max-[768px]:bg-background/[0.14] max-[768px]:border-background/28 text-background hover:bg-background/14 hover:text-background"
                 onClick={() => scrollToSection("compounds")}
               >
                 Browse Compounds
               </Button>
-            </motion.div>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-[12.5px] text-background/40 mt-8"
-            >
+            <p className="reveal-up reveal-d5 text-[12.5px] text-background/40 mt-8">
               Educational research content. Not medical advice. For adults 21+.
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
 
-          {/* RIGHT SIDE - HERO CAROUSEL */}
-          <motion.div
-            initial={{ opacity: 0, x: 40, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-            className="relative"
-          >
+          {/* RIGHT SIDE - HERO CAROUSEL. Also undelayed: it is the LCP
+              element on the deployed site, where the image outweighs the
+              headline. */}
+          <div className="relative reveal-right">
             <HeroCarousel bgAnimating={bgAnimating} />
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

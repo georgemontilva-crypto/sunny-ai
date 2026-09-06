@@ -35,6 +35,8 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
               <img
                 src={coverUrl}
                 alt=""
+                width={1200}
+                height={675}
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
               />
@@ -43,7 +45,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
             )}
             {post.category && (
               <div className="absolute top-4 left-4">
-                <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm text-xs font-medium">
+                <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm max-[768px]:backdrop-blur-none max-[768px]:bg-background text-xs font-medium">
                   {post.category}
                 </Badge>
               </div>

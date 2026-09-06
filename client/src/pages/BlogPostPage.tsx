@@ -55,6 +55,8 @@ export default function BlogPostPage() {
             <img
               src={coverUrl}
               alt=""
+              width={1200}
+              height={675}
               className="w-full aspect-[16/9] object-cover rounded-2xl border border-border/50 mb-8"
             />
           )}

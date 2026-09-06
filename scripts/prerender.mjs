@@ -170,7 +170,7 @@ async function main() {
   // ends up actually requesting (a mismatch here just wastes the preload,
   // it doesn't break anything) — the "mobile" 700w variant is what keeps a
   // phone from preloading the 1400px desktop asset.
-  const heroPreloadTag = '<link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 940px) 100vw, 57vw" />';
+  const heroPreloadTag = '<link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw" />';
   const heroSlot = mediaMap["hero-sunny"];
   if (heroSlot?.base) {
     const srcsetParts = [];
@@ -179,7 +179,7 @@ async function main() {
     if (heroSlot["2x"]) srcsetParts.push(`${heroSlot["2x"]} 2800w`);
     template = template.replace(
       heroPreloadTag,
-      `<link rel="preload" as="image" href="${heroSlot.base}" imagesrcset="${srcsetParts.join(", ")}" imagesizes="(max-width: 940px) 100vw, 57vw" />`
+      `<link rel="preload" as="image" href="${heroSlot.base}" imagesrcset="${srcsetParts.join(", ")}" imagesizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw" />`
     );
   } else {
     template = dropLink(template, heroPreloadTag);
@@ -253,7 +253,7 @@ async function main() {
   }
 
   for (const route of routes) {
-    const { html, head, canonicalHref } = render(route);
+    const { html, head, canonicalHref } = await render(route);
 
     // The post cover wins over the site-wide og-image slot when the page has
     // one. Both fall back to nothing rather than to a URL that 404s: a share
@@ -361,7 +361,7 @@ async function main() {
   console.log("[prerender] wrote /app-shell.html (empty shell for /signin, /signup, /chat, /account)");
 
   // Explicit 404 page for static hosts (Netlify/Vercel/S3 convention)
-  const notFound = render("/__not_found__");
+  const notFound = await render("/__not_found__");
   const notFoundHeadHtml = `<title>${escapeHtml(notFound.head.title)}</title>\n    <meta name="robots" content="noindex, nofollow" />`;
   const notFoundPage = template
     .replace("<!--app-html-->", notFound.html)

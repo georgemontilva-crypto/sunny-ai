@@ -166,7 +166,7 @@ export default function Compounds() {
             aria-label="Previous"
             disabled={atStart}
             onClick={() => scrollByCard(-1)}
-            className="w-11 h-11 rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] max-[768px]:backdrop-blur-none max-[768px]:bg-background/12 max-[768px]:border-background/22 border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
           >
             <ChevronLeft className="w-[17px] h-[17px]" />
           </button>
@@ -175,7 +175,7 @@ export default function Compounds() {
             aria-label="Next"
             disabled={atEnd}
             onClick={() => scrollByCard(1)}
-            className="w-11 h-11 rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-background/80 bg-background/6 backdrop-blur-[14px] max-[768px]:backdrop-blur-none max-[768px]:bg-background/12 max-[768px]:border-background/22 border border-background/16 transition-all duration-300 hover:bg-accent/18 hover:border-accent/50 hover:text-accent disabled:opacity-25 disabled:pointer-events-none"
           >
             <ChevronRight className="w-[17px] h-[17px]" />
           </button>

@@ -13,14 +13,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import SchemaMarkup from "./components/landing/SchemaMarkup";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
-import BlogPage from "@/pages/BlogPage";
-import BlogPostPage from "@/pages/BlogPostPage";
-import ContactPage from "@/pages/ContactPage";
-import PartnerPage from "@/pages/PartnerPage";
-import Terms from "@/pages/legal/Terms";
-import Privacy from "@/pages/legal/Privacy";
-import Cookies from "@/pages/legal/Cookies";
-import Disclaimer from "@/pages/legal/Disclaimer";
 import AdminGuarded from "@/components/admin/AdminGuarded";
 import MemberGuarded from "@/components/member/MemberGuarded";
 
@@ -32,6 +24,23 @@ import MemberGuarded from "@/components/member/MemberGuarded";
 // panel and member-auth flow just to render the home page is exactly the
 // "unused JavaScript" a mobile Lighthouse run flags — these chunks now
 // only load once someone actually navigates to one of these paths.
+// Public routes, lazy for the same reason as the panel below but with one
+// extra requirement: these ARE prerendered, so the static HTML must still
+// contain the finished page. client/src/entry-server.tsx uses React 19's
+// prerenderToNodeStream, which resolves every Suspense boundary before it
+// completes — so the build output is identical to what a static import
+// produced, while the home page's bundle no longer carries the blog's
+// markdown renderer, the partner page, the contact form and four legal
+// documents that a visitor to "/" never renders.
+const BlogPage = lazy(() => import("@/pages/BlogPage"));
+const BlogPostPage = lazy(() => import("@/pages/BlogPostPage"));
+const ContactPage = lazy(() => import("@/pages/ContactPage"));
+const PartnerPage = lazy(() => import("@/pages/PartnerPage"));
+const Terms = lazy(() => import("@/pages/legal/Terms"));
+const Privacy = lazy(() => import("@/pages/legal/Privacy"));
+const Cookies = lazy(() => import("@/pages/legal/Cookies"));
+const Disclaimer = lazy(() => import("@/pages/legal/Disclaimer"));
+
 const AdminLoginPage = lazy(() => import("@/pages/admin/AdminLoginPage"));
 const AdminRequestsPage = lazy(() => import("@/pages/admin/AdminRequestsPage"));
 const AdminMediaPage = lazy(() => import("@/pages/admin/AdminMediaPage"));
