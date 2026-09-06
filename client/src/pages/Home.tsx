@@ -9,7 +9,6 @@ import Goals from "@/components/landing/Goals";
 import FAQ from "@/components/landing/FAQ";
 import Contact from "@/components/landing/Contact";
 import Footer from "@/components/landing/Footer";
-import SchemaMarkup from "@/components/landing/SchemaMarkup";
 
 // Rhythm (per sunny-home-FINAL.html): hero(DARK) -> questions(light) ->
 // compounds(DARK) -> meetSunny(arena) -> howItWorks(light) -> chat(DARK) ->
@@ -24,7 +23,6 @@ import SchemaMarkup from "@/components/landing/SchemaMarkup";
 export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <SchemaMarkup />
       <Navbar />
       <Hero />
       <Questions />

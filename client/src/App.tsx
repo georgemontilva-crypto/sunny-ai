@@ -10,6 +10,7 @@ import ChatWidgetRouteGate from "./components/ChatWidgetRouteGate";
 import ConsentGate from "./components/ConsentGate";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
+import SchemaMarkup from "./components/landing/SchemaMarkup";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import BlogPage from "@/pages/BlogPage";
@@ -57,6 +58,7 @@ function Router() {
   return (
     <>
       <ScrollToTop />
+      <SchemaMarkup />
       <ChatWidgetRouteGate />
       <Suspense fallback={<RouteFallback />}>
         <Switch>

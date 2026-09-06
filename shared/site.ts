@@ -23,6 +23,15 @@ export const SITE = {
   // definitivo.
   indexable: false,
 
+  // The site's own language, as a BCP 47 tag. One source for the three
+  // places that used to hardcode "en" independently: client/index.html's
+  // <html lang>, manifest.json's lang (scripts/prerender.mjs) and the
+  // WebSite JSON-LD. A blog post carries its own `lang` column, and
+  // scripts/prerender.mjs overrides <html lang> for a post written in
+  // anything other than this — a page that says "en" while its article is
+  // in Spanish is a signal Google acts on, and acts on wrongly.
+  lang: "en",
+
   // --- Lynx chat integration -------------------------------------------
   // Single place to change the embed. `chatWidgetSrc`/`chatWidgetKey` feed
   // the floating bubble that client/index.html injects on every public page

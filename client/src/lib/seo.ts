@@ -1,4 +1,4 @@
-import { getPostBySlug } from "./blog";
+import { getPostBySlug, postImageUrl } from "./blog";
 import { SITE, absoluteUrl } from "@shared/site";
 
 export interface HeadMeta {
@@ -7,6 +7,20 @@ export interface HeadMeta {
   canonicalPath: string;
   notFound?: boolean;
   noindex?: boolean;
+  // This page's own language, as a BCP 47 tag. Always SITE.lang except on a
+  // post written in something else, where scripts/prerender.mjs writes it
+  // into <html lang>. Set unconditionally rather than only-when-different:
+  // the value is simply "what language is this page", and when it matches
+  // the site's the substitution is a no-op.
+  lang?: string;
+  // Defaults to "website" where absent; only an article says otherwise.
+  ogType?: "website" | "article";
+  // Overrides the global og-image slot for this page. `alt` is required
+  // alongside it: an image in a share card with no alt is one more thing
+  // that renders as a blank rectangle in a screen reader.
+  image?: { url: string; alt: string };
+  // og/article:* timestamps, ISO 8601. Only /blog/:slug sets these.
+  article?: { publishedTime: string; modifiedTime: string; section?: string };
 }
 
 const NAME = SITE.name;
@@ -68,10 +82,17 @@ export function getMetaForPath(path: string): HeadMeta {
   // regardless of SITE.indexable, and not part of withNoindex()'s per-route
   // defaults that flip once the site goes public.
   if (clean === "/signin" || clean === "/signup" || clean === "/account") {
-    const labels: Record<string, string> = { "/signin": "Sign in", "/signup": "Create account", "/account": "Account" };
+    // Noindex, so these descriptions are never a search snippet — they're
+    // still distinct because they're also what a link preview shows when
+    // someone pastes one of these URLs into a chat.
+    const meta: Record<string, { label: string; description: string }> = {
+      "/signin": { label: "Sign in", description: `Sign in to your ${NAME} account.` },
+      "/signup": { label: "Create account", description: `Create a ${NAME} account to keep your chat history.` },
+      "/account": { label: "Account", description: `Manage your ${NAME} account and your chat history.` },
+    };
     return {
-      title: `${labels[clean]} — ${NAME}`,
-      description: `${NAME} account.`,
+      title: `${meta[clean].label} — ${NAME}`,
+      description: meta[clean].description,
       canonicalPath: clean,
       noindex: true,
     };
@@ -110,23 +131,60 @@ export function getMetaForPath(path: string): HeadMeta {
     // /admin/blog. When set they're used verbatim — no " · Sunny" suffix
     // appended to a title someone deliberately wrote to fit in 60
     // characters. Empty falls back to the post's own title/excerpt.
+    const image = postImageUrl(post);
     return withNoindex({
       title: post.metaTitle || `${post.title} · ${NAME}`,
       description: post.metaDescription || post.excerpt || SITE.description,
       canonicalPath: clean,
+      lang: post.lang,
+      ogType: "article",
+      // The cover is decorative on the page itself (the <h1> says the same
+      // thing right next to it, so BlogPostPage renders it with alt=""),
+      // but a share card is often shown with no title beside it — there,
+      // the article's title is what the image is actually of.
+      ...(image ? { image: { url: image, alt: post.title } } : {}),
+      article: {
+        publishedTime: post.publishedAt,
+        modifiedTime: post.updatedAt || post.publishedAt,
+        ...(post.category ? { section: post.category } : {}),
+      },
     });
   }
+  // Each of the four legal pages describes what *that* document actually
+  // says. They used to be one-line variations on "legal page for Sunny",
+  // which is the shape of description Google drops in favour of a snippet it
+  // picks itself — and four near-identical ones read as boilerplate.
   if (clean === "/legal/terms") {
-    return withNoindex({ title: `Terms of Service — ${NAME}`, description: `Terms and conditions of use for ${NAME}.`, canonicalPath: clean });
+    return withNoindex({
+      title: `Terms of Service — ${NAME}`,
+      description:
+        "The terms governing use of the Sunny website: what the service is, what it explicitly isn't, account rules, and the limits of our liability.",
+      canonicalPath: clean,
+    });
   }
   if (clean === "/legal/privacy") {
-    return withNoindex({ title: `Privacy Policy — ${NAME}`, description: `How ${NAME} handles your personal data.`, canonicalPath: clean });
+    return withNoindex({
+      title: `Privacy Policy — ${NAME}`,
+      description:
+        "What data Sunny collects through this site and through an account, what we do with it, how long we keep it, and how to have it deleted.",
+      canonicalPath: clean,
+    });
   }
   if (clean === "/legal/cookies") {
-    return withNoindex({ title: `Cookie Policy — ${NAME}`, description: `Cookie usage on ${NAME}.`, canonicalPath: clean });
+    return withNoindex({
+      title: `Cookie Policy — ${NAME}`,
+      description:
+        "Sunny sets one cookie, to keep you signed in if you have an account. No advertising cookies and no third-party tracking — here's the detail.",
+      canonicalPath: clean,
+    });
   }
   if (clean === "/legal/disclaimer") {
-    return withNoindex({ title: `Legal Disclaimer — ${NAME}`, description: `Educational and research disclaimer for ${NAME}.`, canonicalPath: clean });
+    return withNoindex({
+      title: `Legal Disclaimer — ${NAME}`,
+      description:
+        "Everything Sunny publishes is educational and research content. No diagnosis, no prescription, no dosing — and nothing here replaces a qualified professional.",
+      canonicalPath: clean,
+    });
   }
 
   return withNoindex({ title: `Page not found — ${NAME}`, description: SITE.description, canonicalPath: clean, notFound: true });

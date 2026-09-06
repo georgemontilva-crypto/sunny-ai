@@ -1,4 +1,9 @@
 <!doctype html>
+<!-- lang is the default (shared/site.ts SITE.lang). scripts/prerender.mjs
+     rewrites this attribute per page, so an article whose posts.lang is
+     not the site language ships with its own. Keep the attribute exactly
+     one double-quoted value long — the substitution asserts that shape
+     and fails the build if it changes. -->
 <html lang="en">
 
   <head>

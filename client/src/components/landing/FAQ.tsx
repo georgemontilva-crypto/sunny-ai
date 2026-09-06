@@ -3,37 +3,27 @@ import { useRef } from "react";
 import { Link } from "wouter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import SectionHead from "@/components/landing/SectionHead";
+import { FAQS, type FaqEntry } from "@/lib/faq";
 
-const faqs = [
-  {
-    q: "Does Sunny sell or distribute peptides?",
-    a: "No. Sunny doesn't sell, manufacture, or distribute any compound. We publish educational summaries of available scientific literature, nothing more.",
-  },
-  {
-    q: "Is this medical advice?",
-    a: "No. Nothing we publish diagnoses, treats, or prescribes. It's educational and research content — any decision about your health should go through a qualified professional.",
-  },
-  {
-    q: "Why don't you include dosing or protocols?",
-    a: "Because it isn't information that's ours to give. Dosing is a clinical decision that depends on each individual, and only a qualified health professional can assess it.",
-  },
-  {
-    q: "How do you decide which compounds to include in the library?",
-    a: "We prioritize compounds with published, verifiable literature — preclinical or clinical — and we say so explicitly on each entry. If the evidence is weak or nonexistent, we say that too.",
-  },
-  {
-    q: "Do you offer integrations for clinics or brands?",
-    a: (
-      <>
-        Yes, through embed or white-label. Check out{" "}
-        <Link href="/partner" className="text-accent hover:underline">
-          our page for clinics and brands
-        </Link>
-        , or reach out through the contact form.
-      </>
-    ),
-  },
-];
+
+// A link inside an answer stays a link on the page, while lib/faq.ts's
+// faqAnswerText() flattens the same segments to the plain text the FAQPage
+// JSON-LD indexes.
+function FaqAnswer({ entry }: { entry: FaqEntry }) {
+  return (
+    <>
+      {entry.a.map((segment, i) =>
+        typeof segment === "string" ? (
+          segment
+        ) : (
+          <Link key={i} href={segment.href} className="text-accent hover:underline">
+            {segment.text}
+          </Link>
+        )
+      )}
+    </>
+  );
+}
 
 export default function FAQ() {
   const ref = useRef(null);
@@ -55,7 +45,7 @@ export default function FAQ() {
           transition={{ duration: 0.6, delay: 0.1 }}
         >
           <Accordion type="single" collapsible className="w-full space-y-2.5">
-            {faqs.map((faq, i) => (
+            {FAQS.map((faq, i) => (
               <AccordionItem
                 key={i}
                 value={`item-${i}`}
@@ -65,7 +55,7 @@ export default function FAQ() {
                   {faq.q}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed text-[15px] max-w-[64ch] pb-5">
-                  {faq.a}
+                  <FaqAnswer entry={faq} />
                 </AccordionContent>
               </AccordionItem>
             ))}

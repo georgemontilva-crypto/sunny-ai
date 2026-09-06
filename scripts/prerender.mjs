@@ -243,35 +243,82 @@ async function main() {
     template = template.replace('<script type="module"', `${blogMapScript}\n    <script type="module"`);
   }
 
+  // <html lang> is substituted per page below. Asserted here rather than at
+  // the substitution site so a change to client/index.html's opening tag
+  // fails the build once, loudly, instead of silently leaving every page
+  // claiming the wrong language.
+  const HTML_LANG_RE = /<html([^>]*?)\slang="[^"]*"/;
+  if (!HTML_LANG_RE.test(template)) {
+    throw new Error('Expected <html lang="…"> in the cached template — client/index.html\'s opening tag changed shape.');
+  }
+
   for (const route of routes) {
     const { html, head, canonicalHref } = render(route);
+
+    // The post cover wins over the site-wide og-image slot when the page has
+    // one. Both fall back to nothing rather than to a URL that 404s: a share
+    // card with a broken image renders worse than one with no image.
+    const pageImage = head.image ?? (ogImageHref ? { url: ogImageHref, alt: SITE.name } : undefined);
+
     const headTags = [
       `<title>${escapeHtml(head.title)}</title>`,
       `<meta name="description" content="${escapeHtml(head.description)}" />`,
       `<meta property="og:site_name" content="${escapeHtml(SITE.name)}" />`,
+      `<meta property="og:type" content="${escapeHtml(head.ogType ?? "website")}" />`,
+      `<meta property="og:locale" content="${escapeHtml((head.lang ?? SITE.lang).replace("-", "_"))}" />`,
       `<meta property="og:title" content="${escapeHtml(head.title)}" />`,
       `<meta property="og:description" content="${escapeHtml(head.description)}" />`,
       `<meta property="og:url" content="${escapeHtml(canonicalHref)}" />`,
     ];
-    // No og-image slot set: omit the tag rather than point social crawlers
-    // at a URL that doesn't exist. "summary_large_image" needs an image to
-    // render as intended, so the card type downgrades along with it.
-    if (ogImageHref) headTags.push(`<meta property="og:image" content="${escapeHtml(ogImageHref)}" />`);
+
+    // No image anywhere: omit the tag rather than point social crawlers at a
+    // URL that doesn't exist. "summary_large_image" needs an image to render
+    // as intended, so the card type downgrades along with it.
+    if (pageImage) {
+      headTags.push(
+        `<meta property="og:image" content="${escapeHtml(pageImage.url)}" />`,
+        `<meta property="og:image:alt" content="${escapeHtml(pageImage.alt)}" />`
+      );
+    }
+
+    // Article-only. Google reads dates from the JSON-LD, but Facebook,
+    // LinkedIn and Slack read these, and they're what puts a date on a
+    // shared link instead of nothing.
+    if (head.article) {
+      headTags.push(
+        `<meta property="article:published_time" content="${escapeHtml(head.article.publishedTime)}" />`,
+        `<meta property="article:modified_time" content="${escapeHtml(head.article.modifiedTime)}" />`
+      );
+      if (head.article.section) {
+        headTags.push(`<meta property="article:section" content="${escapeHtml(head.article.section)}" />`);
+      }
+    }
+
     headTags.push(
-      `<meta name="twitter:card" content="${ogImageHref ? "summary_large_image" : "summary"}" />`,
+      `<meta name="twitter:card" content="${pageImage ? "summary_large_image" : "summary"}" />`,
       `<meta name="twitter:title" content="${escapeHtml(head.title)}" />`,
-      `<meta name="twitter:description" content="${escapeHtml(head.description)}" />`,
-      `<link rel="canonical" href="${escapeHtml(canonicalHref)}" />`
+      `<meta name="twitter:description" content="${escapeHtml(head.description)}" />`
     );
+    if (pageImage) {
+      headTags.push(
+        `<meta name="twitter:image" content="${escapeHtml(pageImage.url)}" />`,
+        `<meta name="twitter:image:alt" content="${escapeHtml(pageImage.alt)}" />`
+      );
+    }
+    headTags.push(`<link rel="canonical" href="${escapeHtml(canonicalHref)}" />`);
     if (head.noindex) headTags.push(`<meta name="robots" content="noindex, nofollow" />`);
     const headHtml = headTags.join("\n    ");
 
+    // Per page, never on the shared `template` — a post written in Spanish
+    // must not leave <html lang="es"> behind for the next route in the loop.
+    const pageLang = head.lang ?? SITE.lang;
     const page = template
+      .replace(HTML_LANG_RE, (_match, attrs) => `<html${attrs} lang="${escapeHtml(pageLang)}"`)
       .replace("<!--app-html-->", html)
       .replace("<!--app-head-->", headHtml);
 
     writeRouteHtml(route, page);
-    console.log(`[prerender] wrote ${route}`);
+    console.log(`[prerender] wrote ${route}${pageLang === SITE.lang ? "" : ` (lang="${pageLang}")`}`);
   }
 
   // Empty SPA shell for /admin/* (server/index.ts falls back here for any
@@ -324,8 +371,54 @@ async function main() {
 
   // Sitemap (built regardless of `indexable` — robots.txt + noindex already
   // keep crawlers out while the site lives on the temporary domain).
+  // Static pages are dated by the build that produced them, which is what
+  // .build-info.json already records — and, importantly, it does NOT change
+  // on a republish: a republish regenerates HTML from the database, it
+  // doesn't edit the terms of service, so bumping lastmod on every image
+  // upload would be a lie that trains crawlers to ignore the field.
+  const buildDate = (() => {
+    try {
+      const info = JSON.parse(fs.readFileSync(path.join(ROOT, "dist-server", ".build-info.json"), "utf-8"));
+      return new Date(info.builtAt).toISOString().slice(0, 10);
+    } catch {
+      return new Date().toISOString().slice(0, 10);
+    }
+  })();
+
+  const postsBySlug = new Map(getAllPosts().map((p) => [p.slug, p]));
+
+  // changefreq and priority are hints, not instructions — Google has said
+  // for years that it largely ignores them. They're here because other
+  // crawlers (Bing, and every SEO audit tool the client will run) do read
+  // them, and because the ordering they express is true: the home page and
+  // the two commercial pages change more often than a policy document.
+  function sitemapMeta(route) {
+    const blogMatch = route.match(/^\/blog\/(.+)$/);
+    if (blogMatch) {
+      const post = postsBySlug.get(blogMatch[1]);
+      // Full timestamp, not just the day: updatedAt is a real edit time, and
+      // an article corrected twice in one afternoon should say so.
+      return { lastmod: post?.updatedAt || post?.publishedAt || buildDate, changefreq: "monthly", priority: "0.7" };
+    }
+    if (route === "/") return { lastmod: buildDate, changefreq: "weekly", priority: "1.0" };
+    if (route === "/partner" || route === "/blog") return { lastmod: buildDate, changefreq: "weekly", priority: "0.8" };
+    if (route.startsWith("/legal/")) return { lastmod: buildDate, changefreq: "yearly", priority: "0.3" };
+    // /contact: changes less than the commercial pages, more than a policy.
+    return { lastmod: buildDate, changefreq: "monthly", priority: "0.5" };
+  }
+
   const sitemapUrls = routes
-    .map((route) => `  <url><loc>${SITE.domain}${route === "/" ? "" : route}</loc></url>`)
+    .map((route) => {
+      const { lastmod, changefreq, priority } = sitemapMeta(route);
+      return (
+        `  <url>\n` +
+        `    <loc>${SITE.domain}${route === "/" ? "" : route}</loc>\n` +
+        `    <lastmod>${lastmod}</lastmod>\n` +
+        `    <changefreq>${changefreq}</changefreq>\n` +
+        `    <priority>${priority}</priority>\n` +
+        `  </url>`
+      );
+    })
     .join("\n");
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapUrls}\n</urlset>\n`;
   fs.writeFileSync(path.join(DIST_DIR, "sitemap.xml"), sitemap, "utf-8");
@@ -359,7 +452,7 @@ async function main() {
     display: "standalone",
     background_color: MANIFEST_BACKGROUND_COLOR,
     theme_color: MANIFEST_THEME_COLOR,
-    lang: "en",
+    lang: SITE.lang,
     orientation: "portrait-primary",
     categories: ["education", "medical"],
     icons: manifestIcons,
