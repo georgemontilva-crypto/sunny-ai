@@ -15,6 +15,7 @@ const navLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Compounds", href: "#compounds" },
   { label: "Goals", href: "#goals" },
+  { label: "Blog", href: "/blog" },
   { label: "Chat", href: "/chat" },
   { label: "Contact", href: "#contact" },
 ];

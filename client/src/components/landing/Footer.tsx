@@ -142,6 +142,7 @@ export default function Footer() {
               <li><a href="/#how-it-works" className={FOOTER_LINK}>How it works</a></li>
               <li><a href="/#compounds" className={FOOTER_LINK}>Compounds</a></li>
               <li><a href="/#goals" className={FOOTER_LINK}>Topics</a></li>
+              <li><Link href="/blog" className={FOOTER_LINK}>Blog</Link></li>
               <li><Link href="/partner" className={FOOTER_LINK}>For brands</Link></li>
             </ul>
           </div>
