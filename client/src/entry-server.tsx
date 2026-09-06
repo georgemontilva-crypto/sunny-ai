@@ -36,10 +36,7 @@ async function streamToString(stream: NodeJS.ReadableStream): Promise<string> {
   return Buffer.concat(chunks).toString("utf-8");
 }
 
-export async function render(url: string): Promise<RenderResult> {
-  const path = url.split("?")[0] || "/";
-  const head = getMetaForPath(path);
-
+async function renderOnce(path: string): Promise<string> {
   const { prelude } = await prerenderToNodeStream(
     <Router ssrPath={path}>
       <App />
@@ -53,7 +50,33 @@ export async function render(url: string): Promise<RenderResult> {
       },
     }
   );
+  return streamToString(prelude);
+}
 
-  const html = await streamToString(prelude);
+export async function render(url: string): Promise<RenderResult> {
+  const path = url.split("?")[0] || "/";
+  const head = getMetaForPath(path);
+
+  // One pass, because nothing on any route suspends below the shell.
+  //
+  // React's static prerender defers any Suspense boundary that sits under
+  // the shell and writes it in streaming shape — fallback inline, real
+  // markup in a <div hidden>, plus a swap script. The route-level boundary
+  // in App.tsx is fine because it IS the shell: React cannot finish the
+  // document without it, so it waits and inlines the result. A boundary
+  // nested deeper is not, which is why Home.tsx keeps its sections eager
+  // (see the note there).
+  const html = await renderOnce(path);
+
+  // The invariant this whole dance exists to protect, asserted rather than
+  // assumed: a pending-boundary marker here means some boundary streamed,
+  // and the prerendered page is no longer complete on its own.
+  if (html.includes("<!--$?-->")) {
+    throw new Error(
+      `Prerender of "${path}" left a pending Suspense boundary (<!--$?-->): the static HTML would ship a ` +
+        "fallback plus a hidden copy of the real content instead of the content itself."
+    );
+  }
+
   return { html, head, canonicalHref: canonicalUrl(head.canonicalPath) };
 }
