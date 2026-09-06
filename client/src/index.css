@@ -625,10 +625,7 @@
     animation: hero-float 8.5s ease-in-out 0.8s infinite;
   }
 
-  .chat-badge-3,
-  .reveal-up,
-  .reveal-left,
-  .reveal-right {
+  .chat-badge-3 {
     bottom: 6%;
     left: 6%;
     animation: hero-float 9s ease-in-out 1.4s infinite;
@@ -697,25 +694,26 @@
    delay: an element at opacity 0 is not an LCP candidate, so any delay here
    is added to LCP one-for-one. The supporting copy below them can wait. */
 @layer components {
-  .reveal-up,
-  .reveal-left,
-  .reveal-right {
-    animation-duration: 0.7s;
-    animation-timing-function: var(--e);
-    animation-fill-mode: both;
-  }
-
+  /* Shorthand a propósito, no longhands sueltos. La shorthand resetea
+     TODOS los longhands de animation — iteration-count y delay incluidos.
+     Con longhands, un `animation: ... infinite` de cualquier otra regla
+     que llegue a coincidir con estos elementos sobrevive, y la entrada
+     del hero se convierte en un bucle: exactamente el parpadeo que hubo
+     aquí cuando estos selectores acabaron colgando por error de la regla
+     de .chat-badge-3 (hero-float 9s ... 1.4s infinite). Las clases de
+     retardo van después a propósito: misma especificidad, orden de
+     fuente posterior, así que ganan sobre el delay que resetea la
+     shorthand. */
   .reveal-up {
-    animation-name: reveal-up;
+    animation: reveal-up 0.7s var(--e) both;
   }
 
   .reveal-left {
-    animation-name: reveal-left;
+    animation: reveal-left 0.7s var(--e) both;
   }
 
   .reveal-right {
-    animation-name: reveal-right;
-    animation-duration: 0.8s;
+    animation: reveal-right 0.8s var(--e) both;
   }
 
   .reveal-d1 {
@@ -784,7 +782,10 @@
   .meetsunny-halo,
   .chat-badge-1,
   .chat-badge-2,
-  .chat-badge-3 {
+  .chat-badge-3,
+  .reveal-up,
+  .reveal-left,
+  .reveal-right {
     animation: none !important;
     transition: none !important;
   }
