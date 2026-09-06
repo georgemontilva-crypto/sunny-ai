@@ -14,7 +14,16 @@
 
     <!--app-head-->
 
-    <link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw" />
+    <!-- No hay <link rel=preload> del hero escrito a mano aquí a propósito.
+         React 19 emite uno solo, por página, a partir del propio
+         <img fetchPriority="high"> de HeroCarousel.tsx, con el mismo
+         srcset y el mismo sizes por construcción — así no pueden
+         desajustarse nunca. El que había aquí vivía en la plantilla
+         compartida, así que se colaba en /blog, /contact, /partner, las
+         cuatro legales, el 404 y los dos shells, donde no hay hero: el
+         navegador descargaba la variante y no la usaba, que es el aviso
+         "preloaded but not used" de consola. Si alguna vez se quita ese
+         fetchPriority, el preload desaparece con él. -->
     <!-- Matches manifest.json's theme_color (scripts/prerender.mjs) — both are
          the Lynx assistant's own primaryColor, so browser chrome, the PWA
          launcher and the chat agree on one color. Update both together. -->

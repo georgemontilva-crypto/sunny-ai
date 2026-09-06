@@ -165,25 +165,14 @@ async function main() {
     ? template.replace('href="/favicon.png"', `href="${pngHref}"`)
     : dropLink(template, '<link rel="icon" type="image/png" href="/favicon.png" />');
 
-  // Responsive preload: imagesrcset/imagesizes mirror HeroCarousel.tsx's own
-  // <img> srcset/sizes exactly, so the browser preloads the same variant it
-  // ends up actually requesting (a mismatch here just wastes the preload,
-  // it doesn't break anything) — the "mobile" 700w variant is what keeps a
-  // phone from preloading the 1400px desktop asset.
-  const heroPreloadTag = '<link rel="preload" as="image" href="/hero-sunny.webp" imagesrcset="/hero-sunny.webp" imagesizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw" />';
-  const heroSlot = mediaMap["hero-sunny"];
-  if (heroSlot?.base) {
-    const srcsetParts = [];
-    if (heroSlot.mobile) srcsetParts.push(`${heroSlot.mobile} 700w`);
-    srcsetParts.push(`${heroSlot.base} 1400w`);
-    if (heroSlot["2x"]) srcsetParts.push(`${heroSlot["2x"]} 2800w`);
-    template = template.replace(
-      heroPreloadTag,
-      `<link rel="preload" as="image" href="${heroSlot.base}" imagesrcset="${srcsetParts.join(", ")}" imagesizes="(max-width: 639px) calc(100vw - 64px), (max-width: 940px) calc(100vw - 80px), 57vw" />`
-    );
-  } else {
-    template = dropLink(template, heroPreloadTag);
-  }
+  // El hero ya no se precarga desde aquí. Lo hacía sustituyendo un <link>
+  // de la plantilla, que es compartida por todas las rutas, así que la
+  // etiqueta acababa también en páginas sin hero y el navegador se
+  // descargaba una variante que no llegaba a usar. React 19 emite el
+  // preload por su cuenta, solo en la página que renderiza el
+  // <img fetchPriority="high">, y derivado de sus mismos atributos, de
+  // modo que srcset y sizes no pueden discrepar. Lo mismo vale para la
+  // imagen de /partner.
 
   // Already an absolute R2 URL when set (client/public is no longer a
   // fallback source, so there's no relative path to prepend SITE.domain
