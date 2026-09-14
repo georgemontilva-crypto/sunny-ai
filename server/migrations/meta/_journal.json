@@ -43,6 +43,13 @@
       "when": 1788650951802,
       "tag": "0005_bright_sunfire",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1789415729323,
+      "tag": "0006_blog_cover_upload",
+      "breakpoints": true
     }
   ]
 }

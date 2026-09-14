@@ -1,10 +1,11 @@
-// Generates the renditions a slot declares from one uploaded source image.
-// Used by media.confirmUpload (Fase 5 live upload flow). The migration
-// script does NOT use this — it uploads the pre-made base/2x/mobile files
-// that already exist in client/public as-is, rather than re-deriving them.
+// Generates the renditions a slot (or a blog image) declares from one
+// uploaded source image. Used by media.confirmUpload and by the blog editor's
+// cover/body uploads (server/blogImages.ts). The migration script does NOT
+// use this — it uploads the pre-made base/2x/mobile files that already exist
+// in client/public as-is, rather than re-deriving them.
 import { createHash } from "node:crypto";
 import sharp from "sharp";
-import type { MediaSlotDef, VariantName, VariantSpec } from "./mediaCatalog.ts";
+import type { VariantName, VariantSpec } from "./mediaCatalog.ts";
 
 export interface GeneratedVariant {
   key: string;
@@ -16,6 +17,14 @@ export interface GeneratedVariant {
 }
 
 export type GeneratedVariants = Partial<Record<VariantName, GeneratedVariant>>;
+
+export type VariantSpecs = Partial<Record<VariantName, VariantSpec>>;
+
+// Where a rendition is stored. Media slots use a fixed name per slot
+// (media/<slot>/<variant>.webp, overwritten on replace); blog images put the
+// content hash in the name, so a replaced file is a new key rather than new
+// bytes under an old one.
+export type VariantKeyFor = (name: VariantName, ext: "webp" | "svg", hash: string) => string;
 
 export interface BaseUndersized {
   targetWidth: number;
@@ -43,16 +52,17 @@ function sha256(buf: Buffer): string {
 // the source is large enough, otherwise saved at native size. SVGs pass
 // through untouched, there's nothing to resize.
 export async function generateVariants(
-  slotDef: MediaSlotDef,
+  specs: VariantSpecs,
   sourceBuffer: Buffer,
-  sourceMimeType: string
+  sourceMimeType: string,
+  keyFor: VariantKeyFor
 ): Promise<GenerateVariantsResult> {
   if (sourceMimeType === "image/svg+xml") {
     const hash = sha256(sourceBuffer);
     return {
       variants: {
         base: {
-          key: `media/${slotDef.slot}/base.svg`,
+          key: keyFor("base", "svg", hash),
           width: 0,
           height: 0,
           bytes: sourceBuffer.length,
@@ -70,7 +80,7 @@ export async function generateVariants(
   const skipped: VariantName[] = [];
   let baseUndersized: BaseUndersized | null = null;
 
-  for (const [name, spec] of Object.entries(slotDef.variants) as [VariantName, VariantSpec][]) {
+  for (const [name, spec] of Object.entries(specs) as [VariantName, VariantSpec][]) {
     const isBase = name === "base";
     const tooSmall = spec.width !== undefined && sourceWidth < spec.width;
 
@@ -95,12 +105,13 @@ export async function generateVariants(
 
     const buffer = await pipeline.webp({ quality: 82 }).toBuffer();
     const meta = await sharp(buffer).metadata();
+    const hash = sha256(buffer);
     variants[name] = {
-      key: `media/${slotDef.slot}/${name}.webp`,
+      key: keyFor(name, "webp", hash),
       width: meta.width ?? sourceWidth,
       height: meta.height ?? 0,
       bytes: buffer.length,
-      hash: sha256(buffer),
+      hash,
       buffer,
     };
   }

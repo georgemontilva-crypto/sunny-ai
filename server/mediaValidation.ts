@@ -1,5 +1,22 @@
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 export const ALLOWED_MIME_TYPES = ["image/webp", "image/jpeg", "image/png", "image/svg+xml"] as const;
+// Blog covers: the cover is also the post's og:image, and share cards don't
+// render SVG.
+export const RASTER_MIME_TYPES = ["image/webp", "image/jpeg", "image/png"] as const;
+
+const TYPE_LABELS: Record<string, string> = {
+  "image/webp": "WebP",
+  "image/jpeg": "JPEG",
+  "image/png": "PNG",
+  "image/svg+xml": "SVG",
+};
+
+// "WebP, JPEG, PNG, or SVG" — for the error messages, so they always name
+// exactly the types that particular upload accepts.
+export function describeMimeTypes(types: readonly string[]): string {
+  const labels = types.map((type) => TYPE_LABELS[type] ?? type);
+  return labels.length > 1 ? `${labels.slice(0, -1).join(", ")}, or ${labels[labels.length - 1]}` : (labels[0] ?? "");
+}
 
 // Never trust the client's declared mimeType — sniff the real bytes.
 export function sniffMimeType(buffer: Buffer): string | null {

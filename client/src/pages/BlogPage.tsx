@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Calendar, ArrowRight, BookOpen, Rss } from "lucide-react";
 import { getAllPosts, type BlogPost } from "@/lib/blog";
-import { getSlotUrl } from "@/lib/media";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
@@ -17,9 +16,9 @@ function formatDate(date: string) {
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
   const isFirst = index === 0;
-  // Empty until an image is uploaded to that slot in /admin/media — the
-  // card falls back to its icon placeholder rather than a broken <img>.
-  const coverUrl = post.coverSlot ? getSlotUrl(post.coverSlot) : undefined;
+  // A post without a cover keeps the card's icon placeholder, so the grid
+  // stays even — unlike the article page, where no cover means no header.
+  const { cover } = post;
 
   return (
     <motion.article
@@ -31,12 +30,14 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
       <Link href={`/blog/${post.slug}`} className="block h-full">
         <div className="h-full rounded-2xl border border-border/50 bg-card overflow-hidden hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
           <div className={`relative overflow-hidden ${isFirst ? "h-56" : "h-44"} bg-muted/40 flex items-center justify-center`}>
-            {coverUrl ? (
+            {cover ? (
               <img
-                src={coverUrl}
+                src={cover.url}
+                srcSet={cover.url2x ? `${cover.url} ${cover.width}w, ${cover.url2x} ${cover.width * 2}w` : undefined}
+                sizes={cover.url2x ? (isFirst ? "(min-width: 64rem) 1024px, 100vw" : "(min-width: 48rem) 50vw, 100vw") : undefined}
                 alt=""
-                width={1200}
-                height={675}
+                width={cover.width}
+                height={cover.height}
                 loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
               />

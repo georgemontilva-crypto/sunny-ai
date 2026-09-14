@@ -24,7 +24,7 @@ import path from "node:path";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
-import { readingTimeMinutes, type BlogPost } from "../shared/blog.ts";
+import { COVER_SIZE, readingTimeMinutes, type BlogPost, type PostCover } from "../shared/blog.ts";
 import { posts } from "../server/schema.ts";
 
 const OUT_FILE = path.resolve(import.meta.dirname, "..", "client", "src", "generated", "blog-map.json");
@@ -39,6 +39,25 @@ function toIso(value: Date | string | null): string {
   if (!value) return "";
   const date = value instanceof Date ? value : new Date(value);
   return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+// The cover's R2 keys -> public URLs, the same resolution
+// generate-media-map.ts does for slots. No `?v=` cache-buster: blog image
+// keys carry their content hash, so new bytes are always a new URL.
+function resolveCover(row: typeof posts.$inferSelect, publicUrl: string | undefined): PostCover | null {
+  if (!row.coverKey) return null;
+  if (!publicUrl) {
+    console.warn(`[blog-map] /blog/${row.slug} has a cover but R2_PUBLIC_URL is not set — rendering it without one`);
+    return null;
+  }
+  const base = publicUrl.replace(/\/$/, "");
+  return {
+    url: `${base}/${row.coverKey}`,
+    url2x: row.cover2xKey ? `${base}/${row.cover2xKey}` : "",
+    alt: row.coverAlt ?? "",
+    width: row.coverWidth || COVER_SIZE.width,
+    height: row.coverHeight || COVER_SIZE.height,
+  };
 }
 
 async function resolveFromDatabase(databaseUrl: string): Promise<BlogPost[]> {
@@ -67,7 +86,7 @@ async function resolveFromDatabase(databaseUrl: string): Promise<BlogPost[]> {
     excerpt: row.excerpt ?? "",
     content: row.content,
     category: row.category ?? "",
-    coverSlot: row.coverSlot ?? "",
+    cover: resolveCover(row, process.env.R2_PUBLIC_URL),
     lang: row.lang,
     publishedAt: toIso(row.publishedAt),
     updatedAt: toIso(row.updatedAt),

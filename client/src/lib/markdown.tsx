@@ -97,7 +97,16 @@ function safeUrl(raw: string, allowMailtoAndTel: boolean): string | undefined {
   return undefined;
 }
 
-function renderInline(tokens: Token[] | undefined, keyPrefix: string): ReactNode {
+export interface RenderMarkdownOptions {
+  // Admin preview only: resolves an image href the public renderer would
+  // reject — a body image inserted in the editor but not saved yet
+  // (upload:<token>, see shared/blog.ts), shown from a local blob: URL until
+  // the save uploads it. The public page never passes this, so it can't
+  // widen what a published body is able to point at.
+  resolveImageSrc?: (href: string) => string | undefined;
+}
+
+function renderInline(tokens: Token[] | undefined, keyPrefix: string, opts: RenderMarkdownOptions): ReactNode {
   if (!tokens) return null;
   return tokens.map((token, i) => {
     const key = `${keyPrefix}-${i}`;
@@ -106,11 +115,11 @@ function renderInline(tokens: Token[] | undefined, keyPrefix: string): ReactNode
       case "escape":
         return decodeEntities((token as Tokens.Text).text);
       case "strong":
-        return <strong key={key}>{renderInline((token as Tokens.Strong).tokens, key)}</strong>;
+        return <strong key={key}>{renderInline((token as Tokens.Strong).tokens, key, opts)}</strong>;
       case "em":
-        return <em key={key}>{renderInline((token as Tokens.Em).tokens, key)}</em>;
+        return <em key={key}>{renderInline((token as Tokens.Em).tokens, key, opts)}</em>;
       case "del":
-        return <del key={key}>{renderInline((token as Tokens.Del).tokens, key)}</del>;
+        return <del key={key}>{renderInline((token as Tokens.Del).tokens, key, opts)}</del>;
       case "codespan":
         return <code key={key}>{decodeEntities((token as Tokens.Codespan).text)}</code>;
       case "br":
@@ -118,7 +127,7 @@ function renderInline(tokens: Token[] | undefined, keyPrefix: string): ReactNode
       case "link": {
         const link = token as Tokens.Link;
         const href = safeUrl(link.href, true);
-        const children = renderInline(link.tokens, key);
+        const children = renderInline(link.tokens, key, opts);
         if (!href) return <span key={key}>{children}</span>;
         const external = /^https?:\/\//i.test(href.trim());
         return (
@@ -134,7 +143,7 @@ function renderInline(tokens: Token[] | undefined, keyPrefix: string): ReactNode
       }
       case "image": {
         const image = token as Tokens.Image;
-        const src = safeUrl(image.href, false);
+        const src = opts.resolveImageSrc?.(image.href) ?? safeUrl(image.href, false);
         const alt = decodeEntities(image.text ?? "");
         if (!src) return <span key={key}>{alt}</span>;
         return <img key={key} src={src} alt={alt} title={image.title ?? undefined} loading="lazy" />;
@@ -148,8 +157,8 @@ function renderInline(tokens: Token[] | undefined, keyPrefix: string): ReactNode
   });
 }
 
-function renderListItem(item: Tokens.ListItem, key: string): ReactNode {
-  const body = renderBlocks(item.tokens, key);
+function renderListItem(item: Tokens.ListItem, key: string, opts: RenderMarkdownOptions): ReactNode {
+  const body = renderBlocks(item.tokens, key, opts);
   if (!item.task) return <li key={key}>{body}</li>;
   return (
     <li key={key} className="list-none -ml-5 flex items-start gap-2">
@@ -159,7 +168,7 @@ function renderListItem(item: Tokens.ListItem, key: string): ReactNode {
   );
 }
 
-function renderBlocks(tokens: Token[] | undefined, keyPrefix: string): ReactNode {
+function renderBlocks(tokens: Token[] | undefined, keyPrefix: string, opts: RenderMarkdownOptions): ReactNode {
   if (!tokens) return null;
   return tokens.map((token, i) => {
     const key = `${keyPrefix}-${i}`;
@@ -167,10 +176,10 @@ function renderBlocks(tokens: Token[] | undefined, keyPrefix: string): ReactNode
       case "heading": {
         const heading = token as Tokens.Heading;
         const Tag = `h${Math.min(6, Math.max(1, heading.depth))}` as "h1";
-        return <Tag key={key}>{renderInline(heading.tokens, key)}</Tag>;
+        return <Tag key={key}>{renderInline(heading.tokens, key, opts)}</Tag>;
       }
       case "paragraph":
-        return <p key={key}>{renderInline((token as Tokens.Paragraph).tokens, key)}</p>;
+        return <p key={key}>{renderInline((token as Tokens.Paragraph).tokens, key, opts)}</p>;
       case "text": {
         // A tight list item's body, or a plain text block: it carries inline
         // tokens of its own when there's anything to mark up. Wrapped in a
@@ -179,14 +188,14 @@ function renderBlocks(tokens: Token[] | undefined, keyPrefix: string): ReactNode
         // fight the prose styles for no reason.
         const text = token as Tokens.Text;
         return text.tokens ? (
-          <Fragment key={key}>{renderInline(text.tokens, key)}</Fragment>
+          <Fragment key={key}>{renderInline(text.tokens, key, opts)}</Fragment>
         ) : (
           decodeEntities(text.text)
         );
       }
       case "list": {
         const list = token as Tokens.List;
-        const items = list.items.map((item, j) => renderListItem(item, `${key}-${j}`));
+        const items = list.items.map((item, j) => renderListItem(item, `${key}-${j}`, opts));
         if (!list.ordered) return <ul key={key}>{items}</ul>;
         const start = Number(list.start);
         return (
@@ -196,7 +205,7 @@ function renderBlocks(tokens: Token[] | undefined, keyPrefix: string): ReactNode
         );
       }
       case "blockquote":
-        return <blockquote key={key}>{renderBlocks((token as Tokens.Blockquote).tokens, key)}</blockquote>;
+        return <blockquote key={key}>{renderBlocks((token as Tokens.Blockquote).tokens, key, opts)}</blockquote>;
       case "code": {
         const code = token as Tokens.Code;
         return (
@@ -216,7 +225,7 @@ function renderBlocks(tokens: Token[] | undefined, keyPrefix: string): ReactNode
                 <tr>
                   {table.header.map((cell, j) => (
                     <th key={`${key}-h-${j}`} style={cell.align ? { textAlign: cell.align } : undefined}>
-                      {renderInline(cell.tokens, `${key}-h-${j}`)}
+                      {renderInline(cell.tokens, `${key}-h-${j}`, opts)}
                     </th>
                   ))}
                 </tr>
@@ -226,7 +235,7 @@ function renderBlocks(tokens: Token[] | undefined, keyPrefix: string): ReactNode
                   <tr key={`${key}-r-${r}`}>
                     {row.map((cell, c) => (
                       <td key={`${key}-r-${r}-${c}`} style={cell.align ? { textAlign: cell.align } : undefined}>
-                        {renderInline(cell.tokens, `${key}-r-${r}-${c}`)}
+                        {renderInline(cell.tokens, `${key}-r-${r}-${c}`, opts)}
                       </td>
                     ))}
                   </tr>
@@ -264,10 +273,10 @@ export const POST_PROSE_CLASSNAME =
   "prose-a:text-primary prose-a:font-medium " +
   "prose-blockquote:text-muted-foreground prose-img:rounded-xl";
 
-export function renderMarkdown(markdown: string): ReactNode {
+export function renderMarkdown(markdown: string, opts: RenderMarkdownOptions = {}): ReactNode {
   if (!markdown.trim()) return null;
   // No `gfm: false` / `breaks: true` overrides — the defaults (GFM on,
   // single newlines are not <br>) are what the migrated MDX bodies were
   // written against.
-  return renderBlocks(marked.lexer(markdown), "md");
+  return renderBlocks(marked.lexer(markdown), "md", opts);
 }

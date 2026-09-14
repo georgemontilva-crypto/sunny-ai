@@ -182,7 +182,6 @@ async function main() {
         excerpt: post.excerpt || null,
         content: post.content,
         category: post.category || null,
-        coverSlot: null,
         status: "draft",
         lang: "es",
         publishedAt: post.date,

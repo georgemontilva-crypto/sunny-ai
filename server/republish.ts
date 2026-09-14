@@ -64,6 +64,32 @@ export function getPublishStatus(): { status: PublishStatus; error: string | nul
   return { status, error: lastError };
 }
 
+// Work that has to wait until the live site stops pointing at something —
+// deleting the image a published article used before it was edited, say.
+// Runs after the next successful republish with nothing queued behind it, so
+// the HTML it waited for reflects the latest save; a failed republish leaves
+// it pending for the one after, instead of deleting a file a page that's
+// still live displays. Keyed, so repeated saves replace the task rather than
+// piling up copies. In-memory only: a restart drops it, and the cost of that
+// is a leftover file, never a missing one.
+const afterPublishTasks = new Map<string, () => Promise<void>>();
+
+export function runAfterPublish(key: string, task: () => Promise<void>): void {
+  afterPublishTasks.set(key, task);
+}
+
+async function drainAfterPublishTasks(id: number): Promise<void> {
+  const tasks = [...afterPublishTasks.entries()];
+  afterPublishTasks.clear();
+  for (const [key, task] of tasks) {
+    try {
+      await task();
+    } catch (err) {
+      console.error(`[republish#${id}] after-publish task "${key}" failed —`, err);
+    }
+  }
+}
+
 export function scheduleRepublish(): void {
   if (running) {
     queued = true;
@@ -247,6 +273,8 @@ async function republish(): Promise<void> {
     if (queued) {
       queued = false;
       scheduleRepublish();
+    } else if (status === "published") {
+      void drainAfterPublishTasks(id);
     }
   }
 }

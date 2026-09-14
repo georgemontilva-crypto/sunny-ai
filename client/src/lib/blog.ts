@@ -9,7 +9,6 @@
 // page, no sitemap entry and no card in the list. That's the whole
 // mechanism behind "Save draft changes nothing public".
 import blogMap from "../generated/blog-map.json";
-import { getSlotUrl } from "./media";
 import type { BlogPost } from "@shared/blog";
 import { absoluteUrl } from "@shared/site";
 
@@ -47,16 +46,15 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 }
 
 // The post's cover as an absolute URL, for og:image and the BlogPosting
-// JSON-LD. Undefined when the post points at no slot, or at one nothing has
-// been uploaded to yet — both callers omit their field in that case rather
-// than emit a URL that 404s, which is worse in a share card or a rich result
-// than having no image at all.
+// JSON-LD — the base rendition, which is 1200×630 precisely so it can serve
+// as the share image too. Undefined when the post has no cover: both callers
+// omit their field then rather than emit a URL that 404s, which is worse in
+// a share card or a rich result than having no image at all.
 //
-// getSlotUrl already returns an absolute R2 URL; absoluteUrl() is a
+// The map generator already resolves an absolute R2 URL; absoluteUrl() is a
 // defensive no-op that guards against double-prefixing if that ever changes.
 export function postImageUrl(post: BlogPost): string | undefined {
-  if (!post.coverSlot) return undefined;
-  const url = getSlotUrl(post.coverSlot);
-  if (!url) return undefined;
+  if (!post.cover) return undefined;
+  const url = post.cover.url;
   return url.startsWith("http") ? url : absoluteUrl(url);
 }

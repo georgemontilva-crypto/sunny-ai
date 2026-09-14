@@ -1,4 +1,4 @@
-import { boolean, index, json, longtext, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, index, int, json, longtext, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 // MySQL has no built-in random-uuid column default (unlike Postgres'
 // gen_random_uuid()) — every id is generated in application code via
@@ -140,10 +140,19 @@ export const posts = mysqlTable(
     excerpt: text("excerpt"),
     content: longtext("content").notNull(),
     category: varchar("category", { length: 80 }),
-    // A slot from server/mediaCatalog.ts (the blog-cover-* ones), not a
-    // URL — the image itself is uploaded through /admin/media like every
-    // other image and resolved at render time via getSlotUrl().
-    coverSlot: varchar("cover_slot", { length: 80 }),
+    // The post's own cover, uploaded from the editor into blog/<postId>/ in
+    // R2 (server/blogImages.ts). Keys, not URLs: scripts/generate-blog-map.ts
+    // resolves them against R2_PUBLIC_URL at build time, the same way media
+    // slots are resolved. All NULL when the post has no cover.
+    coverKey: varchar("cover_key", { length: 255 }),
+    // Only set when the upload was at least 2400px wide — renditions are
+    // never upscaled, so a smaller source gets a base and nothing else.
+    cover2xKey: varchar("cover_2x_key", { length: 255 }),
+    coverAlt: text("cover_alt"),
+    // The base rendition's actual size: 1200×630, or the source's own size
+    // when it was smaller than that. What the page's width/height use.
+    coverWidth: int("cover_width"),
+    coverHeight: int("cover_height"),
     status: varchar("status", { length: 20 }).notNull().default("draft"), // 'draft' | 'published'
     lang: varchar("lang", { length: 5 }).notNull().default("en"),
     publishedAt: timestamp("published_at"),

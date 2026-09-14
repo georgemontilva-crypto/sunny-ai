@@ -1,25 +1,21 @@
 import { randomUUID } from "node:crypto";
 import { TRPCError } from "@trpc/server";
-import { GetObjectCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { writeAudit } from "../auditLog.ts";
 import { getSlotDef, isValidSlot } from "../mediaCatalog.ts";
 import { generateVariants } from "../mediaVariants.ts";
-import { ALLOWED_MIME_TYPES, MAX_UPLOAD_BYTES, sniffMimeType } from "../mediaValidation.ts";
-import { getR2Bucket, getR2Client, tryR2PublicUrl } from "../r2.ts";
+import { tryR2PublicUrl } from "../r2.ts";
 import { getPublishStatus, scheduleRepublish } from "../republish.ts";
 import { media } from "../schema.ts";
 import { adminProcedure, router } from "../trpc.ts";
-
-async function streamToBuffer(stream: unknown): Promise<Buffer> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of stream as AsyncIterable<Buffer>) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-  return Buffer.concat(chunks);
-}
+import {
+  createPresignedUpload,
+  deleteObjectsQuietly,
+  putVariants,
+  readTempUpload,
+  tempKeySchema,
+} from "../uploads.ts";
 
 // The panel needs today's actual R2 image, not the one baked into the
 // client bundle at the last build/republish (that's what public pages use
@@ -73,63 +69,30 @@ export const mediaRouter = router({
     )
     .mutation(async ({ input }) => {
       if (!isValidSlot(input.slot)) throw new TRPCError({ code: "BAD_REQUEST", message: "Unknown slot" });
-      if (!(ALLOWED_MIME_TYPES as readonly string[]).includes(input.mimeType)) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Only WebP, JPEG, PNG, or SVG are allowed" });
-      }
-      if (input.bytes > MAX_UPLOAD_BYTES) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "File is larger than 5 MB" });
-      }
-
-      const r2 = getR2Client();
-      if (!r2) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "R2 is not configured" });
-
-      const tempKey = `uploads/tmp/${randomUUID()}`;
-      const uploadUrl = await getSignedUrl(
-        r2,
-        new PutObjectCommand({ Bucket: getR2Bucket(), Key: tempKey, ContentType: input.mimeType }),
-        { expiresIn: 300 }
-      );
-
-      return { uploadUrl, tempKey };
+      return createPresignedUpload(input);
     }),
 
   confirmUpload: adminProcedure
-    .input(z.object({ slot: z.string().min(1), tempKey: z.string().min(1) }))
+    .input(z.object({ slot: z.string().min(1), tempKey: tempKeySchema }))
     .mutation(async ({ ctx, input }) => {
       const slotDef = getSlotDef(input.slot);
       if (!slotDef) throw new TRPCError({ code: "BAD_REQUEST", message: "Unknown slot" });
 
-      const r2 = getR2Client();
-      if (!r2) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "R2 is not configured" });
-      const bucket = getR2Bucket();
-
-      const obj = await r2
-        .send(new GetObjectCommand({ Bucket: bucket, Key: input.tempKey }))
-        .catch(() => null);
-      if (!obj?.Body) throw new TRPCError({ code: "BAD_REQUEST", message: "Upload not found — please try again" });
-
-      const buffer = await streamToBuffer(obj.Body);
-      const mimeType = sniffMimeType(buffer);
-      if (!mimeType) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "That file doesn't look like a WebP, JPEG, PNG, or SVG" });
-      }
-      if (buffer.length > MAX_UPLOAD_BYTES) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "File is larger than 5 MB" });
-      }
-
-      const { variants, skipped, baseUndersized } = await generateVariants(slotDef, buffer, mimeType);
-
-      for (const variant of Object.values(variants)) {
-        await r2.send(
-          new PutObjectCommand({
-            Bucket: bucket,
-            Key: variant.key,
-            Body: variant.buffer,
-            ContentType: mimeType === "image/svg+xml" ? "image/svg+xml" : "image/webp",
-          })
+      let result;
+      try {
+        const { buffer, mimeType } = await readTempUpload(input.tempKey);
+        const generated = await generateVariants(
+          slotDef.variants,
+          buffer,
+          mimeType,
+          (name, ext) => `media/${slotDef.slot}/${name}.${ext}`
         );
+        await putVariants(generated.variants, mimeType);
+        result = { ...generated, mimeType };
+      } finally {
+        await deleteObjectsQuietly([input.tempKey]);
       }
-      await r2.send(new DeleteObjectCommand({ Bucket: bucket, Key: input.tempKey })).catch(() => {});
+      const { variants, skipped, baseUndersized, mimeType } = result;
 
       const storedVariants: Record<string, unknown> = {};
       for (const [name, v] of Object.entries(variants)) {

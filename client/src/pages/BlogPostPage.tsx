@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Clock, Calendar, ArrowLeft, BookOpen } from "lucide-react";
 import { getPostBySlug } from "@/lib/blog";
-import { getSlotUrl } from "@/lib/media";
 import { POST_PROSE_CLASSNAME, renderMarkdown } from "@/lib/markdown";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
@@ -36,7 +35,7 @@ export default function BlogPostPage() {
     );
   }
 
-  const coverUrl = post.coverSlot ? getSlotUrl(post.coverSlot) : undefined;
+  const { cover } = post;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -51,13 +50,20 @@ export default function BlogPostPage() {
         </div>
 
         <header className="mb-10">
-          {coverUrl && (
+          {/* No cover, no header image and no space held for one. The box is
+          always the 1200×630 shape, so a cover saved smaller than that (or a
+          different ratio) is cropped to match rather than changing the
+          layout. */}
+          {cover && (
             <img
-              src={coverUrl}
-              alt=""
-              width={1200}
-              height={675}
-              className="w-full aspect-[16/9] object-cover rounded-2xl border border-border/50 mb-8"
+              src={cover.url}
+              srcSet={cover.url2x ? `${cover.url} ${cover.width}w, ${cover.url2x} ${cover.width * 2}w` : undefined}
+              sizes={cover.url2x ? "(min-width: 48rem) 736px, calc(100vw - 2rem)" : undefined}
+              alt={cover.alt}
+              width={cover.width}
+              height={cover.height}
+              fetchPriority="high"
+              className="w-full aspect-[1200/630] object-cover rounded-2xl border border-border/50 mb-8"
             />
           )}
 

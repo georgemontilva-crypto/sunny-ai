@@ -27,16 +27,34 @@ export const POST_LANG_LABELS: Record<PostLang, string> = {
 export const SEO_TITLE_MAX = 60;
 export const SEO_DESCRIPTION_MAX = 160;
 
-// One entry of client/src/generated/blog-map.json. Every field is a plain
-// string (never null): the map generator normalizes the nullable columns so
-// the public pages never have to null-check a value they only ever render.
+// The cover's base rendition, which is also the post's og:image — 1200×630
+// is the size share cards are designed around. The 2x is only generated from
+// a source at least that wide; nothing is ever upscaled.
+export const COVER_SIZE = { width: 1200, height: 630 } as const;
+export const COVER_SIZE_2X = { width: 2400, height: 1260 } as const;
+
+// A post's cover as the public pages consume it, with the R2 keys already
+// resolved to public URLs by the map generator.
+export interface PostCover {
+  url: string;
+  url2x: string; // "" when the upload was too small for a 2x rendition
+  alt: string;
+  width: number;
+  height: number;
+}
+
+// One entry of client/src/generated/blog-map.json. Every text field is a
+// plain string (never null): the map generator normalizes the nullable
+// columns so the public pages never have to null-check a value they only
+// ever render. `cover` is the exception — a post without one has no image
+// at all, not an empty one.
 export interface BlogPost {
   slug: string;
   title: string;
   excerpt: string;
   content: string; // markdown
   category: string;
-  coverSlot: string; // "" when the post has no cover
+  cover: PostCover | null;
   lang: string;
   publishedAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
@@ -57,6 +75,25 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, "")
     .slice(0, 191)
     .replace(/-+$/g, "");
+}
+
+// A body image the author has inserted in the editor but not saved yet is
+// referenced in the markdown as ![alt](upload:<token>). Nothing is uploaded
+// until the post is saved — a post that's abandoned leaves nothing behind in
+// R2 — and on save the server swaps each reference for the stored image's
+// real URL. The public renderer doesn't accept this scheme, so a reference
+// that somehow survived would render as its alt text, not a broken image.
+export const PENDING_IMAGE_SCHEME = "upload:";
+export const PENDING_IMAGE_TOKEN_RE = /^[a-z0-9]{12}$/;
+
+export function pendingImageRef(token: string): string {
+  return `${PENDING_IMAGE_SCHEME}${token}`;
+}
+
+// Replaces the reference wherever it's a link destination — followed by the
+// closing paren or by the space before an optional "title".
+export function replacePendingImageRef(markdown: string, token: string, url: string): string {
+  return markdown.replace(new RegExp(`\\(${PENDING_IMAGE_SCHEME}${token}(?=[\\s)])`, "g"), `(${url}`);
 }
 
 // 200 words per minute, floor of 1. Counts the markdown source rather than

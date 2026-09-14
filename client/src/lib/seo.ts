@@ -138,11 +138,11 @@ export function getMetaForPath(path: string): HeadMeta {
       canonicalPath: clean,
       lang: post.lang,
       ogType: "article",
-      // The cover is decorative on the page itself (the <h1> says the same
-      // thing right next to it, so BlogPostPage renders it with alt=""),
-      // but a share card is often shown with no title beside it — there,
-      // the article's title is what the image is actually of.
-      ...(image ? { image: { url: image, alt: post.title } } : {}),
+      // The author's own alt text when they wrote one. Without it, the
+      // article's title: a share card is often shown with no title beside
+      // it, and an image with no alt there is a blank rectangle to a screen
+      // reader.
+      ...(image ? { image: { url: image, alt: post.cover?.alt || post.title } } : {}),
       article: {
         publishedTime: post.publishedAt,
         modifiedTime: post.updatedAt || post.publishedAt,
