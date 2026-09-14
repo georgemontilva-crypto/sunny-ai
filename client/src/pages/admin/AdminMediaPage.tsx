@@ -1,42 +1,21 @@
-import { AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
 import { MEDIA_SLOTS } from "@server/mediaCatalog.ts";
 import MediaSlotCard from "@/components/admin/MediaSlotCard";
+import PublishStatus, { publishStatusRefetchInterval } from "@/components/admin/PublishStatus";
 import { trpc } from "@/lib/trpc";
 
 export default function AdminMediaPage() {
   const { data, isLoading, isError } = trpc.media.list.useQuery();
   const publishStatus = trpc.media.publishStatus.useQuery(undefined, {
-    refetchInterval: (query) => {
-      const s = query.state.data?.status;
-      return s === "pending" || s === "publishing" ? 3000 : false;
-    },
+    refetchInterval: publishStatusRefetchInterval,
   });
 
   const rowBySlot = new Map((data ?? []).map((row) => [row.slot, row]));
-  const status = publishStatus.data?.status;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-start justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-foreground">Media</h1>
-        {(status === "pending" || status === "publishing") && (
-          <span className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Publishing changes…
-          </span>
-        )}
-        {status === "published" && (
-          <span className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle2 className="w-4 h-4" />
-            Published
-          </span>
-        )}
-        {status === "error" && (
-          <span className="flex items-center gap-2 text-sm text-red-600">
-            <AlertTriangle className="w-4 h-4" />
-            Publish failed: {publishStatus.data?.error ?? "unknown error"}
-          </span>
-        )}
+        <PublishStatus report={publishStatus.data} />
       </div>
 
       {isLoading ? (

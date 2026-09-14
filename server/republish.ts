@@ -54,14 +54,39 @@ for (const entry of fs.readdirSync(ROOT)) {
 
 export type PublishStatus = "idle" | "pending" | "publishing" | "published" | "error";
 
+// What a run does, in order — named so the panel can say which part failed
+// instead of a bare "failed". "lock" is waiting for another process's
+// republish (see acquireCrossProcessLock), before any step runs.
+export type PublishStep = "lock" | "media-map" | "settings-map" | "blog-map" | "prerender";
+
+export interface PublishReport {
+  status: PublishStatus;
+  // One line per failed step, "<step>: <reason>". null when nothing failed.
+  error: string | null;
+  failedSteps: PublishStep[];
+  // Whether the run still updated the live site. A failed generator leaves
+  // its previous JSON in place, so the prerender still runs — the site gets
+  // everything that did regenerate, and the failed part keeps showing its
+  // last good version. Only a failed lock or prerender leaves dist/ as it was.
+  siteUpdated: boolean;
+}
+
+// Each one rewrites one client/src/generated/*.json from the database, and
+// prerender.mjs inlines all three.
+const GENERATORS: { step: PublishStep; script: string }[] = [
+  { step: "media-map", script: "scripts/generate-media-map.ts" },
+  { step: "settings-map", script: "scripts/generate-settings-map.ts" },
+  { step: "blog-map", script: "scripts/generate-blog-map.ts" },
+];
+
 let status: PublishStatus = "idle";
-let lastError: string | null = null;
+let lastReport: Omit<PublishReport, "status"> = { error: null, failedSteps: [], siteUpdated: false };
 let running = false;
 let queued = false;
 let runCounter = 0;
 
-export function getPublishStatus(): { status: PublishStatus; error: string | null } {
-  return { status, error: lastError };
+export function getPublishStatus(): PublishReport {
+  return { status, ...lastReport };
 }
 
 // Work that has to wait until the live site stops pointing at something —
@@ -104,19 +129,52 @@ export function scheduleRepublish(): void {
   void republish();
 }
 
+class ChildProcessFailure extends Error {
+  constructor(
+    message: string,
+    readonly stderrTail: string[]
+  ) {
+    super(message);
+  }
+}
+
+// stderr is piped rather than inherited so a failure can carry the child's
+// own explanation to the panel ("exited with code 1" says nothing) — but
+// every chunk is still written through to this process's stderr, so the
+// Railway logs read exactly as before.
 function runChild(command: string, args: string[], extraEnv?: NodeJS.ProcessEnv): Promise<void> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: ROOT,
-      stdio: "inherit",
+      stdio: ["inherit", "inherit", "pipe"],
       env: extraEnv ? { ...process.env, ...extraEnv } : process.env,
+    });
+    const tail: string[] = [];
+    child.stderr.on("data", (chunk: Buffer) => {
+      process.stderr.write(chunk);
+      tail.push(...chunk.toString("utf-8").split(/\r?\n/).filter((line) => line.trim() !== ""));
+      if (tail.length > 50) tail.splice(0, tail.length - 50);
     });
     child.on("error", reject);
     child.on("exit", (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`${command} ${args.join(" ")} exited with code ${code}`));
+      else reject(new ChildProcessFailure(`${command} ${args.join(" ")} exited with code ${code}`, tail));
     });
   });
+}
+
+// One line for the panel. The generators print "[blog-map] FAILED: <reason>"
+// in --strict-on-error mode, so that's preferred; otherwise the first line
+// that looks like an error (prerender.mjs prints a stack), otherwise the last.
+function describeFailure(err: unknown): string {
+  let reason = err instanceof Error ? err.message : String(err);
+  if (err instanceof ChildProcessFailure && err.stderrTail.length > 0) {
+    const failedLine = [...err.stderrTail].reverse().find((line) => line.includes("FAILED:"));
+    const errorLine = err.stderrTail.find((line) => /error/i.test(line));
+    const line = failedLine ?? errorLine ?? err.stderrTail[err.stderrTail.length - 1];
+    reason = failedLine ? line.slice(line.indexOf("FAILED:") + "FAILED:".length).trim() : line.trim();
+  }
+  return reason.length > 300 ? `${reason.slice(0, 297)}...` : reason;
 }
 
 function copyDirRecursive(src: string, dest: string): void {
@@ -241,31 +299,71 @@ async function republish(): Promise<void> {
   logBuildInfo(id);
 
   let releaseLock: (() => Promise<void>) | null = null;
+  const ran: PublishStep[] = [];
+  const failures: { step: PublishStep; reason: string }[] = [];
+  let siteUpdated = false;
+
+  const runStep = async (step: PublishStep, run: () => Promise<void>): Promise<boolean> => {
+    ran.push(step);
+    try {
+      await run();
+      return true;
+    } catch (err) {
+      failures.push({ step, reason: describeFailure(err) });
+      return false;
+    }
+  };
 
   try {
-    releaseLock = await acquireCrossProcessLock(id);
+    try {
+      releaseLock = await acquireCrossProcessLock(id);
+    } catch (err) {
+      failures.push({ step: "lock", reason: describeFailure(err) });
+    }
 
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    if (failures.length === 0) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
 
-    // Refresh client/src/generated/media-map.json, settings-map.json and
-    // blog-map.json from the DB first — prerender.mjs inlines all three at
-    // build time, so stale copies would prerender old image URLs, old
-    // partner-page pricing, or a just-unpublished article.
-    // --strict-on-error: a DB hiccup here must surface as a real failure,
-    // not a silent fallback that wipes every value (or every published
-    // post) and still reports "published".
-    await runChild(process.execPath, [TSX_CLI, "scripts/generate-media-map.ts", "--strict-on-error"]);
-    await runChild(process.execPath, [TSX_CLI, "scripts/generate-settings-map.ts", "--strict-on-error"]);
-    await runChild(process.execPath, [TSX_CLI, "scripts/generate-blog-map.ts", "--strict-on-error"]);
-    await runChild(process.execPath, ["scripts/prerender.mjs"], { PRERENDER_OUT_DIR: tempDir });
+      // Refresh client/src/generated/media-map.json, settings-map.json and
+      // blog-map.json from the DB first — prerender.mjs inlines all three,
+      // so stale copies would prerender old image URLs, old partner-page
+      // pricing, or miss a just-published article.
+      //
+      // Each runs no matter how the others went. They used to be chained,
+      // so a failure in media-map meant blog-map never ran at all and a
+      // freshly published article never reached the site, with nothing in
+      // the panel pointing at why. --strict-on-error still matters: a failing
+      // generator leaves its previous JSON untouched instead of writing an
+      // empty one, so the prerender below always has a complete set of
+      // inputs — fresh where the generator succeeded, last-good where not.
+      for (const { step, script } of GENERATORS) {
+        await runStep(step, () => runChild(process.execPath, [TSX_CLI, script, "--strict-on-error"]));
+      }
+      siteUpdated = await runStep("prerender", async () => {
+        await runChild(process.execPath, ["scripts/prerender.mjs"], { PRERENDER_OUT_DIR: tempDir });
+        copyDirRecursive(tempDir, DIST_DIR);
+      });
+    }
 
-    copyDirRecursive(tempDir, DIST_DIR);
-    status = "published";
-    console.log(`[republish#${id}] finished: published`);
-  } catch (err) {
-    status = "error";
-    lastError = err instanceof Error ? err.message : String(err);
-    console.error(`[republish#${id}] finished: failed —`, err);
+    // Any failure makes the run an error, even when the site was updated
+    // with everything else — "published" would hide that part of it is
+    // stale.
+    status = failures.length === 0 ? "published" : "error";
+    lastReport = {
+      error: failures.length === 0 ? null : failures.map((f) => `${f.step}: ${f.reason}`).join("\n"),
+      failedSteps: failures.map((f) => f.step),
+      siteUpdated,
+    };
+    const summary = ran.map((step) => `${step}=${failures.some((f) => f.step === step) ? "FAILED" : "ok"}`).join(" ");
+    if (failures.length === 0) {
+      console.log(`[republish#${id}] finished: published (${summary})`);
+    } else {
+      console.error(
+        `[republish#${id}] finished: FAILED at ${lastReport.failedSteps.join(", ")} (${summary || "no steps ran"}) — ` +
+          (siteUpdated ? "live site updated with everything that succeeded" : "live site NOT updated")
+      );
+      for (const f of failures) console.error(`[republish#${id}]   ${f.step}: ${f.reason}`);
+    }
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
     if (releaseLock) await releaseLock();

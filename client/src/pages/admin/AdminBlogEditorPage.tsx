@@ -14,6 +14,7 @@ import {
   type PostLang,
 } from "@shared/blog";
 import BlogCoverField, { type SavedCover } from "@/components/admin/BlogCoverField";
+import PublishStatus, { publishStatusRefetchInterval } from "@/components/admin/PublishStatus";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -225,6 +226,12 @@ export default function AdminBlogEditorPage() {
     utils.blog.publishStatus.invalidate();
     if (postId) utils.blog.get.invalidate({ id: postId });
   };
+
+  // Publishing from here is where a failed republish matters most, so the
+  // editor reports it too rather than only the post list.
+  const publishStatus = trpc.blog.publishStatus.useQuery(undefined, {
+    refetchInterval: publishStatusRefetchInterval,
+  });
 
   const requestImageUpload = trpc.blog.requestImageUpload.useMutation();
   const create = trpc.blog.create.useMutation();
@@ -447,6 +454,13 @@ export default function AdminBlogEditorPage() {
         <p className="mb-4 rounded-lg border border-border/60 bg-secondary px-4 py-3 text-sm text-foreground">
           {notice}
         </p>
+      )}
+      {(publishStatus.data?.status === "error" ||
+        publishStatus.data?.status === "pending" ||
+        publishStatus.data?.status === "publishing") && (
+        <div className="mb-4">
+          <PublishStatus report={publishStatus.data} showPublished={false} />
+        </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

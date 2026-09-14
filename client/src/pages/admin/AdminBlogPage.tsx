@@ -1,7 +1,8 @@
-import { AlertTriangle, CheckCircle2, Loader2, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { POST_LANG_LABELS, type PostLang } from "@shared/blog";
+import PublishStatus, { publishStatusRefetchInterval } from "@/components/admin/PublishStatus";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -47,10 +48,7 @@ export default function AdminBlogPage() {
   // Same global publish pipeline the media page reports on — an article
   // going live and an image being replaced are the same republish.
   const publishStatus = trpc.blog.publishStatus.useQuery(undefined, {
-    refetchInterval: (query) => {
-      const s = query.state.data?.status;
-      return s === "pending" || s === "publishing" ? 3000 : false;
-    },
+    refetchInterval: publishStatusRefetchInterval,
   });
 
   const remove = trpc.blog.delete.useMutation({
@@ -63,31 +61,13 @@ export default function AdminBlogPage() {
   });
 
   const hasActiveFilters = statusFilter !== "all" || debouncedSearch !== "";
-  const status = publishStatus.data?.status;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6 gap-4">
+      <div className="flex items-start justify-between mb-6 gap-4">
         <h1 className="text-2xl font-bold text-foreground">Blog</h1>
-        <div className="flex items-center gap-4">
-          {(status === "pending" || status === "publishing") && (
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Publishing changes…
-            </span>
-          )}
-          {status === "published" && (
-            <span className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className="w-4 h-4" />
-              Published
-            </span>
-          )}
-          {status === "error" && (
-            <span className="flex items-center gap-2 text-sm text-red-600">
-              <AlertTriangle className="w-4 h-4" />
-              Publish failed: {publishStatus.data?.error ?? "unknown error"}
-            </span>
-          )}
+        <div className="flex items-start gap-4">
+          <PublishStatus report={publishStatus.data} />
           <Link href="/admin/blog/new">
             <Button size="sm" className="gap-2">
               <Plus className="w-4 h-4" />
