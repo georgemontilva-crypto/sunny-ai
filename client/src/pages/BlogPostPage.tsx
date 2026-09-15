@@ -8,7 +8,7 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("es-ES", { year: "numeric", month: "long", day: "numeric" });
+  return new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
 export default function BlogPostPage() {
@@ -21,12 +21,12 @@ export default function BlogPostPage() {
         <Navbar />
         <div className="max-w-3xl mx-auto px-4 pt-32 pb-24 text-center">
           <BookOpen className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-3">Artículo no encontrado</h1>
-          <p className="text-muted-foreground mb-8">El artículo que buscas no existe o fue eliminado.</p>
+          <h1 className="text-2xl font-bold mb-3">Article not found</h1>
+          <p className="text-muted-foreground mb-8">The article you're looking for doesn't exist or has been removed.</p>
           <Link href="/blog">
             <Button variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver al blog
+              Back to blog
             </Button>
           </Link>
         </div>
@@ -45,7 +45,7 @@ export default function BlogPostPage() {
         <div className="mb-8">
           <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" />
-            Volver al blog
+            Back to blog
           </Link>
         </div>
 
@@ -84,7 +84,7 @@ export default function BlogPostPage() {
             </span>
             <span className="flex items-center gap-1.5">
               <Clock className="w-4 h-4" />
-              {post.readingTimeMinutes} min de lectura
+              {post.readingTimeMinutes} min read
             </span>
           </div>
         </header>
@@ -92,12 +92,12 @@ export default function BlogPostPage() {
         <div className={POST_PROSE_CLASSNAME}>{renderMarkdown(post.content)}</div>
 
         <div className="mt-16 rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
-          <h3 className="text-xl font-bold mb-3">¿Tienes preguntas sobre un compuesto?</h3>
+          <h3 className="text-xl font-bold mb-3">Questions about a compound?</h3>
           <p className="text-muted-foreground mb-6 text-sm">
-            Escríbenos y te ayudamos a encontrar la literatura relevante para tu investigación.
+            Get in touch and we'll help you find the research relevant to your work.
           </p>
           <Link href="/contact">
-            <Button className="font-semibold">Hablar con Sunny</Button>
+            <Button className="font-semibold">Talk to Sunny</Button>
           </Link>
         </div>
       </article>

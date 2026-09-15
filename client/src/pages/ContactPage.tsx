@@ -9,9 +9,9 @@ export default function ContactPage() {
       <div className="pt-16" />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pt-8 pb-0">
         <nav className="flex items-center gap-2 text-xs text-muted-foreground" aria-label="Breadcrumb">
-          <a href="/" className="hover:text-foreground transition-colors">Inicio</a>
+          <a href="/" className="hover:text-foreground transition-colors">Home</a>
           <span>/</span>
-          <span className="text-foreground font-medium">Contacto</span>
+          <span className="text-foreground font-medium">Contact</span>
         </nav>
       </div>
       <Contact />

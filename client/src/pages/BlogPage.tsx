@@ -7,7 +7,7 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("es-ES", {
+  return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -69,11 +69,11 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" />
-                  {post.readingTimeMinutes} min de lectura
+                  {post.readingTimeMinutes} min read
                 </span>
               </div>
               <span className="text-xs text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                Leer más <ArrowRight className="w-3 h-3" />
+                Read more <ArrowRight className="w-3 h-3" />
               </span>
             </div>
           </div>
@@ -94,13 +94,13 @@ export default function BlogPage() {
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
           <Badge variant="outline" className="mb-6 text-primary border-primary/30 bg-primary/5 px-4 py-1.5">
             <Rss className="w-3.5 h-3.5 mr-2" />
-            Blog de Sunny
+            Sunny Blog
           </Badge>
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-6 max-w-3xl mx-auto">
-            Investigación sobre péptidos
+            Peptide Research
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Artículos educativos sobre compuestos, evidencia disponible y cómo leer el panorama de investigación.
+            Educational articles on compounds, the available evidence, and how to read the research landscape.
           </p>
         </motion.div>
       </section>
@@ -110,8 +110,8 @@ export default function BlogPage() {
           {posts.length === 0 ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-24">
               <BookOpen className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Próximamente</h3>
-              <p className="text-muted-foreground">Estamos preparando nuevos artículos.</p>
+              <h3 className="text-xl font-semibold mb-2">Coming soon</h3>
+              <p className="text-muted-foreground">We're working on new articles.</p>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
