@@ -27,6 +27,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { authRoutes } from "./authRoutes.ts";
 import { memberAuthRoutes } from "./memberAuthRoutes.ts";
 import { publicRoutes } from "./publicRoutes.ts";
+import { startPublishScheduler } from "./publishScheduler.ts";
 import { republishIfGeneratedMapsAreEmpty } from "./republish.ts";
 import { appRouter } from "./routers/_app.ts";
 import { createContext } from "./trpc.ts";
@@ -170,4 +171,7 @@ app.listen(PORT, () => {
   // the "listening" log always lands first — see republishIfGeneratedMapsAreEmpty
   // for why this check exists and why it's safe to run unconditionally.
   republishIfGeneratedMapsAreEmpty();
+  // Scheduled posts. Its own first pass is delayed, so it never competes
+  // with the check above for the same republish lock at boot.
+  startPublishScheduler();
 });

@@ -36,6 +36,11 @@ interface FormState {
   lang: PostLang;
   metaTitle: string;
   metaDescription: string;
+  // The value of a <input type="datetime-local">: "YYYY-MM-DDTHH:mm" in the
+  // browser's own time zone, or "" for not scheduled. Kept in this shape
+  // rather than as a Date because it IS what the input holds — converting
+  // on every keystroke is what makes these fields fight the person typing.
+  scheduledAtLocal: string;
 }
 
 const EMPTY_FORM: FormState = {
@@ -48,7 +53,33 @@ const EMPTY_FORM: FormState = {
   lang: "en",
   metaTitle: "",
   metaDescription: "",
+  scheduledAtLocal: "",
 };
+
+// This router has no transformer, so a timestamp arrives as an ISO string
+// even though the types call it a Date.
+function toLocalInputValue(value: string | Date | null): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+// The input's value is read as local time, which is what the author meant:
+// they typed the hour they want to see on their own clock. The server
+// stores the resulting instant in UTC like everything else.
+function fromLocalInputValue(value: string): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function formatScheduled(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString(undefined, { dateStyle: "full", timeStyle: "short" });
+}
 
 function formFromRow(row: PostRow): FormState {
   return {
@@ -61,6 +92,7 @@ function formFromRow(row: PostRow): FormState {
     lang: (POST_LANGS as readonly string[]).includes(row.lang) ? (row.lang as PostLang) : "en",
     metaTitle: row.metaTitle ?? "",
     metaDescription: row.metaDescription ?? "",
+    scheduledAtLocal: toLocalInputValue(row.scheduledAt),
   };
 }
 
@@ -188,6 +220,10 @@ export default function AdminBlogEditorPage() {
 
   const status = existing.data?.status ?? "draft";
   const isPublished = status === "published";
+  // The schedule as SAVED, not as typed. The badge and the notice below
+  // describe what the server will actually do, which is only true of a
+  // value that has been saved.
+  const savedSchedule = !isPublished ? (existing.data?.scheduledAt ?? null) : null;
   const savedCover: SavedCover | null = existing.data?.coverKey
     ? {
         url: existing.data.coverUrl,
@@ -278,9 +314,15 @@ export default function AdminBlogEditorPage() {
           ? { action: "remove" as const }
           : { action: "keep" as const };
 
+      // scheduledAtLocal is the input's string; the server takes an
+      // instant. A published post never carries a schedule, so the field
+      // isn't shown and nothing is sent.
+      const { scheduledAtLocal, ...fields } = form;
+      const scheduledAt = isPublished ? null : fromLocalInputValue(scheduledAtLocal);
+
       const row = isNew
-        ? await create.mutateAsync({ ...form, cover, images })
-        : await update.mutateAsync({ ...form, cover, images, id: postId! });
+        ? await create.mutateAsync({ ...fields, scheduledAt, cover, images })
+        : await update.mutateAsync({ ...fields, scheduledAt, cover, images, id: postId! });
 
       utils.blog.get.setData({ id: row.id }, row);
       loadRow(row);
@@ -303,7 +345,17 @@ export default function AdminBlogEditorPage() {
       navigate(`/admin/blog/${id}`, { replace: true });
       return;
     }
-    setNotice(isPublished ? "Changes saved and published." : "Draft saved. Nothing public has changed.");
+    if (isPublished) {
+      setNotice("Changes saved and published.");
+    } else if (form.scheduledAtLocal) {
+      setNotice(
+        new Date(form.scheduledAtLocal).getTime() <= Date.now()
+          ? "Saved. The scheduled time has passed, so it publishes within a minute."
+          : `Saved. It publishes on its own on ${formatScheduled(form.scheduledAtLocal)}.`
+      );
+    } else {
+      setNotice("Draft saved. Nothing public has changed.");
+    }
   };
 
   const handlePublish = async () => {
@@ -414,7 +466,9 @@ export default function AdminBlogEditorPage() {
               {isNew ? "New post" : form.title || "Untitled"}
             </h1>
             {!isNew && (
-              <Badge variant={isPublished ? "default" : "secondary"}>{isPublished ? "Published" : "Draft"}</Badge>
+              <Badge variant={isPublished ? "default" : "secondary"}>
+                {isPublished ? "Published" : savedSchedule ? "Scheduled" : "Draft"}
+              </Badge>
             )}
             {isDirty && <span className="text-xs text-muted-foreground">Unsaved changes</span>}
           </div>
@@ -516,6 +570,45 @@ export default function AdminBlogEditorPage() {
                 </Select>
               </Field>
             </div>
+
+            {/* Only on a draft: a published article has nothing left to
+            schedule, and showing a date box on one would suggest it could
+            be un-published and re-published on a timer, which it can't. */}
+            {!isPublished && (
+              <div className="mt-4">
+                <Field
+                  label="Publish automatically"
+                  hint="Leave empty to publish by hand. The time is yours — whatever your computer's clock shows."
+                >
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="datetime-local"
+                      value={form.scheduledAtLocal}
+                      onChange={(e) => set("scheduledAtLocal", e.target.value)}
+                      className="w-auto"
+                    />
+                    {form.scheduledAtLocal && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => set("scheduledAtLocal", "")}
+                        className="text-muted-foreground"
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                </Field>
+                {form.scheduledAtLocal && (
+                  <p className="text-xs text-muted-foreground mt-1.5">
+                    {new Date(form.scheduledAtLocal).getTime() <= Date.now()
+                      ? `That time has already passed — saving this will publish the article within a minute, dated ${formatScheduled(form.scheduledAtLocal)}.`
+                      : `Goes live on ${formatScheduled(form.scheduledAtLocal)}. Save for it to take effect.`}
+                  </p>
+                )}
+              </div>
+            )}
           </Card>
 
           <Card className="p-5">

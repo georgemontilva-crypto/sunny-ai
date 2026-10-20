@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { TRPCError } from "@trpc/server";
-import { and, desc, eq, like, ne, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, like, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { PENDING_IMAGE_TOKEN_RE, POST_LANGS } from "../../shared/blog.ts";
 import { writeAudit } from "../auditLog.ts";
@@ -63,6 +63,14 @@ const postInput = z.object({
   lang: z.enum(POST_LANGS),
   metaTitle: optionalText(300),
   metaDescription: optionalText(500),
+  // When to publish this draft automatically, as an ISO instant; null means
+  // "not scheduled". There's no transformer on this router, so a Date
+  // crosses the wire as a string and coerce turns it back.
+  //
+  // A past date is accepted on purpose: it means "publish on the next
+  // check", which is how you'd backfill an article that should already have
+  // been out. The scheduler stamps it with the date given, not with today.
+  scheduledAt: z.coerce.date().nullable(),
 });
 
 type PostInput = z.infer<typeof postInput>;
@@ -84,6 +92,7 @@ function columnsFromInput(input: PostInput) {
     lang: input.lang,
     metaTitle: emptyToNull(input.metaTitle),
     metaDescription: emptyToNull(input.metaDescription),
+    scheduledAt: input.scheduledAt,
   };
 }
 
@@ -161,14 +170,22 @@ export const blogRouter = router({
     .input(
       z
         .object({
-          status: z.enum(["draft", "published"]).optional(),
+          // "scheduled" is not a stored status — it's a draft with a date
+          // on it. It gets its own filter because otherwise a scheduled
+          // post is indistinguishable from an ordinary draft in a long
+          // list, which is exactly when you want to find it.
+          status: z.enum(["draft", "published", "scheduled"]).optional(),
           search: z.string().trim().max(200).optional(),
         })
         .optional()
     )
     .query(({ ctx, input }) => {
       const conditions = [];
-      if (input?.status) conditions.push(eq(posts.status, input.status));
+      if (input?.status === "scheduled") {
+        conditions.push(eq(posts.status, "draft"), isNotNull(posts.scheduledAt));
+      } else if (input?.status) {
+        conditions.push(eq(posts.status, input.status));
+      }
       if (input?.search) {
         // Title-only, as specified. LIKE with the wildcards on both sides
         // can't use the index, but this table is small by nature (articles,
@@ -187,6 +204,7 @@ export const blogRouter = router({
           status: posts.status,
           lang: posts.lang,
           publishedAt: posts.publishedAt,
+          scheduledAt: posts.scheduledAt,
           updatedAt: posts.updatedAt,
           createdAt: posts.createdAt,
         })
@@ -275,6 +293,11 @@ export const blogRouter = router({
               ...columnsFromInput(input),
               content: stored.content,
               ...coverColumns(input, existing, stored.cover),
+              // A published post is never scheduled — see the column's note
+              // in schema.ts. The editor hides the field once a post is
+              // live, but the invariant is kept here, where it can't be
+              // bypassed by a client that sends the field anyway.
+              ...(existing.status === "published" ? { scheduledAt: null } : {}),
             })
             .where(eq(posts.id, input.id));
         } catch (err) {
@@ -320,7 +343,12 @@ export const blogRouter = router({
     // and it's what lets scripts/migrate-blog-to-db.ts carry the old MDX
     // frontmatter dates across.
     const publishedAt = existing.publishedAt ?? new Date();
-    await ctx.db.update(posts).set({ status: "published", publishedAt }).where(eq(posts.id, input.id));
+    // Publishing by hand cancels any pending schedule: the post is already
+    // out, so the instruction has nothing left to do.
+    await ctx.db
+      .update(posts)
+      .set({ status: "published", publishedAt, scheduledAt: null })
+      .where(eq(posts.id, input.id));
 
     await writeAudit(ctx.db, {
       userId: ctx.session.userId,
@@ -342,7 +370,11 @@ export const blogRouter = router({
     const [existing] = await ctx.db.select().from(posts).where(eq(posts.id, input.id));
     if (!existing) throw new TRPCError({ code: "NOT_FOUND" });
 
-    await ctx.db.update(posts).set({ status: "draft" }).where(eq(posts.id, input.id));
+    // scheduledAt is already NULL on a published post, but it is set
+    // explicitly here too: taking an article down and having it reappear by
+    // itself a minute later would be the worst failure this feature could
+    // have, and this line is what makes it impossible.
+    await ctx.db.update(posts).set({ status: "draft", scheduledAt: null }).where(eq(posts.id, input.id));
 
     await writeAudit(ctx.db, {
       userId: ctx.session.userId,

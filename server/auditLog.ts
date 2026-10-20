@@ -4,7 +4,9 @@ import { auditLog } from "./schema.ts";
 
 export function writeAudit(
   db: Db,
-  entry: { userId: string; action: string; entity?: string; detail?: unknown }
+  // userId is null for anything the server does on its own — the scheduled
+  // publisher is the only one today. The column is nullable for this.
+  entry: { userId: string | null; action: string; entity?: string; detail?: unknown }
 ): Promise<unknown> {
   return db.insert(auditLog).values({
     id: randomUUID(),

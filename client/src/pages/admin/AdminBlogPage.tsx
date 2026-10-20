@@ -41,7 +41,7 @@ export default function AdminBlogPage() {
   }, [searchInput]);
 
   const { data, isLoading, isError, refetch } = trpc.blog.list.useQuery({
-    status: statusFilter === "all" ? undefined : (statusFilter as "draft" | "published"),
+    status: statusFilter === "all" ? undefined : (statusFilter as "draft" | "published" | "scheduled"),
     search: debouncedSearch || undefined,
   });
 
@@ -85,6 +85,7 @@ export default function AdminBlogPage() {
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
             <SelectItem value="published">Published</SelectItem>
           </SelectContent>
         </Select>
@@ -154,7 +155,7 @@ export default function AdminBlogPage() {
                   <TableCell className="text-muted-foreground">{row.category || "—"}</TableCell>
                   <TableCell>
                     <Badge variant={row.status === "published" ? "default" : "secondary"}>
-                      {row.status === "published" ? "Published" : "Draft"}
+                      {row.status === "published" ? "Published" : row.scheduledAt ? "Scheduled" : "Draft"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
@@ -164,7 +165,11 @@ export default function AdminBlogPage() {
                     {/* Published posts are dated by their publication day;
                     a draft has never had one, so it shows when it was last
                     edited instead — the same value the list is sorted by. */}
-                    {row.publishedAt ? formatDate(row.publishedAt) : `Edited ${formatDate(row.updatedAt)}`}
+                    {row.publishedAt
+                      ? formatDate(row.publishedAt)
+                      : row.scheduledAt
+                        ? `Goes live ${formatDate(row.scheduledAt)}`
+                        : `Edited ${formatDate(row.updatedAt)}`}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap">
                     <Link href={`/admin/blog/${row.id}`}>

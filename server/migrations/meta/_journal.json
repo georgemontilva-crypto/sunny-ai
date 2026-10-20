@@ -50,6 +50,13 @@
       "when": 1789415729323,
       "tag": "0006_blog_cover_upload",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1792463546894,
+      "tag": "0007_blog_scheduled_publishing",
+      "breakpoints": true
     }
   ]
 }

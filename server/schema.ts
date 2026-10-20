@@ -156,6 +156,13 @@ export const posts = mysqlTable(
     status: varchar("status", { length: 20 }).notNull().default("draft"), // 'draft' | 'published'
     lang: varchar("lang", { length: 5 }).notNull().default("en"),
     publishedAt: timestamp("published_at"),
+    // When set on a DRAFT, server/publishScheduler.ts publishes the post at
+    // this instant and clears the column. Always NULL on a published post:
+    // the column is a pending instruction, not a record of one — keeping it
+    // after the fact would make "is this scheduled?" ambiguous, and a
+    // post that was unpublished by hand would silently republish itself.
+    // Stored in UTC like every other timestamp here; the editor converts.
+    scheduledAt: timestamp("scheduled_at"),
     updatedAt: timestamp("updated_at").notNull().defaultNow().onUpdateNow(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     authorId: varchar("author_id", { length: 36 }).references(() => users.id),
@@ -168,6 +175,9 @@ export const posts = mysqlTable(
     // "published, newest first" query generate-blog-map.ts runs.
     index("posts_status_published_at_idx").on(table.status, table.publishedAt),
     index("posts_slug_idx").on(table.slug),
+    // The scheduler's only query: drafts whose time has come. It runs every
+    // minute forever, so it gets an index even though the table is small.
+    index("posts_status_scheduled_at_idx").on(table.status, table.scheduledAt),
   ]
 );
 
